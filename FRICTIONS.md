@@ -132,4 +132,6 @@ Specify compilerOption '"ignoreDeprecations": "6.0"' to silence this error.
 
 Vérifié par `tsc --noEmit` sur un projet réellement scaffoldé, contenant un import par alias, sous TypeScript 5.9 puis sous 7.0.2. Aucune erreur dans les deux cas.
 
+**En marge, une contrainte à connaître.** En vérifiant sous TypeScript 7, le lint s'est mis à échouer avec un code de sortie 2, celui d'une erreur fatale de configuration et non d'une violation. Le message est sans ambiguïté : `typescript-eslint does not support TS 7.0`. Le `tsconfig.json` généré est donc valide sous TypeScript 5, 6 et 7, mais la chaîne de lint, elle, ne suit pas encore. C'est la raison pour laquelle le template continue d'épingler `typescript@^5.7.0`. Ce pin est délibéré, pas un oubli.
+
 **La leçon.** Une option de configuration héritée survit longtemps après être devenue inutile, parce que rien ne la remet en cause tant que tout compile. Ici, c'est l'usage sur un vrai projet qui l'a fait apparaître, pas la chaîne de vérification : celle-ci utilisait une version de TypeScript qui ne signalait rien encore. Un outillage qui n'est testé que sur les versions qu'il épingle ne voit pas venir ce que ses utilisateurs voient déjà.
