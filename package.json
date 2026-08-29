@@ -1,0 +1,25 @@
+{
+  "name": "maedow-arch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Maedow Arch — standard d'architecture logicielle : corpus documentaire, site de documentation et outillage npm",
+  "type": "module",
+  "license": "MIT",
+  "author": "Jean-Marc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maedow-arch/maedow-arch-docs"
+  },
+  "scripts": {
+    "test:boundaries": "node packages/eslint-config-maedow-arch/test/run.mjs",
+    "site:dev": "npm --prefix site run dev",
+    "site:build": "npm --prefix site run build"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.0",
+    "eslint-import-resolver-typescript": "^4.4.5",
+    "eslint-plugin-boundaries": "^7.2.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.68.0"
+  }
+}

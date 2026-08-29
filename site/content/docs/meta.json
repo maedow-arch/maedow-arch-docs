@@ -1,0 +1,9 @@
+{
+  "title": "Documentation",
+  "pages": [
+    "index",
+    "architecture",
+    "models",
+    "conventions"
+  ]
+}

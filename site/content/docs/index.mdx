@@ -1,0 +1,79 @@
+---
+title: Introduction & Manifeste
+description: Maedow Arch en bref — pourquoi ce standard existe, et par où commencer.
+---
+
+Maedow Arch définit un standard d'ingénierie logicielle universel, modulaire et découplé, pour les applications web et fullstack modernes (TypeScript, React, Next.js).
+
+## Démarrage
+
+```bash
+npx create-maedow-arch-app mon-projet
+cd mon-projet
+npm install
+npm run dev
+```
+
+Le projet généré porte déjà la structure complète (`app/ → features/ → core/ → lib/`), le Result Pattern avec ses helpers, et les générateurs :
+
+```bash
+npm run generate:domain billing
+npm run generate:feature checkout
+```
+
+Les frontières entre couches ne reposent pas sur la discipline — elles sont vérifiées au lint :
+
+```bash
+npm run lint
+```
+
+```
+Maedow Arch : core ne peut pas importer components. Voir architecture.md §6.
+```
+
+## Les trois piliers
+
+<Cards>
+  <Card
+    title="Blueprint & 4 Couches"
+    href="/docs/architecture"
+    description="La structure en couches, l'agnosticisme de l'infrastructure, les frontières outillées et les modes Light / Full."
+  />
+  <Card
+    title="Modélisation & Séparation du JSX"
+    href="/docs/models"
+    description="La règle « Zéro Modèle dans le JSX », la typologie des 5 formes de données et le pragmatisme typé."
+  />
+  <Card
+    title="Conventions & Standards"
+    href="/docs/conventions"
+    description="TypeScript strict, Result Pattern et ses helpers, sécurité et scaffolding."
+  />
+</Cards>
+
+## Pourquoi ce standard
+
+Les frameworks modernes encouragent la co-localisation rapide : requêtes brutes au milieu du JSX, types redéfinis à la volée, dépendances circulaires non contrôlées. On prototype vite, puis la dette devient exponentielle :
+
+- Impossible de tester les règles métier sans monter de faux arbres React.
+- Couplage dur à une base de données ou un fournisseur d'authentification.
+- Érosion du code dès que plusieurs développeurs collaborent.
+
+Maedow Arch applique les principes de la *Clean Architecture* et des *Ports & Adapters*, optimisés pour TypeScript.
+
+Sans verser dans l'excès inverse : la **Règle de Lazy Abstraction** interdit d'introduire contrats et adapters avant qu'une deuxième implémentation réelle existe, et le **Mode Light** assume qu'un site vitrine n'a pas besoin des quatre couches.
+
+## Outillage
+
+<Cards>
+  <Card
+    title="create-maedow-arch-app"
+    href="https://www.npmjs.com/package/create-maedow-arch-app"
+    description="La CLI de scaffolding — un projet Maedow Arch complet en une commande."
+  />
+  <Card
+    title="eslint-config-maedow-arch"
+    href="https://www.npmjs.com/package/eslint-config-maedow-arch"
+    description="Les frontières app / features / core / components / lib, appliquées par ESLint."
+  />
+</Cards>

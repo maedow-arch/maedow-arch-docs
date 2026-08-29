@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/purple.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/*
+ * Trame de points discrète, reprise de la maquette de référence.
+ * Elle habille l'en-tête de la page d'accueil et le pied de page sans
+ * concurrencer le texte : opacité faible, et elle s'efface en thème sombre.
+ */
+.maedow-dots {
+  background-image: radial-gradient(
+    circle at center,
+    var(--color-fd-border) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}
+
+/* Le contenu prime : la trame s'estompe vers le bas. */
+.maedow-dots-fade {
+  mask-image: linear-gradient(to bottom, black, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+}

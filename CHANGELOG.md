@@ -1,0 +1,48 @@
+# Changelog
+
+Toutes les évolutions notables de Maedow Arch — le corpus documentaire, le site et l'outillage.
+
+Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le versionnage suit [SemVer](https://semver.org/lang/fr/).
+
+Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
+
+## [Non publié]
+
+### Ajouté
+
+**Corpus**
+- **Règle de Lazy Abstraction** (`architecture.md` §4) : un `contract.ts` et ses adapters ne s'introduisent qu'à la deuxième implémentation réelle.
+- **Règle de dégradation de `features/_shared/`** (`architecture.md` §5.1) : garde-fou anti fourre-tout.
+- **Mode Light vs Mode Full** (`architecture.md` §9) : deux profils explicites et une règle de bascule progressive.
+- **Helpers du Result Pattern** (`conventions.md` §4.1) : `unwrapOr`, `mapResult`, `match`.
+
+**Dépôt**
+- Structure monorepo : le corpus à la racine, le site dans `site/`, les deux packages npm dans `packages/`.
+- `LICENSE` (MIT), ce `CHANGELOG.md` et `FRICTIONS.md`.
+- `npm run test:boundaries` — test de non-régression des frontières, avec une fixture valide **et** une fixture invalide de 5 imports interdits.
+
+**Outillage**
+- `create-maedow-arch-app` : le template porte désormais `layout.tsx`, `page.tsx`, `eslint.config.mjs`, `next.config.mjs`, `vitest.config.ts` et un `.gitignore`.
+- `create-maedow-arch-app` : validation du nom de projet, et `README.md` (la page affichée sur npmjs.com, jusqu'ici absente).
+- `eslint-config-maedow-arch` : message d'erreur explicite — `Maedow Arch : core ne peut pas importer components. Voir architecture.md §6.`
+
+**Site**
+- `site/scripts/sync-docs.mjs` : les pages sont dérivées des `.md` de la racine, en `predev` et `prebuild`.
+- Section d'installation en page d'accueil, avec commandes copiables.
+- Recherche, page 404, favicon, image OpenGraph, pied de page.
+
+### Modifié
+- Rebranding « Architecture Maedow » → **Maedow Arch** sur l'ensemble du corpus, du site et de l'outillage.
+- `eslint-config-maedow-arch` : `eslint-import-resolver-typescript` devient une peerDependency **obligatoire**, et `eslint-plugin-boundaries` passe à `>=7`.
+- `create-maedow-arch-app` : `zod` passe de `devDependencies` à `dependencies` — le code généré l'importe à l'exécution.
+- Les paquets `fumadocs-*` du site sont épinglés à des versions exactes.
+
+### Corrigé
+- **Les frontières ESLint ne se déclenchaient jamais** (F-001) : les patterns ciblaient la racine alors que le template génère dans `src/`, et sans résolveur TypeScript toute dépendance `.ts`/`.tsx` était classée « unknown ». Le lint passait au vert sans rien vérifier.
+- **`features/_shared` était classé comme une feature ordinaire** (F-002) : ordre de déclaration des éléments inversé — le premier pattern qui matche gagne.
+- **Un projet fraîchement scaffoldé ne démarrait pas** (F-003) : `next`, `react`, `react-dom` et `eslint` manquaient au template, et `src/app/` était vide.
+- **Le `.gitignore` du template aurait disparu du paquet publié** (F-004) : npm exclut ce nom de fichier. Livré sous `_gitignore`, renommé à la génération.
+- **Le site servait une documentation tronquée** (F-005) : les `.mdx` copiés à la main avaient perdu de 23 % à 45 % de leur contenu et portaient encore l'ancienne marque.
+- **Le site ne buildait pas** (F-006) : `fumadocs-mdx` et `fumadocs-core` avaient dérivé sous leurs plages `^` jusqu'à des formes de `source` incompatibles.
+- `architecture.md` : ancre de conversion parasite sous le titre §9, et renvoi vers `conventions.md` §7 au lieu de §4.1.
+- Les 4 références à l'ancien dépôt `Jean-Marc18/maedow-docs` pointent vers `maedow-arch/maedow-arch-docs`.

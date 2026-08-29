@@ -1,0 +1,39 @@
+{
+  "name": "create-maedow-arch-app",
+  "version": "0.1.0",
+  "description": "Scaffold un projet suivant Maedow Arch (app/features/core/components/lib, Result Pattern, ESLint boundaries)",
+  "type": "module",
+  "bin": {
+    "create-maedow-arch-app": "./bin/create-maedow-arch-app.mjs"
+  },
+  "files": [
+    "bin",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "maedow-arch",
+    "architecture",
+    "scaffold",
+    "cli",
+    "boilerplate",
+    "nextjs",
+    "clean-architecture",
+    "typescript"
+  ],
+  "license": "MIT",
+  "author": "Jean-Marc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maedow-arch/maedow-arch-docs.git",
+    "directory": "packages/create-maedow-arch-app"
+  },
+  "homepage": "https://github.com/maedow-arch/maedow-arch-docs#readme",
+  "bugs": {
+    "url": "https://github.com/maedow-arch/maedow-arch-docs/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

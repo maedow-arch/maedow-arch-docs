@@ -1,0 +1,35 @@
+{
+  "name": "maedow-arch-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site de documentation de Maedow Arch (Next.js + Fumadocs)",
+  "scripts": {
+    "sync": "node scripts/sync-docs.mjs",
+    "predev": "npm run sync",
+    "dev": "next dev",
+    "prebuild": "npm run sync",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "fumadocs-core": "15.8.5",
+    "fumadocs-mdx": "11.10.1",
+    "fumadocs-ui": "15.8.5",
+    "lucide-react": "^1.16.0",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "eslint-config-maedow-arch",
+  "version": "0.1.0",
+  "description": "Règles ESLint de Maedow Arch — enforce les frontières app/features/core/components/lib via eslint-plugin-boundaries",
+  "main": "index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  },
+  "keywords": [
+    "eslint",
+    "eslintconfig",
+    "maedow-arch",
+    "architecture",
+    "boundaries",
+    "clean-architecture",
+    "typescript"
+  ],
+  "license": "MIT",
+  "author": "Jean-Marc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maedow-arch/maedow-arch-docs.git",
+    "directory": "packages/eslint-config-maedow-arch"
+  },
+  "homepage": "https://github.com/maedow-arch/maedow-arch-docs#readme",
+  "bugs": {
+    "url": "https://github.com/maedow-arch/maedow-arch-docs/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "eslint": ">=9",
+    "eslint-import-resolver-typescript": ">=4",
+    "eslint-plugin-boundaries": ">=7"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ]
+}

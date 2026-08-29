@@ -1,0 +1,32 @@
+# Dépendances
+node_modules
+
+# Build Next.js / Fumadocs
+.next
+out
+build
+.source
+*.tsbuildinfo
+next-env.d.ts
+
+# Déploiement
+.vercel
+
+# Environnement
+.env*.local
+*.pem
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Scratch de test des packages
+/tmp-scaffold
+
+# Références visuelles de travail — captures de sites tiers, hors dépôt public
+/inspirations
