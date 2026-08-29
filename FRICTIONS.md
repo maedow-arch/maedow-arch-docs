@@ -114,3 +114,22 @@ integration first.
 **Ce qu'on en a fait.** Installation de l'App sur l'organisation, puis création du projet avec `site/` comme répertoire racine et le déploiement continu sur `main`.
 
 **La leçon.** Après un transfert de dépôt vers une organisation, toutes les intégrations tierces sont à réautoriser. Le dépôt est identique, ses autorisations ne le sont plus.
+
+---
+
+## F-009 : `baseUrl` déprécié, remonté par un vrai projet
+
+**Symptôme.** Sur un projet généré par la CLI, l'éditeur signale une erreur dans `tsconfig.json` :
+
+```
+Option 'baseUrl' is deprecated and will stop functioning in TypeScript 7.0.
+Specify compilerOption '"ignoreDeprecations": "6.0"' to silence this error.
+```
+
+**Cause.** Le template déclarait `"baseUrl": "."` en plus de `"paths"`. C'était nécessaire avant TypeScript 4.1, plus depuis. TypeScript 6 déprécie l'option et la 7 la supprimera. La version installée dans le projet importe peu, puisque l'éditeur analyse avec la sienne : l'alerte apparaît dès que l'environnement de développement est à jour.
+
+**Ce qu'on en a fait.** `baseUrl` a été retiré du template et des deux fixtures de test. Une seconde correction s'est imposée dans la foulée : sans `baseUrl`, les substitutions de `paths` doivent être relatives. Le compilateur est explicite sur ce point, `Non-relative paths are not allowed when 'baseUrl' is not set`. L'alias est donc devenu `"@/*": ["./src/*"]`.
+
+Vérifié par `tsc --noEmit` sur un projet réellement scaffoldé, contenant un import par alias, sous TypeScript 5.9 puis sous 7.0.2. Aucune erreur dans les deux cas.
+
+**La leçon.** Une option de configuration héritée survit longtemps après être devenue inutile, parce que rien ne la remet en cause tant que tout compile. Ici, c'est l'usage sur un vrai projet qui l'a fait apparaître, pas la chaîne de vérification : celle-ci utilisait une version de TypeScript qui ne signalait rien encore. Un outillage qui n'est testé que sur les versions qu'il épingle ne voit pas venir ce que ses utilisateurs voient déjà.

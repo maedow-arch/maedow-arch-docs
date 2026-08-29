@@ -6,6 +6,13 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [0.1.2] : 2026-08-29
+
+### Corrigé
+
+- **`baseUrl` déprécié dans le `tsconfig.json` généré** (F-009). L'option est inutile depuis TypeScript 4.1 quand on utilise `paths`, dépréciée en 6.0 et supprimée en 7.0. Elle a été retirée du template et des fixtures de test.
+- Conséquence de la correction précédente : sans `baseUrl`, les substitutions de `paths` doivent être relatives. L'alias devient `"@/*": ["./src/*"]`. Vérifié par `tsc --noEmit` sous TypeScript 5.9 et 7.0.2.
+
 ## [0.1.1] : 2026-08-29
 
 ### Modifié
