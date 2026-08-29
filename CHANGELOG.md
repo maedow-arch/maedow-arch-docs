@@ -6,6 +6,17 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [0.1.1] : 2026-08-29
+
+### Modifié
+
+- Réécriture éditoriale de l'ensemble des textes. Le tiret cadratin servait de raccourci pour accoler une glose à une phrase déjà finie : chaque occurrence a été reprise avec la ponctuation qui convient au sens. Cela concerne les README publiés sur npm, d'où cette version.
+- `eslint-config-maedow-arch` : description du package reformulée.
+
+### Corrigé
+
+- La description du frontmatter de la page d'accueil de la documentation contenait un deux-points non échappé, ce qui cassait le parsing YAML et donc le build du site.
+
 ## [0.1.0] : 2026-08-29
 
 Première publication. `create-maedow-arch-app` et `eslint-config-maedow-arch` sont disponibles sur npm, et la documentation est en ligne sur https://maedow-arch-docs.vercel.app.

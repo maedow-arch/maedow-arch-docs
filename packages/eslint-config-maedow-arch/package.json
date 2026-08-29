@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-maedow-arch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Règles ESLint de Maedow Arch. Applique les frontières app/features/core/components/lib au moyen d'eslint-plugin-boundaries",
   "main": "index.js",
   "type": "module",
