@@ -6,7 +6,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
-## [Non publié]
+## [0.1.0] — 2026-08-29
+
+Première publication : `create-maedow-arch-app` et `eslint-config-maedow-arch` sont sur npm, le site est en ligne sur https://maedow-arch-docs.vercel.app.
 
 ### Ajouté
 

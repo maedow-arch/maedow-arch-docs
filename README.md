@@ -2,6 +2,12 @@
 
 Bienvenue dans la documentation officielle de **Maedow Arch**. Ce corpus méthodologique définit un standard d'ingénierie logicielle universel, modulaire et découplé, conçu pour le développement d'applications web et fullstack modernes (TypeScript, React, Next.js, etc.).
 
+**Documentation en ligne : [maedow-arch-docs.vercel.app](https://maedow-arch-docs.vercel.app)**
+
+[![create-maedow-arch-app](https://img.shields.io/npm/v/create-maedow-arch-app?label=create-maedow-arch-app&color=8b5cf6)](https://www.npmjs.com/package/create-maedow-arch-app)
+[![eslint-config-maedow-arch](https://img.shields.io/npm/v/eslint-config-maedow-arch?label=eslint-config-maedow-arch&color=8b5cf6)](https://www.npmjs.com/package/eslint-config-maedow-arch)
+[![licence MIT](https://img.shields.io/badge/licence-MIT-8b5cf6)](./LICENSE)
+
 ---
 
 ## 🚀 Démarrage Rapide

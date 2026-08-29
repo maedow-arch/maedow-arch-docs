@@ -78,3 +78,39 @@ La règle : on écrit ici **à chaud**, pendant qu'on bute. Une friction reconst
 **La leçon.** `npm run build` n'avait jamais été lancé sur ce projet : seul `next dev` l'avait été, et il masquait l'erreur sur les routes non visitées. Un projet dont on n'a jamais produit le build de production n'est pas un projet qui marche.
 
 **Reste à faire.** Migrer vers `fumadocs-core`/`ui` 16.x + `fumadocs-mdx` 15.x, où `loader()` accepte nativement la forme fonction — et retirer le raccord.
+
+---
+
+## F-007 — npm refuse désormais toute publication sans 2FA
+
+**Symptôme.** `npm publish --access public` sur un compte fraîchement créé : `403 Forbidden`.
+
+```
+Two-factor authentication or granular access token with bypass 2fa
+enabled is required to publish packages.
+```
+
+**Cause.** npm a durci sa politique : la publication directe exige la 2FA sur le compte, ou un *granular access token* explicitement autorisé à la contourner. Un compte tout neuf a la 2FA désactivée par défaut — donc publier est impossible tant qu'on ne l'a pas activée.
+
+Une fois la 2FA activée, le refus change de nature : `EOTP`, un code à usage unique est demandé à chaque publication.
+
+**Ce qu'on en a fait.** 2FA activée en `auth-and-writes`, puis publication.
+
+**La leçon.** Créer le compte npm ne suffit pas à pouvoir publier. Pour un projet qui vise une publication automatisée (CI), il faut prévoir dès le départ un *granular access token* limité aux paquets concernés — c'est la seule voie non interactive qui reste ouverte.
+
+---
+
+## F-008 — Vercel ne voit pas un dépôt fraîchement transféré
+
+**Symptôme.** Création du projet Vercel refusée sur `maedow-arch/maedow-arch-docs` :
+
+```
+400 — To link a GitHub repository, you need to install the GitHub
+integration first.
+```
+
+**Cause.** L'App GitHub de Vercel était installée sur le compte personnel, pas sur l'organisation `maedow-arch` créée le jour même. Une App GitHub s'installe par compte ou par organisation : transférer un dépôt ne transfère pas les autorisations.
+
+**Ce qu'on en a fait.** Installation de l'App sur l'organisation, puis création du projet — Root Directory `site/`, déploiement continu sur `main`.
+
+**La leçon.** Après un transfert de dépôt vers une organisation, toutes les intégrations tierces sont à réautoriser. Le dépôt est identique, ses autorisations ne le sont pas.
