@@ -30,3 +30,11 @@ Thumbs.db
 
 # Références visuelles de travail — captures de sites tiers, hors dépôt public
 /inspirations
+
+# Pages dérivées des .md de la racine par site/scripts/sync-docs.mjs.
+# Elles sont régénérées en predev et prebuild : les versionner, c'est
+# rouvrir la porte à la divergence silencieuse (voir FRICTIONS.md, F-005).
+# index.mdx est écrit à la main et reste versionné.
+site/content/docs/architecture.mdx
+site/content/docs/models.mdx
+site/content/docs/conventions.mdx

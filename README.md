@@ -7,6 +7,7 @@ Bienvenue dans la documentation officielle de **Maedow Arch**. Ce corpus méthod
 [![create-maedow-arch-app](https://img.shields.io/npm/v/create-maedow-arch-app?label=create-maedow-arch-app&color=8b5cf6)](https://www.npmjs.com/package/create-maedow-arch-app)
 [![eslint-config-maedow-arch](https://img.shields.io/npm/v/eslint-config-maedow-arch?label=eslint-config-maedow-arch&color=8b5cf6)](https://www.npmjs.com/package/eslint-config-maedow-arch)
 [![licence MIT](https://img.shields.io/badge/licence-MIT-8b5cf6)](./LICENSE)
+[![CI](https://github.com/maedow-arch/maedow-arch-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/maedow-arch/maedow-arch-docs/actions/workflows/ci.yml)
 
 ---
 

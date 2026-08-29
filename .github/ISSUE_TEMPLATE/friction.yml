@@ -1,0 +1,46 @@
+name: Friction rencontrée
+description: Signaler ce qui a résisté en conditions réelles — règle trop stricte, générateur mal aligné, étape manquante.
+title: "[Friction] "
+labels: ["friction"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Les retours d'usage réel sont l'apport le plus utile à ce standard.
+        Décrivez ce qui a coincé, pas ce qui devrait exister en théorie.
+  - type: textarea
+    id: symptome
+    attributes:
+      label: Symptôme
+      description: Qu'avez-vous observé ? Commande lancée, sortie obtenue.
+      placeholder: "npm run lint passe au vert alors que core/ importe une feature."
+    validations:
+      required: true
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Ce que vous attendiez
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Où
+      options:
+        - create-maedow-arch-app (la CLI)
+        - eslint-config-maedow-arch (les frontières)
+        - Le corpus documentaire
+        - Le site de documentation
+        - Autre / je ne sais pas
+    validations:
+      required: true
+  - type: textarea
+    id: contexte
+    attributes:
+      label: Contexte
+      description: Versions, système, structure du projet.
+      value: |
+        - create-maedow-arch-app :
+        - eslint-config-maedow-arch :
+        - Node :
+        - Système :
