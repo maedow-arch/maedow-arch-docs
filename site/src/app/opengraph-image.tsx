@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-export const alt = 'Maedow Arch — Standard modulaire et découplé';
+export const alt = 'Maedow Arch, standard modulaire et découplé';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -32,7 +32,7 @@ export default function OpenGraphImage() {
           Maedow Arch
         </div>
         <div style={{ fontSize: 32, color: '#a8a2b8', marginTop: 20, maxWidth: 900, lineHeight: 1.4 }}>
-          Une architecture qui tient dans le temps — domaine métier isolé,
+          Une architecture qui tient dans le temps. Domaine métier isolé,
           infrastructure interchangeable, frontières vérifiées par le linter.
         </div>
         <div style={{ fontSize: 26, color: '#8b5cf6', marginTop: 44, fontFamily: 'monospace' }}>

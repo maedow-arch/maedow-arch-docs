@@ -36,5 +36,5 @@ writeFileSync(
 console.log(`✅ Domaine "${name}" généré dans ${dir}/`);
 console.log(`   - types.ts`);
 console.log(`   - validation.ts`);
-console.log(`   - service.ts (accès direct — voir la Règle de Lazy Abstraction)`);
+console.log(`   - service.ts (accès direct, voir la Règle de Lazy Abstraction)`);
 console.log(`   Rappel : n'ajoute contract.ts + repository.ts que si un 2ème fournisseur devient réel.`);

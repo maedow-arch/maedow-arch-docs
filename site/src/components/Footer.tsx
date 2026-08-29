@@ -43,7 +43,7 @@ export function Footer() {
             l’infrastructure.
           </p>
           <p className="mt-6 text-xs text-fd-muted-foreground">
-            © {new Date().getFullYear()} Maedow Arch — Licence MIT
+            © {new Date().getFullYear()} Maedow Arch. Licence MIT
           </p>
         </div>
 

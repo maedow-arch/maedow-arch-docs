@@ -6,7 +6,7 @@
  * en `.mdx` pour Fumadocs : il retire le H1 de tête (Fumadocs affiche déjà le
  * titre du frontmatter) et injecte `title` / `description`.
  *
- * Il tourne en `predev` et `prebuild` — donc jamais de copie manuelle, et donc
+ * Il tourne en `predev` et `prebuild`, donc jamais de copie manuelle, et donc
  * plus de risque qu'une page du site soit tronquée ou reste sur une marque
  * périmée pendant que la source, elle, a évolué.
  *

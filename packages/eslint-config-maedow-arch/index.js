@@ -12,13 +12,13 @@ import boundaries from "eslint-plugin-boundaries";
  *
  * ⚠️ Deux points qui font échouer silencieusement une config boundaries :
  *
- * 1. L'ORDRE des éléments compte — le premier pattern qui matche gagne.
+ * 1. L'ORDRE des éléments compte : le premier pattern qui matche l'emporte.
  *    `shared-feature` doit précéder `feature`, sinon `features/_shared/`
  *    serait classé comme une feature ordinaire et sa règle serait morte.
  *
  * 2. La RÉSOLUTION des imports doit connaître TypeScript. Sans résolveur TS,
  *    les imports `.ts`/`.tsx` sont classés « unknown » et AUCUNE règle ne se
- *    déclenche — le lint passe au vert sans rien vérifier. D'où la
+ *    déclenche, et le lint passe au vert sans rien vérifier. D'où la
  *    peerDependency `eslint-import-resolver-typescript`.
  *
  * Les patterns ne sont pas ancrés à la racine : ils matchent le segment

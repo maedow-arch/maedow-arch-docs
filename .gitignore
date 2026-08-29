@@ -28,7 +28,7 @@ Thumbs.db
 # Scratch de test des packages
 /tmp-scaffold
 
-# Références visuelles de travail — captures de sites tiers, hors dépôt public
+# Références visuelles de travail : captures de sites tiers, hors dépôt public
 /inspirations
 
 # Pages dérivées des .md de la racine par site/scripts/sync-docs.mjs.

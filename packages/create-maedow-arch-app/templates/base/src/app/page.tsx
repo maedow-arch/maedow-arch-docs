@@ -5,13 +5,13 @@ export default function HomePage() {
       <p>Projet généré avec Maedow Arch.</p>
       <ol>
         <li>
-          <code>npm run generate:domain &lt;nom&gt;</code> — crée un domaine métier dans <code>src/core/</code>
+          <code>npm run generate:domain &lt;nom&gt;</code> crée un domaine métier dans <code>src/core/</code>
         </li>
         <li>
-          <code>npm run generate:feature &lt;nom&gt;</code> — crée une feature dans <code>src/features/</code>
+          <code>npm run generate:feature &lt;nom&gt;</code> crée une feature dans <code>src/features/</code>
         </li>
         <li>
-          <code>npm run lint</code> — vérifie les frontières architecturales
+          <code>npm run lint</code> vérifie les frontières architecturales
         </li>
       </ol>
     </main>

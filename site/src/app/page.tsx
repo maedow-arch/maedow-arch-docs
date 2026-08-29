@@ -10,12 +10,12 @@ const PILLARS = [
   {
     icon: Layers,
     title: 'Zéro Modèle dans le JSX',
-    body: 'Les types du domaine et la logique métier vivent en TypeScript pur, loin de la couche de rendu — donc testables sans monter d’arbre React.',
+    body: 'Les types du domaine et la logique métier vivent en TypeScript pur, loin de la couche de rendu, donc testables sans monter d’arbre React.',
   },
   {
     icon: Cpu,
     title: 'Agnostique Auth & DB',
-    body: 'Ports & Adapters, introduits au bon moment : la Règle de Lazy Abstraction interdit l’indirection tant qu’une deuxième implémentation n’existe pas.',
+    body: 'Ports et Adapters, introduits au bon moment : la Règle de Lazy Abstraction interdit l’indirection tant qu’une deuxième implémentation n’existe pas.',
   },
   {
     icon: ShieldCheck,
@@ -80,7 +80,7 @@ export default function HomePage() {
           <div className="relative max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-fd-primary/10 text-fd-primary mb-8 border border-fd-primary/20">
               <span className="w-1.5 h-1.5 rounded-full bg-fd-primary" />
-              Standard ouvert — licence MIT
+              Standard ouvert sous licence MIT
             </div>
 
             <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-fd-foreground mb-6 text-balance">

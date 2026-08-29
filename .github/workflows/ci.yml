@@ -60,7 +60,7 @@ jobs:
           npm run lint
           npm run typecheck
           npm run build
-      - name: Test négatif — un import interdit doit faire échouer le lint
+      - name: Test négatif, un import interdit doit faire échouer le lint
         working-directory: demo
         run: |
           cat > src/core/billing/violation.ts <<'EOF'
@@ -68,7 +68,7 @@ jobs:
           export const boom = () => CheckoutScreen();
           EOF
           if npm run lint; then
-            echo "::error::Le lint est passé alors qu'un import interdit était présent — les frontières ne sont pas appliquées."
+            echo "::error::Le lint est passé alors qu'un import interdit était présent. Les frontières ne sont pas appliquées."
             exit 1
           fi
           echo "Violation correctement détectée."

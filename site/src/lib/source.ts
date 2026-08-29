@@ -6,7 +6,7 @@ import { loader, type VirtualFile } from 'fumadocs-core/source';
  * Raccord entre fumadocs-mdx et fumadocs-core.
  *
  * `createMDXSource` (fumadocs-mdx 11.10) renvoie `{ files: () => [...] }` —
- * une fonction — tandis que le `loader()` de fumadocs-core 15.8 fait
+ * une fonction, tandis que le `loader()` de fumadocs-core 15.8 fait
  * `files.map(...)` et attend donc un tableau. Les deux paquets ont dérivé sous
  * leurs plages `^` : c'est ce décalage qui empêchait le site de builder.
  *

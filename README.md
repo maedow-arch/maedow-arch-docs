@@ -82,7 +82,7 @@ export default [...maedowArchConfig];
 
 | Package | Description |
 | :--- | :--- |
-| [`create-maedow-arch-app`](https://www.npmjs.com/package/create-maedow-arch-app) | CLI de scaffolding — génère un projet Maedow Arch complet en une commande. |
+| [`create-maedow-arch-app`](https://www.npmjs.com/package/create-maedow-arch-app) | CLI de scaffolding. Génère un projet Maedow Arch complet en une commande. |
 | [`eslint-config-maedow-arch`](https://www.npmjs.com/package/eslint-config-maedow-arch) | Config ESLint prête à l'emploi qui enforce les frontières `app/features/core/components/lib`. |
 
 ---
@@ -91,14 +91,14 @@ export default [...maedowArchConfig];
 
 ```
 maedow-arch-docs/
-├── architecture.md · models.md · conventions.md   # le corpus — source de vérité
+├── architecture.md · models.md · conventions.md   # le corpus, source de vérité
 ├── site/                                          # le site de documentation (Next.js + Fumadocs)
 └── packages/
     ├── create-maedow-arch-app/                    # la CLI de scaffolding
     └── eslint-config-maedow-arch/                 # les règles de frontières
 ```
 
-Les pages du site sont **dérivées** des `.md` de cette racine par `site/scripts/sync-docs.mjs` — ne modifiez jamais `site/content/docs/*.mdx` à la main.
+Les pages du site sont **dérivées** des `.md` de cette racine par `site/scripts/sync-docs.mjs`. Ne modifiez jamais `site/content/docs/*.mdx` à la main.
 
 ```bash
 npm run test:boundaries   # vérifie que les frontières se déclenchent vraiment
@@ -111,4 +111,4 @@ npm run site:dev          # lance le site en local
 
 Maedow Arch est un standard ouvert, sous licence MIT.
 
-Les retours d'usage réel — frictions rencontrées, cas limites, règles trop strictes ou pas assez — sont l'apport le plus utile. Ils passent par les issues du dépôt, et alimentent [`FRICTIONS.md`](./FRICTIONS.md), le journal de ce qui a résisté en conditions réelles.
+Les retours d'usage réel constituent l'apport le plus utile : frictions rencontrées, cas limites, règles trop strictes ou pas assez. Ils passent par les issues du dépôt et alimentent [`FRICTIONS.md`](./FRICTIONS.md), le journal de ce qui a résisté en conditions réelles.

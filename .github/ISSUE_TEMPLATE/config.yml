@@ -2,4 +2,4 @@ blank_issues_enabled: true
 contact_links:
   - name: Documentation
     url: https://maedow-arch-docs.vercel.app
-    about: Le corpus complet — blueprint, modélisation, conventions.
+    about: Le corpus complet : blueprint, modélisation, conventions.

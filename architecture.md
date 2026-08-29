@@ -244,8 +244,8 @@ La Maedow Arch complète (4 couches, contracts, adapters, générateurs) est con
 | Type de projet | Site vitrine, prototype, MVP jetable, landing page | SaaS, produit avec cycle de vie long, produit multi-clients |
 | Durée de vie prévue | Courte (< 6 mois) ou usage unique | Longue, avec évolutions régulières |
 | Logique métier | Faible ou inexistante | Significative (règles, calculs, transitions d'état) |
-| Structure recommandée | `app/` + `features/` uniquement — logique directement dans la feature, pas de `core/` séparé | Structure complète : `app/ → features/ → core/ → lib/` |
-| Contracts / Adapters | Aucun — accès direct à la donnée | Introduits uniquement via la Règle de Lazy Abstraction (§4) |
+| Structure recommandée | `app/` + `features/` uniquement, avec la logique directement dans la feature et sans `core/` séparé | Structure complète : `app/ → features/ → core/ → lib/` |
+| Contracts / Adapters | Aucun, accès direct à la donnée | Introduits uniquement via la Règle de Lazy Abstraction (§4) |
 | Result Pattern | Optionnel | Recommandé, avec helpers (voir `conventions.md` §4.1) |
 
-**Règle de bascule** : un projet démarré en Mode Light qui gagne en complexité (nouvelle feature qui duplique de la logique, besoin de tester le métier indépendamment de l'UI, montée en charge du produit) doit migrer progressivement vers le Mode Full — domaine par domaine, jamais en un seul refactor global.
+**Règle de bascule** : un projet démarré en Mode Light qui gagne en complexité (nouvelle feature qui duplique de la logique, besoin de tester le métier indépendamment de l'UI, montée en charge du produit) doit migrer progressivement vers le Mode Full, domaine par domaine, jamais en un seul refactor global.

@@ -63,7 +63,7 @@ const fail = (line) => {
 };
 
 // --- 1. La fixture valide doit être silencieuse -------------------------------
-console.log("\n▸ Fixture valid/ — le flux app → features → core → lib est respecté");
+console.log("\n▸ Fixture valid/ : le flux app → features → core → lib est respecté");
 const validProblems = await lint("valid");
 if (validProblems.length === 0) {
   console.log("  ✓ aucune erreur, comme attendu");
@@ -74,7 +74,7 @@ if (validProblems.length === 0) {
 }
 
 // --- 2. La fixture invalide doit lever exactement les violations attendues -----
-console.log("\n▸ Fixture invalid/ — 5 imports interdits, un par fichier");
+console.log("\n▸ Fixture invalid/ : 5 imports interdits, un par fichier");
 const invalidProblems = await lint("invalid");
 
 for (const expected of EXPECTED_VIOLATIONS) {
@@ -85,7 +85,7 @@ for (const expected of EXPECTED_VIOLATIONS) {
       problem.message.includes(`${expected.from} ne peut pas importer ${expected.to}`)
   );
   if (found) {
-    console.log(`  ✓ ${expected.file} — ${expected.from} ⇸ ${expected.to}`);
+    console.log(`  ✓ ${expected.file} : ${expected.from} ⇸ ${expected.to}`);
   } else {
     fail(
       `violation NON détectée dans ${expected.file} (${expected.from} → ${expected.to}). ` +

@@ -1,6 +1,6 @@
 /**
  * Marque de Maedow Arch : quatre barres empilées, de la plus large à la plus
- * étroite — les 4 couches `app → features → core → lib`, et le flux de
+ * étroite : les 4 couches `app → features → core → lib`, et le flux de
  * dépendance qui ne remonte jamais.
  */
 export function Logo({ className = '' }: { className?: string }) {

@@ -11,7 +11,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: {
     template: '%s | Maedow Arch',
-    default: 'Maedow Arch — Standard Modulaire & Découplé',
+    default: 'Maedow Arch, standard modulaire et découplé',
   },
   description:
     'Standard d’architecture logicielle universel, modulaire et agnostique pour applications web et fullstack modernes.',
