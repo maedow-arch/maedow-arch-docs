@@ -178,3 +178,27 @@ packages/eslint-config-maedow-arch/index.js
 **La leçon, et elle en dit long.** Le risque était réel, mon diagnostic de son emplacement était faux. J'avais désigné pnpm parce que son arborescence stricte est réputée fragile sur ce point, et c'est npm, le plus courant, qui trébuchait. Un risque anticipé n'est pas un risque compris : seule la matrice l'a localisé.
 
 C'est aussi F-004 qui revient sous un autre visage. Tester par un lien vers le dépôt et tester par le paquet publié ne sont pas le même test, et c'est la deuxième fois que cette confusion produit un défaut.
+
+---
+
+## F-012 : un contrôle qui ne voyait pas ce qu'il prétendait garantir
+
+**Symptôme.** Après la réécriture éditoriale, j'annonçais zéro tiret cadratin dans le dépôt. Il en restait un, dans un commentaire de `site/src/lib/source.ts`.
+
+**Cause.** Je vérifiais avec `grep " — "`, c'est-à-dire la chaîne entourée d'espaces. L'occurrence survivante se trouvait en fin de ligne, suivie d'un retour à la ligne et non d'une espace. Le motif ne pouvait pas la voir.
+
+**Ce qu'on en a fait.** Le contrôle porte désormais sur le caractère lui-même, `grep "—"`, sans hypothèse sur ce qui l'entoure. La consigne en mémoire persistante a été corrigée dans le même sens.
+
+**La leçon.** Ce n'est pas le résultat qui était faux, c'est la méthode. Un contrôle qui repose sur une hypothèse implicite sur la forme de ce qu'il cherche finit par la démentir. C'est le même mécanisme qu'en F-001 : là un lint vert ne prouvait rien, ici un grep vide ne prouvait rien.
+
+---
+
+## F-013 : deux utilitaires Tailwind de même spécificité, et la bordure disparaît
+
+**Symptôme.** Dans la démonstration Tailwind, le bouton fantôme apparaissait sans bordure, là où la version en CSS natif en montrait une. Le défaut n'était visible qu'à la comparaison des deux captures.
+
+**Cause.** La classe de base posait `border border-transparent`, la variante ajoutait `border-line`. Ces deux utilitaires de couleur de bordure ont la même spécificité : c'est l'ordre du CSS généré qui les départage, pas l'ordre des classes dans la chaîne. Le résultat n'était donc pas celui que la lecture du code laissait attendre.
+
+**Ce qu'on en a fait.** La base ne pose plus que `border`, et chaque variante déclare sa propre couleur. La règle générale : ne jamais poser deux fois la même propriété via des utilitaires, dans une base puis dans une variante.
+
+**La leçon.** Un build vert et un typecheck vert ne disent rien du rendu. Ce défaut n'a été trouvé que parce que le plan exigeait une comparaison visuelle entre les deux variantes.

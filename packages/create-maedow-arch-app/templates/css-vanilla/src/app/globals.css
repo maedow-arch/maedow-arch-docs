@@ -1,0 +1,21 @@
+/*
+ * CSS natif, sans framework.
+ *
+ * Maedow Arch porte sur l'architecture, pas sur la manière de peindre les
+ * pixels. Ce fichier ne pose qu'une base neutre : à vous de l'habiller.
+ */
+
+:root {
+  color-scheme: light dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}

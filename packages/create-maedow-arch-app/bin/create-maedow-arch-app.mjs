@@ -18,8 +18,11 @@ const DOCS_URL = "https://github.com/maedow-arch/maedow-arch-docs";
 
 const MODES = ["full", "light"];
 const TEMPLATES = ["demo", "blank"];
+const STYLES = ["vanilla", "tailwind"];
 const DEFAULT_MODE = "full";
 const DEFAULT_TEMPLATE = "demo";
+const DEFAULT_STYLE = "vanilla";
+const FRAMEWORK = "next";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const templatesDir = join(__dirname, "..", "templates");
@@ -56,6 +59,7 @@ function parseArgs(argv) {
   const positional = [];
   let mode = null;
   let template = null;
+  let style = null;
 
   const take = (value, name) => {
     if (value === undefined) fail(`L'option ${name} attend une valeur.`, usage());
@@ -72,6 +76,14 @@ function parseArgs(argv) {
       template = take(argv[++i], "--template");
     } else if (arg.startsWith("--template=")) {
       template = arg.slice("--template=".length);
+    } else if (arg === "--css" || arg === "-c") {
+      style = take(argv[++i], "--css");
+    } else if (arg.startsWith("--css=")) {
+      style = arg.slice("--css=".length);
+    } else if (arg === "--tailwind") {
+      style = "tailwind";
+    } else if (arg === "--vanilla") {
+      style = "vanilla";
     } else if (arg === "--light") {
       mode = "light";
     } else if (arg === "--full") {
@@ -83,6 +95,7 @@ function parseArgs(argv) {
     } else if (arg === "--yes" || arg === "-y") {
       mode = mode ?? DEFAULT_MODE;
       template = template ?? DEFAULT_TEMPLATE;
+      style = style ?? DEFAULT_STYLE;
     } else if (arg === "--help" || arg === "-h") {
       console.log(usage());
       process.exit(0);
@@ -93,7 +106,7 @@ function parseArgs(argv) {
     }
   }
 
-  return { projectName: positional[0], mode, template };
+  return { projectName: positional[0], mode, template, style };
 }
 
 function usage() {
@@ -103,6 +116,7 @@ function usage() {
     "Options :",
     "  -m, --mode <full|light>       Profil d'architecture. Par défaut : full.",
     "  -t, --template <demo|blank>   Contenu de départ. Par défaut : demo.",
+    "  -c, --css <vanilla|tailwind>  Style. Par défaut : vanilla.",
     "  -y, --yes                     Accepte les valeurs par défaut, sans question.",
     "  -h, --help                    Affiche cette aide.",
     "",
@@ -115,6 +129,10 @@ function usage() {
     "Contenus :",
     "  demo    Un compteur borné, décliné selon le profil choisi.",
     "  blank   L'arborescence et la configuration, sans code d'exemple.",
+    "",
+    "Styles :",
+    "  vanilla   CSS natif, aucune dépendance de style.",
+    "  tailwind  Tailwind CSS 4, configuré et prêt à l'emploi.",
   ].join("\n");
 }
 
@@ -144,7 +162,7 @@ async function askChoice(rl, question, choices, fallback) {
   });
   console.log(lines.join("\n"));
 
-  const answer = (await rl.question(`> `)).trim().toLowerCase();
+  const answer = (await rl.question("> ")).trim().toLowerCase();
   if (answer === "") return fallback;
 
   const byIndex = choices[Number(answer) - 1];
@@ -158,11 +176,66 @@ async function askChoice(rl, question, choices, fallback) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Composition des couches
+ * ------------------------------------------------------------------ */
+
+/**
+ * Le projet se compose par couches successives, chacune écrasant la
+ * précédente. Cela évite de dupliquer la configuration entre les variantes,
+ * dont le nombre croît avec chaque axe.
+ *
+ * L'ordre compte : le framework pose la coquille, le mode ajoute ou retire la
+ * couche domaine, le style habille, et la démonstration se pose par-dessus.
+ */
+function layersFor({ framework, mode, template, style }) {
+  const layers = ["base", `framework-${framework}`, `mode-${mode}`, `css-${style}`];
+  if (template === "demo") {
+    layers.push("demo-shared", `demo-${style}`, `demo-${mode}`, `demo-app-${framework}`);
+  }
+  return layers.filter((layer) => existsSync(join(templatesDir, layer)));
+}
+
+/** Fusion en profondeur, la valeur de droite l'emportant sur celle de gauche. */
+function deepMerge(target, source) {
+  for (const [key, value] of Object.entries(source)) {
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      target[key] = deepMerge(target[key] ?? {}, value);
+    } else {
+      target[key] = value;
+    }
+  }
+  return target;
+}
+
+/**
+ * Le package.json est assemblé depuis les fragments de chaque couche, plutôt
+ * qu'écrit en autant d'exemplaires qu'il existe de combinaisons. Les
+ * dépendances sont triées, comme le ferait npm.
+ */
+function buildPackageJson(layers) {
+  let merged = {};
+  for (const layer of layers) {
+    const fragmentPath = join(templatesDir, layer, "package.fragment.json");
+    if (existsSync(fragmentPath)) {
+      merged = deepMerge(merged, JSON.parse(readFileSync(fragmentPath, "utf-8")));
+    }
+  }
+  for (const field of ["dependencies", "devDependencies"]) {
+    if (merged[field]) {
+      merged[field] = Object.fromEntries(
+        Object.entries(merged[field]).sort(([a], [b]) => a.localeCompare(b))
+      );
+    }
+  }
+  return merged;
+}
+
+/* ------------------------------------------------------------------ *
  * Génération
  * ------------------------------------------------------------------ */
 
 const TEXT_EXTENSIONS = new Set([
-  ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".json", ".md", ".css", ".template",
+  ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".json", ".md", ".css", ".html",
 ]);
 
 function isTextFile(path) {
@@ -205,22 +278,12 @@ function countFiles(dir) {
   return total;
 }
 
-/**
- * Le projet se compose par couches successives, chacune écrasant la
- * précédente. Cela évite de dupliquer la configuration entre quatre variantes.
- */
-function layersFor(mode, template) {
-  const layers = ["base", `mode-${mode}`];
-  if (template === "demo") layers.push("demo-shared", `demo-${mode}`);
-  return layers.filter((layer) => existsSync(join(templatesDir, layer)));
-}
-
 /* ------------------------------------------------------------------ *
  * Programme
  * ------------------------------------------------------------------ */
 
 const args = parseArgs(process.argv.slice(2));
-let { projectName, mode, template } = args;
+let { projectName, mode, template, style } = args;
 
 if (!projectName) {
   fail("Il manque le nom du projet.", usage());
@@ -245,8 +308,11 @@ if (mode !== null && !MODES.includes(mode)) {
 if (template !== null && !TEMPLATES.includes(template)) {
   fail(`Contenu inconnu : « ${template} ». Choix possibles : ${TEMPLATES.join(", ")}.`, usage());
 }
+if (style !== null && !STYLES.includes(style)) {
+  fail(`Style inconnu : « ${style} ». Choix possibles : ${STYLES.join(", ")}.`, usage());
+}
 
-if ((mode === null || template === null) && isInteractive) {
+if ((mode === null || template === null || style === null) && isInteractive) {
   const rl = createInterface({ input: stdin, output: stdout });
   try {
     if (mode === null) {
@@ -254,11 +320,7 @@ if ((mode === null || template === null) && isInteractive) {
         rl,
         "Quel profil d'architecture ?",
         [
-          {
-            value: "full",
-            label: "Full",
-            hint: "Les quatre couches. Pour un produit qui dure.",
-          },
+          { value: "full", label: "Full", hint: "Les quatre couches. Pour un produit qui dure." },
           {
             value: "light",
             label: "Light",
@@ -283,6 +345,17 @@ if ((mode === null || template === null) && isInteractive) {
         DEFAULT_TEMPLATE
       );
     }
+    if (style === null) {
+      style = await askChoice(
+        rl,
+        "Quel style ?",
+        [
+          { value: "vanilla", label: "CSS natif", hint: "Aucune dépendance de style." },
+          { value: "tailwind", label: "Tailwind CSS 4", hint: "Configuré et prêt à l'emploi." },
+        ],
+        DEFAULT_STYLE
+      );
+    }
   } finally {
     rl.close();
   }
@@ -290,21 +363,29 @@ if ((mode === null || template === null) && isInteractive) {
 
 mode = mode ?? DEFAULT_MODE;
 template = template ?? DEFAULT_TEMPLATE;
+style = style ?? DEFAULT_STYLE;
 
 const pm = detectPackageManager();
 const cmd = COMMANDS[pm];
 
-console.log(`\n📦 Création de « ${projectName} », profil ${mode}, contenu ${template}.`);
+console.log(
+  `\n📦 Création de « ${projectName} », profil ${mode}, contenu ${template}, style ${style}.`
+);
+
+const layers = layersFor({ framework: FRAMEWORK, mode, template, style });
 
 mkdirSync(targetDir, { recursive: true });
-for (const layer of layersFor(mode, template)) {
+for (const layer of layers) {
   cpSync(join(templatesDir, layer), targetDir, { recursive: true, force: true });
 }
 
-// package.json.template devient package.json.
-const pkgTemplatePath = join(targetDir, "package.json.template");
-writeFileSync(join(targetDir, "package.json"), readFileSync(pkgTemplatePath, "utf-8"));
-rmSync(pkgTemplatePath);
+// Le package.json est assemblé depuis les fragments des couches appliquées,
+// plutôt qu'écrit en autant d'exemplaires qu'il existe de combinaisons.
+writeFileSync(
+  join(targetDir, "package.json"),
+  `${JSON.stringify(buildPackageJson(layers), null, 2)}\n`
+);
+rmSync(join(targetDir, "package.fragment.json"), { force: true });
 
 // npm exclut les fichiers nommés `.gitignore` des paquets publiés : le
 // template le transporte sous le nom `_gitignore`.

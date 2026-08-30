@@ -36,6 +36,21 @@ Les frontières restent vérifiées dans les deux cas : une feature n'importe ja
 
 Sans drapeau, la CLI pose la question lorsqu'elle est lancée depuis un terminal, et retient `full` sinon. Elle ne bloque jamais un script ni une intégration continue.
 
+## Choisir son style
+
+```bash
+npx create-maedow-arch-app mon-projet --css vanilla     # par défaut
+npx create-maedow-arch-app mon-projet --css tailwind
+```
+
+**CSS natif** ne pose aucune dépendance de style. La démonstration livrée prouve qu'il n'en faut aucune pour obtenir quelque chose de soigné.
+
+**Tailwind CSS 4** arrive configuré et prêt à l'emploi, avec ses jetons de design déclarés dans un bloc `@theme`.
+
+Dans la démonstration Tailwind, les composants réutilisables sont écrits en idiome Tailwind, parce que ce sont eux qu'on recopie dans son propre projet. La mise en page des pages reste en classes sémantiques : elle se prête mal aux utilitaires, et la dupliquer aurait créé deux versions à garder synchronisées.
+
+Ce choix n'a aucune incidence sur les frontières architecturales.
+
 ## Choisir son contenu
 
 ```bash
