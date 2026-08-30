@@ -21,7 +21,9 @@ export function Panel({
     <section className="bg-surface border border-line rounded-[14px] p-7">
       <header className="mb-5">
         <h2 className="text-[1.1rem] font-bold font-display tracking-tight m-0">{title}</h2>
-        {hint ? <p className="mt-[0.4rem] mb-0 text-ink-faint text-sm text-pretty">{hint}</p> : null}
+        {hint ? (
+          <p className="mt-[0.4rem] mb-0 text-ink-faint text-sm text-pretty">{hint}</p>
+        ) : null}
       </header>
       {children}
     </section>

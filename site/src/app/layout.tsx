@@ -1,8 +1,8 @@
-import './globals.css';
-import { RootProvider } from 'fumadocs-ui/provider/next';
-import { Space_Grotesk, Manrope } from 'next/font/google';
-import type { ReactNode } from 'react';
-import type { Metadata } from 'next';
+import "./globals.css";
+import { RootProvider } from "fumadocs-ui/provider/next";
+import { Space_Grotesk, Manrope } from "next/font/google";
+import type { ReactNode } from "react";
+import type { Metadata } from "next";
 
 /*
  * Space Grotesk porte les titres : son dessin géométrique et ses détails
@@ -14,24 +14,24 @@ import type { Metadata } from 'next';
  * un domaine tiers, et aucun décalage de mise en page au chargement.
  */
 const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
 });
 
 const manrope = Manrope({
-  subsets: ['latin'],
-  variable: '--font-body',
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Maedow Arch',
-    default: 'Maedow Arch, standard modulaire et découplé',
+    template: "%s | Maedow Arch",
+    default: "Maedow Arch, standard modulaire et découplé",
   },
   description:
-    'Standard d’architecture logicielle universel, modulaire et agnostique pour applications web et fullstack modernes.',
+    "Standard d’architecture logicielle universel, modulaire et agnostique pour applications web et fullstack modernes.",
 };
 
 export default function Layout({ children }: { children: ReactNode }) {

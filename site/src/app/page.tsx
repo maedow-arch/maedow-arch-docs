@@ -1,44 +1,44 @@
-import Link from 'next/link';
-import { ArrowRight, BookOpen, Layers, ShieldCheck, Cpu, Terminal } from 'lucide-react';
-import { GithubIcon } from '@/components/GithubIcon';
-import { CopyCommand } from '@/components/CopyCommand';
-import { Logo } from '@/components/Logo';
-import { Footer } from '@/components/Footer';
-import { REPO_URL } from '@/lib/links';
+import Link from "next/link";
+import { ArrowRight, BookOpen, Layers, ShieldCheck, Cpu, Terminal } from "lucide-react";
+import { GithubIcon } from "@/components/GithubIcon";
+import { CopyCommand } from "@/components/CopyCommand";
+import { Logo } from "@/components/Logo";
+import { Footer } from "@/components/Footer";
+import { REPO_URL } from "@/lib/links";
 
 const PILLARS = [
   {
     icon: Layers,
-    title: 'Zéro Modèle dans le JSX',
-    body: 'Les types du domaine et la logique métier vivent en TypeScript pur, loin de la couche de rendu, donc testables sans monter d’arbre React.',
+    title: "Zéro Modèle dans le JSX",
+    body: "Les types du domaine et la logique métier vivent en TypeScript pur, loin de la couche de rendu, donc testables sans monter d’arbre React.",
   },
   {
     icon: Cpu,
-    title: 'Agnostique Auth & DB',
-    body: 'Ports et Adapters, introduits au bon moment : la Règle de Lazy Abstraction interdit l’indirection tant qu’une deuxième implémentation n’existe pas.',
+    title: "Agnostique Auth & DB",
+    body: "Ports et Adapters, introduits au bon moment : la Règle de Lazy Abstraction interdit l’indirection tant qu’une deuxième implémentation n’existe pas.",
   },
   {
     icon: ShieldCheck,
-    title: 'Frontières outillées',
-    body: 'Le flux app → features → core → lib est vérifié par ESLint à chaque commit. L’architecture ne dépend pas de la mémoire de l’équipe.',
+    title: "Frontières outillées",
+    body: "Le flux app → features → core → lib est vérifié par ESLint à chaque commit. L’architecture ne dépend pas de la mémoire de l’équipe.",
   },
 ];
 
 const CHAPTERS = [
   {
-    href: '/docs/architecture',
-    title: 'Blueprint & 4 Couches',
-    body: 'La structure en couches, l’agnosticisme de l’infrastructure, les frontières et les modes Light / Full.',
+    href: "/docs/architecture",
+    title: "Blueprint & 4 Couches",
+    body: "La structure en couches, l’agnosticisme de l’infrastructure, les frontières et les modes Light / Full.",
   },
   {
-    href: '/docs/models',
-    title: 'Modélisation & Séparation du JSX',
-    body: 'La typologie des 5 formes de données, du modèle de persistance aux props de composant.',
+    href: "/docs/models",
+    title: "Modélisation & Séparation du JSX",
+    body: "La typologie des 5 formes de données, du modèle de persistance aux props de composant.",
   },
   {
-    href: '/docs/conventions',
-    title: 'Conventions & Standards',
-    body: 'TypeScript strict, Result Pattern et ses helpers, sécurité et scaffolding.',
+    href: "/docs/conventions",
+    title: "Conventions & Standards",
+    body: "TypeScript strict, Result Pattern et ses helpers, sécurité et scaffolding.",
   },
 ];
 

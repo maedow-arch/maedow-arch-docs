@@ -1,0 +1,13 @@
+# Normalise les fins de ligne en LF dans le dépôt.
+#
+# Sans cette règle, git convertissait en CRLF à chaque checkout sous Windows,
+# et Prettier réécrivait en LF : chaque fichier apparaissait modifié à chaque
+# passage, et git avertissait à chaque commit.
+* text=auto eol=lf
+
+# Fichiers binaires, à laisser intacts.
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff binary
+*.woff2 binary

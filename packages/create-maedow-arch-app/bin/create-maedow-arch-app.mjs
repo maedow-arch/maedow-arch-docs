@@ -243,7 +243,16 @@ function buildPackageJson(layers) {
  * ------------------------------------------------------------------ */
 
 const TEXT_EXTENSIONS = new Set([
-  ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".json", ".md", ".css", ".html",
+  ".ts",
+  ".tsx",
+  ".js",
+  ".jsx",
+  ".mjs",
+  ".cjs",
+  ".json",
+  ".md",
+  ".css",
+  ".html",
 ]);
 
 function isTextFile(path) {
@@ -345,7 +354,11 @@ if ((mode === null || template === null || style === null || framework === null)
       "Quel profil d'architecture ?",
       [
         { value: "full", label: "Full", hint: "les quatre couches, pour un produit qui dure" },
-        { value: "light", label: "Light", hint: "sans couche core, pour un site vitrine ou un MVP" },
+        {
+          value: "light",
+          label: "Light",
+          hint: "sans couche core, pour un site vitrine ou un MVP",
+        },
       ],
       DEFAULT_MODE
     );
@@ -355,7 +368,11 @@ if ((mode === null || template === null || style === null || framework === null)
     template = await ask(
       "Quel contenu de départ ?",
       [
-        { value: "demo", label: "Démonstration", hint: "un compteur borné, décliné selon le profil" },
+        {
+          value: "demo",
+          label: "Démonstration",
+          hint: "un compteur borné, décliné selon le profil",
+        },
         { value: "blank", label: "Vierge", hint: "l'arborescence seule, sans exemple" },
       ],
       DEFAULT_TEMPLATE
@@ -442,7 +459,9 @@ log.step(
     "Générateurs :",
     `  ${cmd.run("generate:feature")} <nom>   un écran dans src/features/`,
     `  ${cmd.run("generate:domain")} <nom>    ` +
-      (mode === "full" ? "une entité métier dans src/core/" : "un domaine, début de bascule vers full"),
+      (mode === "full"
+        ? "une entité métier dans src/core/"
+        : "un domaine, début de bascule vers full"),
   ].join("\n")
 );
 
