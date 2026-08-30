@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Check, Copy } from 'lucide-react';
+import { useState } from "react";
+import { Check, Copy } from "lucide-react";
 
 /**
  * Une commande shell avec bouton copier.
@@ -10,13 +10,7 @@ import { Check, Copy } from 'lucide-react';
  * refusée) : en cas d'échec on ne change pas l'état, le lecteur voit que rien
  * ne s'est passé et peut sélectionner le texte à la main.
  */
-export function CopyCommand({
-  command,
-  compact = false,
-}: {
-  command: string;
-  compact?: boolean;
-}) {
+export function CopyCommand({ command, compact = false }: { command: string; compact?: boolean }) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -32,7 +26,7 @@ export function CopyCommand({
   return (
     <div
       className={`flex items-center justify-between gap-3 rounded-lg border border-fd-border bg-fd-muted/40 font-mono ${
-        compact ? 'px-3 py-2 text-xs' : 'px-5 py-4 text-sm'
+        compact ? "px-3 py-2 text-xs" : "px-5 py-4 text-sm"
       }`}
     >
       <code className="text-fd-foreground overflow-x-auto whitespace-nowrap">
@@ -42,7 +36,7 @@ export function CopyCommand({
       <button
         type="button"
         onClick={copy}
-        aria-label={copied ? 'Commande copiée' : `Copier : ${command}`}
+        aria-label={copied ? "Commande copiée" : `Copier : ${command}`}
         className="shrink-0 p-1.5 rounded-md text-fd-muted-foreground hover:text-fd-foreground hover:bg-fd-accent transition-colors"
       >
         {copied ? <Check className="w-4 h-4 text-fd-primary" /> : <Copy className="w-4 h-4" />}

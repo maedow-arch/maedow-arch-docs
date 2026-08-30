@@ -1,6 +1,5 @@
 export type Result<TData, TError = string> =
-  | { ok: true; data: TData }
-  | { ok: false; error: TError };
+  { ok: true; data: TData } | { ok: false; error: TError };
 
 export function unwrapOr<TData, TError>(result: Result<TData, TError>, fallback: TData): TData {
   return result.ok ? result.data : fallback;

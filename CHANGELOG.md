@@ -6,6 +6,31 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [0.7.0] : 2026-08-30
+
+### Ajouté
+
+- **Prettier dans le dépôt**, avec `npm run format` et `npm run format:check`, ce dernier vérifié en intégration continue.
+- **Prettier dans les projets générés** : configuration, fichier d'exclusion et les deux scripts. Un projet fraîchement scaffoldé passe `prettier --check` sans rien avoir à reformater.
+- **`.gitattributes`** normalisant les fins de ligne en LF. Sans lui, git convertissait en CRLF à chaque checkout sous Windows pendant que Prettier réécrivait en LF : chaque fichier apparaissait modifié à chaque passage.
+
+### Décidé
+
+- **Prettier formate le code, pas la prose.** Les fichiers Markdown sont exclus. Sur le corpus, Prettier réalignait les tableaux en lignes de deux cents caractères et changeait les conventions d'écriture, `*ainsi*` devenant `_ainsi_`. Ces documents sont le produit lui-même, ils restent tels qu'ils sont écrits.
+
+## [0.6.0] : 2026-08-30
+
+### Ajouté
+
+- **Prompts interactifs à la hauteur de ce que font les outils comparables.** Navigation aux flèches, options visibles côte à côte avec leur explication, annulation propre par Ctrl+C. Avec quatre questions à poser, taper un chiffre sans voir les choix ne tenait plus.
+- La sortie complète passe par le même rail visuel, en interactif comme en non interactif.
+
+### Modifié
+
+- **Le paquet publié est désormais bundlé par esbuild**, et conserve `dependencies: {}`. C'est la démarche de `create-vite`, qui utilise la même bibliothèque de prompts sans imposer d'arbre de dépendances à ses utilisateurs. Sans bundle, les mêmes prompts coûteraient cinq paquets et 199 Ko à résoudre à chaque `npx`.
+- Un hook `prepublishOnly` reconstruit le bundle, pour ne jamais publier une version périmée.
+- **La CI construit le bundle et génère avec lui**, plutôt qu'avec la source. C'est l'artefact que reçoit l'utilisateur, et c'est donc lui qu'il faut éprouver. Deuxième application de la leçon de F-004 et F-011.
+
 ## [0.5.0] : 2026-08-30
 
 ### Ajouté

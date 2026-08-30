@@ -3,7 +3,7 @@
  * étroite : les 4 couches `app → features → core → lib`, et le flux de
  * dépendance qui ne remonte jamais.
  */
-export function Logo({ className = '' }: { className?: string }) {
+export function Logo({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <svg

@@ -48,9 +48,9 @@ export function DemoPage() {
         <p className="page__eyebrow">Maedow Arch</p>
         <h1 className="page__title">__PROJECT_NAME__</h1>
         <p className="page__lead">
-          Une démonstration volontairement minuscule. Le compteur ci-dessous a des bornes,
-          et ces bornes sont une règle métier : elle vit dans <code>core/</code>, elle
-          retourne un refus typé, et elle se teste sans monter le moindre composant.
+          Une démonstration volontairement minuscule. Le compteur ci-dessous a des bornes, et ces
+          bornes sont une règle métier : elle vit dans <code>core/</code>, elle retourne un refus
+          typé, et elle se teste sans monter le moindre composant.
         </p>
       </header>
 
@@ -73,9 +73,9 @@ export function DemoPage() {
 
       <Panel title="Vérifier que les frontières tiennent">
         <p className="prose">
-          Le flux de dépendance ne descend que dans un sens. Pour le prouver, tentez
-          l&apos;inverse : ajoutez dans <code>src/core/counter/rules.ts</code> un import
-          venu d&apos;une feature, puis lancez le lint.
+          Le flux de dépendance ne descend que dans un sens. Pour le prouver, tentez l&apos;inverse
+          : ajoutez dans <code>src/core/counter/rules.ts</code> un import venu d&apos;une feature,
+          puis lancez le lint.
         </p>
         <pre className="code">
           <code>{`import { CounterScreen } from "@/features/counter/Screen";`}</code>

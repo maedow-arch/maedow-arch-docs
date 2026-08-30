@@ -1,8 +1,8 @@
-import { DocsLayout } from 'fumadocs-ui/layouts/docs';
-import type { ReactNode } from 'react';
-import { source } from '@/lib/source';
-import { Logo } from '@/components/Logo';
-import { REPO_URL } from '@/lib/links';
+import { DocsLayout } from "fumadocs-ui/layouts/docs";
+import type { ReactNode } from "react";
+import { source } from "@/lib/source";
+import { Logo } from "@/components/Logo";
+import { REPO_URL } from "@/lib/links";
 
 export default function RootDocsLayout({ children }: { children: ReactNode }) {
   return (
@@ -10,7 +10,7 @@ export default function RootDocsLayout({ children }: { children: ReactNode }) {
       tree={source.pageTree}
       nav={{
         title: <Logo />,
-        url: '/',
+        url: "/",
       }}
       githubUrl={REPO_URL}
       sidebar={{

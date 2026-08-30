@@ -13,12 +13,15 @@
   "scripts": {
     "test:boundaries": "node packages/eslint-config-maedow-arch/test/run.mjs",
     "site:dev": "npm --prefix site run dev",
-    "site:build": "npm --prefix site run build"
+    "site:build": "npm --prefix site run build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "eslint": "^9.39.0",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-boundaries": "^7.2.0",
+    "prettier": "^3.9.6",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.68.0"
   }

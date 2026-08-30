@@ -40,9 +40,9 @@ export function DemoPage() {
         <p className="page__eyebrow">Maedow Arch Light</p>
         <h1 className="page__title">__PROJECT_NAME__</h1>
         <p className="page__lead">
-          Ce projet suit le profil Light : pas de couche <code>core/</code> séparée, la
-          logique reste dans la feature. C&apos;est ce que recommande le corpus pour un
-          site vitrine, un prototype ou un MVP, quand la logique métier est faible.
+          Ce projet suit le profil Light : pas de couche <code>core/</code> séparée, la logique
+          reste dans la feature. C&apos;est ce que recommande le corpus pour un site vitrine, un
+          prototype ou un MVP, quand la logique métier est faible.
         </p>
       </header>
 
@@ -71,10 +71,9 @@ export function DemoPage() {
           <li>On veut tester le métier sans monter l&apos;écran.</li>
         </ul>
         <p className="prose">
-          Alors <code>features/counter/rules.ts</code> part dans{" "}
-          <code>src/core/counter/</code>, les transitions retournent un{" "}
-          <code>Result</code>, et la feature ne garde que la traduction pour
-          l&apos;affichage.
+          Alors <code>features/counter/rules.ts</code> part dans <code>src/core/counter/</code>, les
+          transitions retournent un <code>Result</code>, et la feature ne garde que la traduction
+          pour l&apos;affichage.
         </p>
         <p className="prose">Pour voir à quoi ressemble l&apos;étape suivante :</p>
         <pre className="code">
@@ -87,9 +86,9 @@ export function DemoPage() {
 
       <Panel title="Les frontières tiennent, même en Light">
         <p className="prose">
-          Une feature n&apos;importe jamais une autre feature, et{" "}
-          <code>components/</code> reste présentationnel. Ces règles valent dans les deux
-          profils. Pour le vérifier, tentez un import interdit puis lancez le lint.
+          Une feature n&apos;importe jamais une autre feature, et <code>components/</code> reste
+          présentationnel. Ces règles valent dans les deux profils. Pour le vérifier, tentez un
+          import interdit puis lancez le lint.
         </p>
         <pre className="code code--error">
           <code>Maedow Arch : feature ne peut pas importer feature.</code>
