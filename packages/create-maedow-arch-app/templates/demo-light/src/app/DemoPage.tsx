@@ -33,7 +33,7 @@ const LAYERS = [
   },
 ];
 
-export default function HomePage() {
+export function DemoPage() {
   return (
     <main className="page">
       <header className="page__head">
