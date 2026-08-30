@@ -42,11 +42,12 @@ jobs:
   # paquets. Sans cette matrice, une combinaison se met à pourrir en silence :
   # c'est le mode de défaillance que documente FRICTIONS.md, de bout en bout.
   scaffold:
-    name: ${{ matrix.template }} sous ${{ matrix.pm }}
+    name: ${{ matrix.mode }}/${{ matrix.template }} sous ${{ matrix.pm }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        mode: [full, light]
         template: [demo, blank]
         pm: [npm, pnpm, bun]
     steps:
@@ -63,7 +64,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Générer le projet
-        run: node packages/create-maedow-arch-app/bin/create-maedow-arch-app.mjs app --template ${{ matrix.template }}
+        run: node packages/create-maedow-arch-app/bin/create-maedow-arch-app.mjs app --mode ${{ matrix.mode }} --template ${{ matrix.template }}
 
       - name: Installer, avec la config ESLint locale plutôt que celle du registre
         working-directory: app
@@ -78,27 +79,40 @@ jobs:
           npm run typecheck
           npm run build
 
+      # Seul le profil full embarque des tests de domaine : en Light, les
+      # règles vivent dans la feature et la démonstration n'en fournit pas.
       - name: Tests du domaine
-        if: matrix.template == 'demo'
+        if: matrix.template == 'demo' && matrix.mode == 'full'
         working-directory: app
         run: npm run test
 
       - name: Générateurs
         working-directory: app
         run: |
-          npm run generate:domain billing
+          if [ "${{ matrix.mode }}" = "full" ]; then npm run generate:domain billing; fi
           npm run generate:feature checkout
           npm run lint
 
+      # La violation testée diffère selon le profil, mais l'exigence est la
+      # même : le lint doit échouer. Un lint vert ici signalerait une
+      # configuration inactive, le mode de défaillance décrit en F-001.
       - name: Test négatif, un import interdit doit faire échouer le lint
         working-directory: app
         run: |
-          cat > src/core/billing/violation.ts <<'EOF'
+          npm run generate:feature autre
+          if [ "${{ matrix.mode }}" = "full" ]; then
+            cat > src/core/billing/violation.ts <<'EOF'
           import { CheckoutScreen } from "../../features/checkout/Screen";
           export const boom = () => CheckoutScreen();
           EOF
+          else
+            cat > src/features/checkout/violation.ts <<'EOF'
+          import { AutreScreen } from "../autre/Screen";
+          export const boom = () => AutreScreen();
+          EOF
+          fi
           if npm run lint; then
-            echo "::error::Le lint est passé alors qu'un import interdit était présent. Les frontières ne sont pas appliquées sous ${{ matrix.pm }}."
+            echo "::error::Le lint est passé alors qu'un import interdit était présent. Les frontières ne sont pas appliquées en ${{ matrix.mode }} sous ${{ matrix.pm }}."
             exit 1
           fi
-          echo "Violation correctement détectée sous ${{ matrix.pm }}."
+          echo "Violation correctement détectée en ${{ matrix.mode }} sous ${{ matrix.pm }}."

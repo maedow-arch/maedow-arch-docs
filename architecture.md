@@ -244,8 +244,27 @@ La Maedow Arch complète (4 couches, contracts, adapters, générateurs) est con
 | Type de projet | Site vitrine, prototype, MVP jetable, landing page | SaaS, produit avec cycle de vie long, produit multi-clients |
 | Durée de vie prévue | Courte (< 6 mois) ou usage unique | Longue, avec évolutions régulières |
 | Logique métier | Faible ou inexistante | Significative (règles, calculs, transitions d'état) |
-| Structure recommandée | `app/` + `features/` uniquement, avec la logique directement dans la feature et sans `core/` séparé | Structure complète : `app/ → features/ → core/ → lib/` |
+| Structure recommandée | `app/`, `features/`, `components/` et `lib/`, avec la logique directement dans la feature et **sans couche `core/`** | Structure complète : `app/ → features/ → core/ → lib/` |
 | Contracts / Adapters | Aucun, accès direct à la donnée | Introduits uniquement via la Règle de Lazy Abstraction (§4) |
 | Result Pattern | Optionnel | Recommandé, avec helpers (voir `conventions.md` §4.1) |
+
+### 9.1. Ce que Light conserve
+
+Light retire la couche domaine, rien d'autre. `components/ui/` et `lib/` restent légitimes : un site vitrine a des boutons et des helpers de formatage sans que cela constitue de la sur-ingénierie, et les garder à part rend la bascule ultérieure indolore.
+
+Les **règles de frontières du §6 s'appliquent identiquement dans les deux profils**. Une feature n'importe jamais une autre feature, `components/` demeure présentationnel, `lib/` ne dépend de rien. Ces contraintes ne coûtent rien et valent quelle que soit la taille du projet. Les deux profils ne sont donc pas deux jeux de règles, mais une relation d'inclusion : Light ne peuple pas `core/`, il ne l'autorise pas différemment.
+
+Conséquence pratique : `eslint-config-maedow-arch` sert les deux profils sans configuration distincte.
+
+### 9.2. Choisir son profil à l'installation
+
+```bash
+npx create-maedow-arch-app mon-projet --mode full    # les quatre couches
+npx create-maedow-arch-app mon-projet --mode light   # sans couche core
+```
+
+Sans drapeau, la CLI pose la question lorsqu'elle est lancée depuis un terminal, et retient `full` sinon.
+
+Chaque profil se décline en deux contenus : `--template demo` livre un compteur borné illustrant le profil choisi, `--template blank` livre l'arborescence seule. Générer la même démonstration dans les deux profils et comparer les arborescences est le moyen le plus court de saisir ce que la séparation apporte, et ce qu'elle coûte.
 
 **Règle de bascule** : un projet démarré en Mode Light qui gagne en complexité (nouvelle feature qui duplique de la logique, besoin de tester le métier indépendamment de l'UI, montée en charge du produit) doit migrer progressivement vers le Mode Full, domaine par domaine, jamais en un seul refactor global.

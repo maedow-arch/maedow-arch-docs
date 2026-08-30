@@ -19,14 +19,40 @@ bunx create-maedow-arch-app mon-projet
 yarn dlx create-maedow-arch-app mon-projet
 ```
 
-## Deux points de départ
+## Choisir son profil
+
+Le corpus définit deux profils d'architecture, et la CLI produit l'un ou l'autre.
 
 ```bash
-npx create-maedow-arch-app mon-projet              # démonstration, par défaut
-npx create-maedow-arch-app mon-projet --blank      # arborescence seule
+npx create-maedow-arch-app mon-projet --mode full    # les quatre couches
+npx create-maedow-arch-app mon-projet --mode light   # sans couche core
 ```
 
-La **démonstration** livre un compteur borné. Le choix est délibéré : un compteur nu ne justifierait aucune séparation, puisque `useState(0)` suffirait. Ici les bornes sont une règle métier, elle vit dans `core/`, retourne un refus typé, et se teste sans monter le moindre composant. Neuf tests, exécutés en quelques millisecondes.
+**Full** installe `app/ → features/ → core/ → lib/`. C'est le profil des produits qui durent : SaaS, application métier, cycle de vie long, logique significative.
+
+**Light** retire la couche domaine. Les règles vivent dans la feature qui les utilise. C'est le profil des sites vitrines, des prototypes et des MVP, quand isoler un domaine coûterait plus qu'il ne rapporte.
+
+Les frontières restent vérifiées dans les deux cas : une feature n'importe jamais une autre feature, `components/` demeure présentationnel. Les deux profils ne sont pas deux jeux de règles, mais une relation d'inclusion.
+
+Sans drapeau, la CLI pose la question lorsqu'elle est lancée depuis un terminal, et retient `full` sinon. Elle ne bloque jamais un script ni une intégration continue.
+
+## Choisir son contenu
+
+```bash
+npx create-maedow-arch-app mon-projet --template demo    # par défaut
+npx create-maedow-arch-app mon-projet --template blank
+```
+
+La **démonstration** livre un compteur borné, décliné selon le profil. Le choix du compteur est délibéré : un compteur nu ne justifierait aucune séparation, puisque `useState(0)` suffirait. Ici les bornes sont une règle métier, ce qui change tout.
+
+En **Full**, ces règles vivent dans `core/counter/`, retournent un refus typé, et se vérifient par neuf tests qui s'exécutent sans React ni DOM. En **Light**, les mêmes bornes tiennent dans la feature, en trois fois moins de lignes.
+
+Générer les deux et comparer est le moyen le plus court de saisir ce que la séparation apporte, et ce qu'elle coûte :
+
+```bash
+npx create-maedow-arch-app comparaison-light --mode light
+npx create-maedow-arch-app comparaison-full  --mode full
+```
 
 Le **squelette vierge** livre l'arborescence, la configuration et les générateurs, sans code d'exemple ni parti pris typographique.
 

@@ -6,6 +6,26 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [0.3.0] : 2026-08-30
+
+### Ajouté
+
+- **Choix du profil à l'installation.** `--mode full` installe les quatre couches, `--mode light` retire la couche domaine. Le corpus définissait ces deux profils depuis §9, mais l'outillage n'en produisait qu'un : pour un projet que §9 qualifie de Light, la CLI scaffoldait justement la sur-ingénierie que la section met en garde de ne pas faire.
+- **Démonstration déclinée selon le profil.** Le même compteur borné, avec les règles dans `core/` en Full, et dans la feature en Light. Générer les deux et comparer rend la règle de bascule tangible, et répond à l'objection « c'est sur-ingénieré » mieux qu'un paragraphe.
+- **Questions interactives** lorsque la CLI est lancée depuis un terminal sans drapeau, avec repli silencieux sur les valeurs par défaut hors terminal ou sous `CI`. Aucune dépendance ajoutée : `node:readline/promises` suffit.
+- `--help`, `--yes`, et les raccourcis `--light`, `--full`, `--demo`, `--blank`.
+- **Matrice de CI portée à douze combinaisons** : deux profils, deux contenus, trois gestionnaires de paquets, chacune menée jusqu'au test négatif.
+
+### Modifié
+
+- **`architecture.md` §9 précisé.** La cellule « structure recommandée » disait à la fois « `app/` + `features/` uniquement » et « sans `core/` séparé », ce qui n'est pas la même chose et laissait indécidé le sort de `components/` et `lib/`. Light conserve désormais explicitement ces deux dossiers.
+- **§9.1 et §9.2 ajoutés** : ce que Light conserve, et comment choisir son profil à l'installation. §9 décrivait une structure sans indiquer par quel bout l'atteindre.
+- Les templates sont réorganisés en couches composables, ce qui évite de dupliquer la configuration entre quatre variantes.
+
+### Vérifié
+
+- **La même configuration ESLint sert les deux profils.** Mesuré sur un projet sans `core/` : le lint reste vert, et interdit toujours qu'une feature en importe une autre. Les deux profils ne sont pas deux jeux de règles, mais une relation d'inclusion. Cette constatation est désormais inscrite dans le corpus.
+
 ## [0.2.0] : 2026-08-30
 
 ### Ajouté
