@@ -42,14 +42,24 @@ jobs:
   # paquets. Sans cette matrice, une combinaison se met à pourrir en silence :
   # c'est le mode de défaillance que documente FRICTIONS.md, de bout en bout.
   scaffold:
-    name: ${{ matrix.mode }}/${{ matrix.template }} sous ${{ matrix.pm }}
+    name: ${{ matrix.mode }}/${{ matrix.template }}/${{ matrix.css }} sous ${{ matrix.pm }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # Les combinaisons sont vérifiées sous npm, et quatre entrées
+      # supplémentaires couvrent pnpm et bun. Croiser les quatre axes avec les
+      # trois gestionnaires donnerait quarante-huit jobs, ce qui deviendrait le
+      # prochain pourrissement silencieux plutôt qu'un garde-fou.
       matrix:
         mode: [full, light]
         template: [demo, blank]
-        pm: [npm, pnpm, bun]
+        css: [vanilla, tailwind]
+        pm: [npm]
+        include:
+          - { mode: full, template: demo, css: tailwind, pm: pnpm }
+          - { mode: full, template: demo, css: vanilla, pm: bun }
+          - { mode: light, template: blank, css: tailwind, pm: bun }
+          - { mode: light, template: demo, css: vanilla, pm: pnpm }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -64,7 +74,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Générer le projet
-        run: node packages/create-maedow-arch-app/bin/create-maedow-arch-app.mjs app --mode ${{ matrix.mode }} --template ${{ matrix.template }}
+        run: node packages/create-maedow-arch-app/bin/create-maedow-arch-app.mjs app --mode ${{ matrix.mode }} --template ${{ matrix.template }} --css ${{ matrix.css }}
 
       # La config ESLint est empaquetée puis installée depuis son tarball, et
       # non liée par `file:`. npm et bun résolvent un lien `file:` par un
@@ -122,7 +132,7 @@ jobs:
           EOF
           fi
           if npm run lint; then
-            echo "::error::Le lint est passé alors qu'un import interdit était présent. Les frontières ne sont pas appliquées en ${{ matrix.mode }} sous ${{ matrix.pm }}."
+            echo "::error::Le lint est passé alors qu'un import interdit était présent. Les frontières ne sont pas appliquées en ${{ matrix.mode }}/${{ matrix.css }} sous ${{ matrix.pm }}."
             exit 1
           fi
-          echo "Violation correctement détectée en ${{ matrix.mode }} sous ${{ matrix.pm }}."
+          echo "Violation correctement détectée en ${{ matrix.mode }}/${{ matrix.css }} sous ${{ matrix.pm }}."

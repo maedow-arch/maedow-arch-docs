@@ -4,9 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -14,9 +11,8 @@
     "generate:domain": "node scripts/scaffold-domain.mjs"
   },
   "dependencies": {
-    "next": "^15.5.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {

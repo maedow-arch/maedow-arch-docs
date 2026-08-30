@@ -6,6 +6,28 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [0.4.0] : 2026-08-30
+
+### Ajouté
+
+- **Choix du style à l'installation.** `--css vanilla` livre du CSS natif sans aucune dépendance, `--css tailwind` livre Tailwind CSS 4 configuré. Le défaut reste `vanilla` : le standard revendique l'agnosticisme, et la démonstration prouve qu'aucun framework de style n'est nécessaire pour livrer quelque chose de soigné.
+- Les composants réutilisables de la démonstration existent dans les deux idiomes. La mise en page reste en classes sémantiques, dupliquer deux cent vingt-cinq lignes pour un choix de style aurait créé deux versions à garder synchronisées.
+- Matrice de CI étendue à vingt jobs : seize combinaisons sous npm, plus quatre entrées couvrant pnpm et bun.
+
+### Modifié
+
+- **Le `package.json` généré est assemblé depuis des fragments**, un par couche de template, fusionnés en profondeur et triés. Le fichier unique ne pouvait plus suivre trois axes de variation.
+- Les templates sont réorganisés : ce qui relève de Next quitte `base/`, ce qui relève du style est isolé dans ses propres couches.
+
+### Corrigé
+
+- **La bordure du bouton fantôme disparaissait en Tailwind** (F-013). Deux utilitaires de couleur de bordure de même spécificité se départagent selon l'ordre du CSS généré, pas selon l'ordre des classes.
+
+### Site
+
+- **Migration vers Fumadocs 16 et Next 16.** Le raccord manuel de `lib/source.ts` disparaît, soldant la dette inscrite en F-006. `fumadocs-ui` 16 exigeant `next@16.x.x`, la migration en entraînait une seconde.
+- `next lint` n'existant plus en Next 16, le script correspondant est retiré plutôt que laissé mort.
+
 ## [0.3.0] : 2026-08-30
 
 ### Ajouté

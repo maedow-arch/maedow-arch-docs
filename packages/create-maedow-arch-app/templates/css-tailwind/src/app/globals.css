@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/*
+ * Tailwind CSS 4 se configure depuis ce fichier, sans tailwind.config.
+ * Déclarez vos jetons de design dans un bloc @theme.
+ *
+ * Ce choix de style appartient au produit : Maedow Arch porte sur
+ * l'architecture, et fonctionne aussi bien en CSS natif.
+ */

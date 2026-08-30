@@ -1,6 +1,6 @@
 {
   "name": "create-maedow-arch-app",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Scaffold un projet suivant Maedow Arch (app/features/core/components/lib, Result Pattern, ESLint boundaries)",
   "type": "module",
   "bin": {
