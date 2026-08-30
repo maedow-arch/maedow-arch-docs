@@ -38,37 +38,67 @@ jobs:
       - run: npm run build
         working-directory: site
 
+  # Chaque variante du template est vérifiée sous chaque gestionnaire de
+  # paquets. Sans cette matrice, une combinaison se met à pourrir en silence :
+  # c'est le mode de défaillance que documente FRICTIONS.md, de bout en bout.
   scaffold:
-    name: Projet généré
+    name: ${{ matrix.template }} sous ${{ matrix.pm }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [demo, blank]
+        pm: [npm, pnpm, bun]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Générer un projet depuis la CLI locale
+
+      - if: matrix.pm == 'pnpm'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - if: matrix.pm == 'bun'
+        uses: oven-sh/setup-bun@v2
+
+      - name: Générer le projet
+        run: node packages/create-maedow-arch-app/bin/create-maedow-arch-app.mjs app --template ${{ matrix.template }}
+
+      - name: Installer, avec la config ESLint locale plutôt que celle du registre
+        working-directory: app
         run: |
-          node packages/create-maedow-arch-app/bin/create-maedow-arch-app.mjs demo
-          cd demo
           npm pkg set devDependencies.eslint-config-maedow-arch=file:../packages/eslint-config-maedow-arch
-          npm install --no-audit --no-fund
-      - name: Générateurs, lint, typecheck, build
-        working-directory: demo
+          ${{ matrix.pm == 'npm' && 'npm install --no-audit --no-fund' || '' }}${{ matrix.pm == 'pnpm' && 'pnpm install' || '' }}${{ matrix.pm == 'bun' && 'bun install' || '' }}
+
+      - name: Lint, typecheck, build
+        working-directory: app
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run build
+
+      - name: Tests du domaine
+        if: matrix.template == 'demo'
+        working-directory: app
+        run: npm run test
+
+      - name: Générateurs
+        working-directory: app
         run: |
           npm run generate:domain billing
           npm run generate:feature checkout
           npm run lint
-          npm run typecheck
-          npm run build
+
       - name: Test négatif, un import interdit doit faire échouer le lint
-        working-directory: demo
+        working-directory: app
         run: |
           cat > src/core/billing/violation.ts <<'EOF'
           import { CheckoutScreen } from "../../features/checkout/Screen";
           export const boom = () => CheckoutScreen();
           EOF
           if npm run lint; then
-            echo "::error::Le lint est passé alors qu'un import interdit était présent. Les frontières ne sont pas appliquées."
+            echo "::error::Le lint est passé alors qu'un import interdit était présent. Les frontières ne sont pas appliquées sous ${{ matrix.pm }}."
             exit 1
           fi
-          echo "Violation correctement détectée."
+          echo "Violation correctement détectée sous ${{ matrix.pm }}."

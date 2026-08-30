@@ -6,6 +6,20 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [0.2.0] : 2026-08-30
+
+### Ajouté
+
+- **Deux points de départ au choix.** `--template demo` livre une démonstration complète, `--template blank` l'arborescence seule. La démonstration est le défaut.
+- **Un compteur borné comme démonstration.** Ses bornes sont une règle métier : elle vit dans `core/counter/`, retourne un refus typé via le Result Pattern, et se vérifie par neuf tests qui s'exécutent sans React ni DOM. Un compteur nu aurait montré l'architecture au moment où elle est le moins justifiée.
+- **Détection du gestionnaire de paquets.** La CLI reconnaît npm, pnpm, yarn et bun, et adapte les commandes qu'elle affiche.
+- **Space Grotesk et Manrope** sur le site de documentation et dans le template de démonstration, auto-hébergées par `next/font`. Le squelette vierge reste typographiquement neutre : Maedow Arch est un standard d'architecture, pas un système de design.
+- **Matrice de CI à six combinaisons.** Chaque variante de template est vérifiée sous npm, pnpm et bun, jusqu'au test négatif inclus.
+
+### Vérifié
+
+- Les frontières se déclenchent bien sous l'arborescence stricte de pnpm (F-010). Le risque était plausible, il ne se matérialise pas.
+
 ## [0.1.2] : 2026-08-29
 
 ### Corrigé

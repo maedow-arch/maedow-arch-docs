@@ -1,0 +1,294 @@
+/*
+ * CSS natif, sans framework.
+ *
+ * La démonstration ne présuppose aucune bibliothèque de style : Maedow Arch
+ * porte sur l'architecture, pas sur la manière de peindre les pixels. Tout
+ * tient dans des propriétés personnalisées, faciles à reprendre ou à jeter.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  --ink: #16141c;
+  --ink-soft: #5b5566;
+  --ink-faint: #8b8496;
+  --surface: #ffffff;
+  --ground: #faf9fc;
+  --line: #e7e3ee;
+  --accent: #6d3ff5;
+  --accent-soft: #f0eaff;
+  --danger: #b4341f;
+
+  --radius: 14px;
+  --gap: 1.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #f3f1f7;
+    --ink-soft: #a9a2b8;
+    --ink-faint: #7d7590;
+    --surface: #17151d;
+    --ground: #100e15;
+    --line: #2a2634;
+    --accent: #a78bfa;
+    --accent-soft: #241d3a;
+    --danger: #f0836e;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+code,
+pre {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+
+/* ---------- Mise en page ---------- */
+
+.page {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.page__eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.page__title {
+  font-size: clamp(2.25rem, 6vw, 3.25rem);
+  font-weight: 700;
+}
+
+.page__lead {
+  margin: 1rem 0 0;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  text-wrap: pretty;
+}
+
+.page__foot {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.page__foot a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.page__foot a:hover {
+  border-bottom-color: currentColor;
+}
+
+/* ---------- Panel, depuis features/_shared ---------- */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+}
+
+.panel__head {
+  margin-bottom: 1.25rem;
+}
+
+.panel__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.panel__hint {
+  margin: 0.4rem 0 0;
+  color: var(--ink-faint);
+  font-size: 0.875rem;
+  text-wrap: pretty;
+}
+
+/* ---------- Compteur ---------- */
+
+.counter__value {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(3.5rem, 14vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1;
+  margin: 0 0 1.25rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+
+.counter__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.counter__notice {
+  margin: 1rem 0 0;
+  min-height: 1.4rem;
+  font-size: 0.875rem;
+  color: var(--danger);
+}
+
+/* ---------- Boutons, depuis components/ui ---------- */
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.6rem 1.15rem;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.btn--primary:not(:disabled):hover {
+  opacity: 0.88;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.btn--ghost:not(:disabled):hover {
+  background: var(--accent-soft);
+}
+
+/* ---------- Jauge ---------- */
+
+.gauge {
+  height: 8px;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.gauge__fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+/* ---------- Carte des couches ---------- */
+
+.layers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.layers__item {
+  display: grid;
+  gap: 0.15rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--line);
+}
+
+.layers__dir {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.layers__role {
+  font-weight: 600;
+  font-size: 0.925rem;
+}
+
+.layers__detail {
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+  text-wrap: pretty;
+}
+
+/* ---------- Prose et code ---------- */
+
+.prose {
+  margin: 0 0 0.9rem;
+  color: var(--ink-soft);
+  font-size: 0.925rem;
+  text-wrap: pretty;
+}
+
+.prose--muted {
+  color: var(--ink-faint);
+  font-size: 0.85rem;
+  margin-bottom: 0;
+}
+
+.prose code,
+.panel code:not(.layers__dir) {
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 0.1em 0.4em;
+  border-radius: 5px;
+  font-size: 0.875em;
+}
+
+.code {
+  margin: 0 0 0.9rem;
+  padding: 0.85rem 1rem;
+  background: var(--ground);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow-x: auto;
+  font-size: 0.8rem;
+}
+
+.code code {
+  background: none;
+  color: var(--ink-soft);
+  padding: 0;
+}
+
+.code--error code {
+  color: var(--danger);
+}

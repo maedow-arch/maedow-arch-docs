@@ -11,6 +11,25 @@ npm install
 npm run dev
 ```
 
+pnpm, yarn et bun installent depuis le même registre, la CLI fonctionne à l'identique et adapte les commandes qu'elle affiche :
+
+```bash
+pnpm dlx create-maedow-arch-app mon-projet
+bunx create-maedow-arch-app mon-projet
+yarn dlx create-maedow-arch-app mon-projet
+```
+
+## Deux points de départ
+
+```bash
+npx create-maedow-arch-app mon-projet              # démonstration, par défaut
+npx create-maedow-arch-app mon-projet --blank      # arborescence seule
+```
+
+La **démonstration** livre un compteur borné. Le choix est délibéré : un compteur nu ne justifierait aucune séparation, puisque `useState(0)` suffirait. Ici les bornes sont une règle métier, elle vit dans `core/`, retourne un refus typé, et se teste sans monter le moindre composant. Neuf tests, exécutés en quelques millisecondes.
+
+Le **squelette vierge** livre l'arborescence, la configuration et les générateurs, sans code d'exemple ni parti pris typographique.
+
 ## Ce qui est généré
 
 ```

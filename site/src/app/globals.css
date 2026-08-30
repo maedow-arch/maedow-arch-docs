@@ -3,9 +3,43 @@
 @import 'fumadocs-ui/css/preset.css';
 
 /*
+ * Deux fontes, deux rôles.
+ * Space Grotesk pour les titres : son dessin géométrique et ses détails
+ * mécaniques donnent le ton technique du propos.
+ * Manrope pour le texte courant, où seule compte la lisibilité sur de longs
+ * paragraphes.
+ *
+ * Les variables sont injectées par `next/font/google` dans `layout.tsx`, qui
+ * auto-héberge les fichiers. Les piles de repli restent explicites : si une
+ * fonte ne charge pas, la page reste lisible et la métrique bouge peu.
+ */
+@theme inline {
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+/*
+ * Les titres du site et ceux rendus par Fumadocs dans les pages MDX.
+ * `letter-spacing` légèrement resserré : Space Grotesk respire beaucoup aux
+ * grandes tailles.
+ */
+h1,
+h2,
+h3,
+h4,
+.font-heading {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/*
  * Trame de points discrète, reprise de la maquette de référence.
  * Elle habille l'en-tête de la page d'accueil et le pied de page sans
- * concurrencer le texte : opacité faible, et elle s'efface en thème sombre.
+ * concurrencer le texte.
  */
 .maedow-dots {
   background-image: radial-gradient(

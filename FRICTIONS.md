@@ -135,3 +135,23 @@ Vérifié par `tsc --noEmit` sur un projet réellement scaffoldé, contenant un 
 **En marge, une contrainte à connaître.** En vérifiant sous TypeScript 7, le lint s'est mis à échouer avec un code de sortie 2, celui d'une erreur fatale de configuration et non d'une violation. Le message est sans ambiguïté : `typescript-eslint does not support TS 7.0`. Le `tsconfig.json` généré est donc valide sous TypeScript 5, 6 et 7, mais la chaîne de lint, elle, ne suit pas encore. C'est la raison pour laquelle le template continue d'épingler `typescript@^5.7.0`. Ce pin est délibéré, pas un oubli.
 
 **La leçon.** Une option de configuration héritée survit longtemps après être devenue inutile, parce que rien ne la remet en cause tant que tout compile. Ici, c'est l'usage sur un vrai projet qui l'a fait apparaître, pas la chaîne de vérification : celle-ci utilisait une version de TypeScript qui ne signalait rien encore. Un outillage qui n'est testé que sur les versions qu'il épingle ne voit pas venir ce que ses utilisateurs voient déjà.
+
+---
+
+## F-010 : le risque pnpm, anticipé puis démenti
+
+**Le soupçon.** pnpm n'aplatit pas `node_modules`. Or `eslint-config-maedow-arch` déclare trois peerDependencies et charge `eslint-plugin-boundaries` depuis sa propre position dans l'arborescence. C'est exactement le type de résolution que l'arborescence stricte de pnpm met en défaut. Et d'après F-001, une résolution qui échoue ne fait pas hurler ESLint : **elle le fait passer au vert**. Un utilisateur pnpm aurait donc pu croire ses frontières protégées alors qu'elles ne l'étaient pas.
+
+**Ce qu'on a mesuré.** Un projet généré, installé par `pnpm install`, puis soumis au test négatif. Les frontières se déclenchent normalement :
+
+```
+Maedow Arch : core ne peut pas importer feature. Voir architecture.md §6
+lint sain          EXIT 0
+lint avec violation  EXIT 1
+```
+
+Le lint, le typecheck et le build passent également.
+
+**Ce qu'on en a fait.** Rien à corriger, mais la vérification est désormais permanente. La CI exécute une matrice de six combinaisons, deux variantes de template sous npm, pnpm et bun, chacune allant jusqu'au test négatif.
+
+**La leçon.** Un risque théorique se vérifie, il ne se suppose pas. Celui-ci était plausible et documenté par le comportement de F-001, mais il ne se matérialise pas. L'inscrire ici évite qu'on le redoute à nouveau dans six mois, et la matrice de CI garantit qu'on le saura le jour où il apparaîtra vraiment.
