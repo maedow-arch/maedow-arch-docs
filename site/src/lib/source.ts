@@ -1,30 +1,19 @@
-import { docs, meta } from '@/.source';
-import { createMDXSource } from 'fumadocs-mdx';
-import { loader, type VirtualFile } from 'fumadocs-core/source';
+import { docs, meta } from '@/.source/server';
+import { toFumadocsSource } from 'fumadocs-mdx/runtime/server';
+import { loader } from 'fumadocs-core/source';
 
 /**
- * Raccord entre fumadocs-mdx et fumadocs-core.
+ * Les collections sont importées depuis l'entrée serveur générée par
+ * fumadocs-mdx, puis converties en source pour le loader.
  *
- * `createMDXSource` (fumadocs-mdx 11.10) renvoie `{ files: () => [...] }` —
- * une fonction, tandis que le `loader()` de fumadocs-core 15.8 fait
- * `files.map(...)` et attend donc un tableau. Les deux paquets ont dérivé sous
- * leurs plages `^` : c'est ce décalage qui empêchait le site de builder.
+ * Ce fichier portait auparavant un raccord manuel : `createMDXSource` renvoyait
+ * une fonction là où le `loader()` de fumadocs-core attendait un tableau, les
+ * deux paquets ayant dérivé sous leurs plages de versions. Voir F-006.
  *
- * On résout la fonction sur place plutôt que de reconstruire un objet, pour ne
- * pas perdre le typage générique de la collection (sans quoi `page.data` se
- * dégrade en `PageData` et `page.data.body` n'existe plus).
- *
- * À retirer lors du passage à fumadocs-core / fumadocs-ui 16.x + fumadocs-mdx
- * 15.x, où `loader()` accepte nativement la forme fonction.
+ * Les versions restent épinglées exactement, pour que cette dérive ne se
+ * reproduise pas.
  */
-const mdxSource = createMDXSource(docs, meta);
-
-const rawFiles: unknown = mdxSource.files;
-if (typeof rawFiles === 'function') {
-  (mdxSource as { files: VirtualFile[] }).files = (rawFiles as () => VirtualFile[])();
-}
-
 export const source = loader({
   baseUrl: '/docs',
-  source: mdxSource,
+  source: toFumadocsSource(docs, meta),
 });

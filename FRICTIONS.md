@@ -77,7 +77,7 @@ La règle : on écrit ici à chaud, pendant qu'on bute. Une friction reconstruit
 
 **La leçon.** `npm run build` n'avait jamais été lancé sur ce projet. Seul `next dev` l'avait été, et il masquait l'erreur sur les routes non visitées. Un projet dont on n'a jamais produit le build de production n'est pas un projet qui marche.
 
-**Reste à faire.** Migrer vers `fumadocs-core` et `fumadocs-ui` 16.x avec `fumadocs-mdx` 15.x, où `loader()` accepte nativement la forme fonction, puis retirer le raccord.
+**Soldé le 2026-08-30.** La migration vers `fumadocs-core` et `fumadocs-ui` 16.15.4 avec `fumadocs-mdx` 15.4.0 a retiré le raccord. Elle a coûté plus cher que prévu : `fumadocs-ui` 16 exige `next@16.x.x`, la migration en entraînait donc une seconde, de Next 15 vers 16. Trois ruptures d'API à traiter, plus une quatrième non documentée dans les notes de version : `fumadocs-mdx` 15 ne génère plus un `.source/index.ts` unique mais plusieurs points d'entrée, et il faut importer depuis `.source/server`. Au passage, `next lint` n'existe plus en Next 16, et le script correspondant du site a été retiré plutôt que laissé mort.
 
 ---
 

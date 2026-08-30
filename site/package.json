@@ -9,18 +9,17 @@
     "dev": "next dev",
     "prebuild": "npm run sync",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",
-    "fumadocs-core": "15.8.5",
-    "fumadocs-mdx": "11.10.1",
-    "fumadocs-ui": "15.8.5",
+    "fumadocs-core": "16.15.4",
+    "fumadocs-mdx": "15.4.0",
+    "fumadocs-ui": "16.15.4",
     "lucide-react": "^1.16.0",
-    "next": "^15.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "next": "16.3.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

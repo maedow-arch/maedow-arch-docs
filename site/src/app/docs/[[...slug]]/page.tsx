@@ -31,7 +31,9 @@ export default async function Page(props: {
         sha: 'main',
         // Les pages sont dérivées des documents de la racine du dépôt :
         // on renvoie vers la source, pas vers le .mdx généré.
-        path: page.file.name === 'index' ? 'README.md' : `${page.file.name}.md`,
+        // `page.path` est relatif au dossier de contenu, par exemple
+        // `architecture.mdx`.
+        path: page.path === 'index.mdx' ? 'README.md' : page.path.replace(/\.mdx$/, '.md'),
       }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>

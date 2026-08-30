@@ -1,5 +1,5 @@
 import './globals.css';
-import { RootProvider } from 'fumadocs-ui/provider';
+import { RootProvider } from 'fumadocs-ui/provider/next';
 import { Space_Grotesk, Manrope } from 'next/font/google';
 import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
