@@ -6,6 +6,24 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [0.5.0] : 2026-08-30
+
+### Ajouté
+
+- **Choix du framework hôte à l'installation.** `--framework next` ou `--framework vite`. Le template Vite embarque `react-router`, sans quoi la couche `app/` n'aurait aucun routing à porter et la doctrine serait creuse.
+- La démonstration existe dans les deux frameworks. Son contenu est un composant React ordinaire, et chaque framework fournit son câblage : `page.tsx` sous Next, `HomePage` montée par `routes.tsx` sous Vite.
+- Matrice de CI portée à vingt-deux jobs, dont vingt de scaffolding couvrant les seize combinaisons sous npm et quatre entrées pour pnpm et bun.
+
+### Corpus
+
+- **§3 généralisé.** La colonne « ce qu'elle contient » de la couche App nommait des fichiers Next. Elle décrit désormais un rôle, avec Next comme exemple.
+- **§10 ajouté, « Maedow Arch hors Next.js ».** Le tableau d'équivalence entre frameworks, la démonstration que les frontières ne changent pas, et une méthode en trois questions pour porter le standard vers un framework non couvert.
+
+### Vérifié
+
+- **Les frontières se déclenchent hors Next.** Mesuré sur un projet Vite généré : un import interdit depuis `core/` fait échouer le lint avec le motif exact. C'était la condition sans laquelle le template n'aurait rien valu.
+- Les seize combinaisons se génèrent. Le projet Vite installe, linte, typecheck, passe ses neuf tests de domaine, build et s'affiche à l'identique de la version Next.
+
 ## [0.4.0] : 2026-08-30
 
 ### Ajouté

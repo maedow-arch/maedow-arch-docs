@@ -50,7 +50,7 @@
 
 | Couche | Répertoire | Responsabilité | Ce qu'elle CONTIENT | Ce qu'elle NE CONTIENT JAMAIS |
 | :--- | :--- | :--- | :--- | :--- |
-| **App** | `app/` | Point d'entrée, routing, injection de dépendances. | `page.tsx`, `layout.tsx`, `route.ts`, middlewares. | Logique métier détaillée, requêtes directes non encapsulées. |
+| **App** | `app/` | Point d'entrée, routing, injection de dépendances. | Les fichiers d'amorçage et de routing du framework hôte. Sous Next.js : `page.tsx`, `layout.tsx`, `route.ts`, middlewares. Voir §10. | Logique métier détaillée, requêtes directes non encapsulées. |
 | **Features** | `features/<feature>/` | Écrans et modules fonctionnels utilisateur. | Composants `.tsx`, hooks React dédiés, adaptateurs de vue. | Définitions de modèles de données partagés, logique de persistance brute. |
 | **Shared Features** | `features/_shared/` | Composants UI métier utilisés par $\ge$ 2 features. | Composants composites métier partagés (`UserAvatarCard`, `AddressPicker`). | Primitives UI agnostiques (qui vont dans `components/ui/`). |
 | **Core** | `core/<module>/` | Cœur métier, domaine pur, persistance, contrats. | Types/Interfaces purs (`.ts`), machines d'états, validateurs, interfaces de repositories. | **ZÉRO fichier `.tsx`**, aucun import React/DOM. |
@@ -268,3 +268,46 @@ Sans drapeau, la CLI pose la question lorsqu'elle est lancée depuis un terminal
 Chaque profil se décline en deux contenus : `--template demo` livre un compteur borné illustrant le profil choisi, `--template blank` livre l'arborescence seule. Générer la même démonstration dans les deux profils et comparer les arborescences est le moyen le plus court de saisir ce que la séparation apporte, et ce qu'elle coûte.
 
 **Règle de bascule** : un projet démarré en Mode Light qui gagne en complexité (nouvelle feature qui duplique de la logique, besoin de tester le métier indépendamment de l'UI, montée en charge du produit) doit migrer progressivement vers le Mode Full, domaine par domaine, jamais en un seul refactor global.
+
+---
+
+## 10. Maedow Arch hors Next.js
+
+Le standard revendique l'agnosticisme technique. Il doit donc valoir au-delà du framework qui a servi à le formuler.
+
+**Trois couches sur quatre ne bougent pas.** `features/`, `core/`, `components/` et `lib/` ne connaissent ni routeur, ni convention de fichiers, ni rendu serveur. Elles sont déjà portables telles quelles.
+
+**Seule la couche `app/` s'adapte.** Sa définition reste inchangée : point d'entrée, routing, injection de dépendances. Ce sont ses fichiers qui diffèrent, parce que chaque framework déclare ses routes à sa façon.
+
+| Responsabilité | Next.js App Router | React sur Vite |
+| :--- | :--- | :--- |
+| Point d'entrée | `app/layout.tsx` | `app/main.tsx` |
+| Coquille et injection | `app/layout.tsx` | `app/App.tsx` |
+| Déclaration des routes | l'arborescence de `app/` | `app/routes.tsx` |
+
+L'interdiction, elle, ne change jamais : aucune logique métier détaillée dans cette couche, quel que soit le framework.
+
+### 10.1. Ce que cela implique pour les frontières
+
+Rien. Les règles du §6 portent sur des répertoires, pas sur des fichiers : `app` peut tout importer, une feature n'en importe pas une autre, `core` ignore l'interface. Ces énoncés ne mentionnent aucun framework.
+
+`eslint-config-maedow-arch` sert donc les deux, sans configuration distincte. C'est le même constat qu'en §9.1 pour les profils Light et Full : les axes de variation d'un projet ne changent pas ses frontières.
+
+### 10.2. Choisir son framework à l'installation
+
+```bash
+npx create-maedow-arch-app mon-projet --framework next   # Next.js App Router
+npx create-maedow-arch-app mon-projet --framework vite   # React sur Vite
+```
+
+Sans drapeau, la CLI pose la question lorsqu'elle est lancée depuis un terminal, et retient `next` sinon.
+
+### 10.3. Porter Maedow Arch vers un autre framework
+
+La démarche tient en trois questions, à poser dans cet ordre.
+
+1. **Où démarre l'application ?** Ce fichier appartient à `app/`.
+2. **Où sont déclarées les routes ?** Ce fichier appartient à `app/`.
+3. **Où sont injectées les dépendances, contextes et fournisseurs ?** Ce fichier appartient à `app/`.
+
+Tout le reste va dans les couches inférieures, sans adaptation. Si l'une de ces trois réponses vous conduit à écrire de la logique métier dans `app/`, c'est le signe que cette logique appartenait à `core/` ou à la feature.
