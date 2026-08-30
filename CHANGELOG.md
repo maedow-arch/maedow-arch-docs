@@ -6,6 +6,18 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [Non publié]
+
+### Ajouté
+
+- **Profil de lecture Light ou Full sur le site.** Un sélecteur en tête de la barre latérale masque les sections qui n'appartiennent pas au profil choisi. Le masquage se fait en CSS et le profil est posé avant la première peinture : la bascule ne reconstruit pas la page et aucune section n'apparaît pour disparaître ensuite. Les entrées de sommaire correspondantes sont retirées avec elles.
+- **Balises `<ModeFull>` et `<ModeLight>` dans le corpus.** Elles restent invisibles sur GitHub, qui rend normalement le markdown qu'elles entourent.
+
+### Modifié
+
+- **Le corpus marque la section Agnosticisme technique comme propre au Mode Full.** Le §9 le déclarait déjà : en Light, ni contracts ni adapters. Un lecteur en Light ne la voit plus.
+- **Refonte visuelle du site.** Palette issue du Maedow Design System, avec trois valeurs dérivées pour le thème clair, chacune mesurée au premier seuil AA. Quatre fontes et quatre rôles : Space Grotesk aux titres, Google Sans Flex au texte courant, Google Sans Code au code de la documentation, Geist Mono au seul bloc terminal de la page d'accueil.
+
 ## [0.7.0] : 2026-08-30
 
 ### Ajouté
