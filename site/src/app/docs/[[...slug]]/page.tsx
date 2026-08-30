@@ -1,19 +1,12 @@
-import { source } from '@/lib/source';
-import {
-  DocsBody,
-  DocsDescription,
-  DocsPage,
-  DocsTitle,
-} from 'fumadocs-ui/page';
-import { Cards, Card } from 'fumadocs-ui/components/card';
-import defaultMdxComponents from 'fumadocs-ui/mdx';
-import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
-import { REPO_URL } from '@/lib/links';
+import { source } from "@/lib/source";
+import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page";
+import { Cards, Card } from "fumadocs-ui/components/card";
+import defaultMdxComponents from "fumadocs-ui/mdx";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { REPO_URL } from "@/lib/links";
 
-export default async function Page(props: {
-  params: Promise<{ slug?: string[] }>;
-}) {
+export default async function Page(props: { params: Promise<{ slug?: string[] }> }) {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
@@ -24,16 +17,16 @@ export default async function Page(props: {
     <DocsPage
       toc={page.data.toc ?? []}
       full={page.data.full}
-      tableOfContent={{ style: 'clerk', single: false }}
+      tableOfContent={{ style: "clerk", single: false }}
       editOnGithub={{
-        owner: 'maedow-arch',
-        repo: 'maedow-arch-docs',
-        sha: 'main',
+        owner: "maedow-arch",
+        repo: "maedow-arch-docs",
+        sha: "main",
         // Les pages sont dérivées des documents de la racine du dépôt :
         // on renvoie vers la source, pas vers le .mdx généré.
         // `page.path` est relatif au dossier de contenu, par exemple
         // `architecture.mdx`.
-        path: page.path === 'index.mdx' ? 'README.md' : page.path.replace(/\.mdx$/, '.md'),
+        path: page.path === "index.mdx" ? "README.md" : page.path.replace(/\.mdx$/, ".md"),
       }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
@@ -65,7 +58,7 @@ export async function generateMetadata(props: {
       title: page.data.title,
       description: page.data.description,
       url: `${REPO_URL}`,
-      type: 'article',
+      type: "article",
     },
   };
 }

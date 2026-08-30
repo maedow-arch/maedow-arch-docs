@@ -1,5 +1,5 @@
 name: Friction rencontrée
-description: Signaler ce qui a résisté en conditions réelles : règle trop stricte, générateur mal aligné, étape manquante.
+description: "Signaler ce qui a résisté en conditions réelles : règle trop stricte, générateur mal aligné, étape manquante."
 title: "[Friction] "
 labels: ["friction"]
 body:

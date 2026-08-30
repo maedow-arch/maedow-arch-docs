@@ -1,0 +1,16 @@
+node_modules
+.next
+.source
+dist
+out
+build
+package-lock.json
+
+# Prettier formate le code, pas la prose.
+#
+# Sur les documents, il réaligne les tableaux en lignes de deux cents
+# caractères et modifie les conventions d'écriture, par exemple *ainsi* qui
+# devient _ainsi_. Le corpus est le produit lui-même : il reste tel qu'il est
+# écrit.
+*.md
+*.mdx

@@ -1,6 +1,6 @@
-@import 'tailwindcss';
-@import 'fumadocs-ui/css/purple.css';
-@import 'fumadocs-ui/css/preset.css';
+@import "tailwindcss";
+@import "fumadocs-ui/css/purple.css";
+@import "fumadocs-ui/css/preset.css";
 
 /*
  * Deux fontes, deux rôles.
@@ -19,7 +19,12 @@
 }
 
 body {
-  font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family:
+    var(--font-body),
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 /*
@@ -42,11 +47,7 @@ h4,
  * concurrencer le texte.
  */
 .maedow-dots {
-  background-image: radial-gradient(
-    circle at center,
-    var(--color-fd-border) 1px,
-    transparent 1px
-  );
+  background-image: radial-gradient(circle at center, var(--color-fd-border) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 

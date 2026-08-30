@@ -6,6 +6,18 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [0.7.0] : 2026-08-30
+
+### Ajouté
+
+- **Prettier dans le dépôt**, avec `npm run format` et `npm run format:check`, ce dernier vérifié en intégration continue.
+- **Prettier dans les projets générés** : configuration, fichier d'exclusion et les deux scripts. Un projet fraîchement scaffoldé passe `prettier --check` sans rien avoir à reformater.
+- **`.gitattributes`** normalisant les fins de ligne en LF. Sans lui, git convertissait en CRLF à chaque checkout sous Windows pendant que Prettier réécrivait en LF : chaque fichier apparaissait modifié à chaque passage.
+
+### Décidé
+
+- **Prettier formate le code, pas la prose.** Les fichiers Markdown sont exclus. Sur le corpus, Prettier réalignait les tableaux en lignes de deux cents caractères et changeait les conventions d'écriture, `*ainsi*` devenant `_ainsi_`. Ces documents sont le produit lui-même, ils restent tels qu'ils sont écrits.
+
 ## [0.6.0] : 2026-08-30
 
 ### Ajouté

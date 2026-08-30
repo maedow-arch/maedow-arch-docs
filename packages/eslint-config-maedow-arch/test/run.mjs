@@ -49,7 +49,10 @@ async function lint(fixtureName) {
   const results = await eslint.lintFiles(["src"]);
   return results.flatMap((result) =>
     result.messages.map((message) => ({
-      file: result.filePath.slice(cwd.length + 1).replaceAll("\\", "/").replace(/^src\//, ""),
+      file: result.filePath
+        .slice(cwd.length + 1)
+        .replaceAll("\\", "/")
+        .replace(/^src\//, ""),
       ruleId: message.ruleId,
       message: message.message,
     }))

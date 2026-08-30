@@ -1,30 +1,30 @@
-import Link from 'next/link';
-import { Logo } from '@/components/Logo';
-import { REPO_URL, NPM_CLI_URL, NPM_ESLINT_URL } from '@/lib/links';
+import Link from "next/link";
+import { Logo } from "@/components/Logo";
+import { REPO_URL, NPM_CLI_URL, NPM_ESLINT_URL } from "@/lib/links";
 
 const COLUMNS = [
   {
-    heading: 'Documentation',
+    heading: "Documentation",
     links: [
-      { label: 'Introduction', href: '/docs' },
-      { label: 'Blueprint & 4 Couches', href: '/docs/architecture' },
-      { label: 'Modélisation', href: '/docs/models' },
-      { label: 'Conventions', href: '/docs/conventions' },
+      { label: "Introduction", href: "/docs" },
+      { label: "Blueprint & 4 Couches", href: "/docs/architecture" },
+      { label: "Modélisation", href: "/docs/models" },
+      { label: "Conventions", href: "/docs/conventions" },
     ],
   },
   {
-    heading: 'Outillage',
+    heading: "Outillage",
     links: [
-      { label: 'create-maedow-arch-app', href: NPM_CLI_URL },
-      { label: 'eslint-config-maedow-arch', href: NPM_ESLINT_URL },
+      { label: "create-maedow-arch-app", href: NPM_CLI_URL },
+      { label: "eslint-config-maedow-arch", href: NPM_ESLINT_URL },
     ],
   },
   {
-    heading: 'Projet',
+    heading: "Projet",
     links: [
-      { label: 'Dépôt GitHub', href: REPO_URL },
-      { label: 'Changelog', href: `${REPO_URL}/blob/main/CHANGELOG.md` },
-      { label: 'Signaler une friction', href: `${REPO_URL}/issues` },
+      { label: "Dépôt GitHub", href: REPO_URL },
+      { label: "Changelog", href: `${REPO_URL}/blob/main/CHANGELOG.md` },
+      { label: "Signaler une friction", href: `${REPO_URL}/issues` },
     ],
   },
 ];

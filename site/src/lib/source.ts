@@ -1,6 +1,6 @@
-import { docs, meta } from '@/.source/server';
-import { toFumadocsSource } from 'fumadocs-mdx/runtime/server';
-import { loader } from 'fumadocs-core/source';
+import { docs, meta } from "@/.source/server";
+import { toFumadocsSource } from "fumadocs-mdx/runtime/server";
+import { loader } from "fumadocs-core/source";
 
 /**
  * Les collections sont importées depuis l'entrée serveur générée par
@@ -14,6 +14,6 @@ import { loader } from 'fumadocs-core/source';
  * reproduise pas.
  */
 export const source = loader({
-  baseUrl: '/docs',
+  baseUrl: "/docs",
   source: toFumadocsSource(docs, meta),
 });

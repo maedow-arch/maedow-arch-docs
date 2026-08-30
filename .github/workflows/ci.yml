@@ -21,6 +21,21 @@ jobs:
       # passerait le test positif sans rien vérifier.
       - run: npm run test:boundaries
 
+  format:
+    name: Formatage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Prettier formate le code, pas la prose : le corpus est exclu, et
+      # .gitattributes normalise les fins de ligne pour que ce contrôle ne
+      # dépende pas du système de celui qui commite.
+      - run: npm run format:check
+
   site:
     name: Build du site
     runs-on: ubuntu-latest

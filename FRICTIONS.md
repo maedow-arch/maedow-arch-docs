@@ -202,3 +202,28 @@ C'est aussi F-004 qui revient sous un autre visage. Tester par un lien vers le d
 **Ce qu'on en a fait.** La base ne pose plus que `border`, et chaque variante déclare sa propre couleur. La règle générale : ne jamais poser deux fois la même propriété via des utilitaires, dans une base puis dans une variante.
 
 **La leçon.** Un build vert et un typecheck vert ne disent rien du rendu. Ce défaut n'a été trouvé que parce que le plan exigeait une comparaison visuelle entre les deux variantes.
+
+---
+
+## F-014 : le nettoyage des tirets cadratins avait cassé deux fichiers YAML
+
+**Symptôme.** Aucun, pendant deux jours. Les gabarits d'issue étaient invalides sur GitHub, et rien ne le signalait. C'est l'ajout de Prettier qui les a fait apparaître, en refusant de les analyser.
+
+```
+.github/ISSUE_TEMPLATE/friction.yml
+SyntaxError: Nested mappings are not allowed in compact mappings (2:14)
+```
+
+**Cause.** En remplaçant le tiret cadratin par un deux-points, j'ai produit des scalaires YAML non quotés contenant ` : `, ce que le format interprète comme une imbrication.
+
+```yaml
+description: Signaler ce qui a résisté en conditions réelles : règle trop stricte
+```
+
+Le même défaut avait déjà frappé le frontmatter de la page d'accueil de la documentation le jour même, où le build l'avait attrapé. Ici rien ne compilait ces fichiers : ils partaient sur GitHub tels quels, et l'interface se contentait de ne pas proposer le formulaire.
+
+**Ce qu'on en a fait.** Les valeurs sont passées entre guillemets, et le contrôle Prettier de la CI empêchera la récidive.
+
+**La leçon.** Une substitution mécanique dans un fichier de configuration change sa syntaxe, pas seulement son texte. J'avais pourtant vu ce défaut une première fois, dans le frontmatter, sans en tirer la conclusion générale : chercher toutes les occurrences du même motif au lieu de corriger celle qui venait de se manifester.
+
+Et c'est le premier apport concret de Prettier, avant même la question du style : un formateur est aussi un analyseur syntaxique qui refuse ce qu'il ne comprend pas.
