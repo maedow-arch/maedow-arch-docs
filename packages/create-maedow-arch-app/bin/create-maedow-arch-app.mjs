@@ -412,7 +412,7 @@ const pm = detectPackageManager();
 const cmd = COMMANDS[pm];
 
 console.log(
-  `\n📦 Création de « ${projectName} », profil ${mode}, contenu ${template}, style ${style}.`
+  `\n📦 Création de « ${projectName} » : ${framework}, profil ${mode}, contenu ${template}, style ${style}.`
 );
 
 const layers = layersFor({ framework, mode, template, style });
