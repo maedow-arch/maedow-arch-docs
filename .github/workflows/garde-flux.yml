@@ -1,0 +1,32 @@
+name: Garde du flux
+
+# Une pull request vers main ne peut venir que de develop, et depuis le dépôt
+# lui-même. Sans ce garde, un correctif pourrait rejoindre les versions
+# publiées sans être passé par l'intégration, et le flux ne tiendrait que par
+# la vigilance de celui qui ouvre la PR.
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  origine:
+    name: Origine de la branche
+    runs-on: ubuntu-latest
+    steps:
+      - name: La branche source doit être develop
+        env:
+          SOURCE: ${{ github.head_ref }}
+          DEPOT_SOURCE: ${{ github.event.pull_request.head.repo.full_name }}
+          DEPOT: ${{ github.repository }}
+        run: |
+          if [ "$DEPOT_SOURCE" != "$DEPOT" ]; then
+            echo "::error::Cette PR vise main depuis le fork $DEPOT_SOURCE."
+            echo "Les contributions entrent par develop. Ouvrez la PR vers develop."
+            exit 1
+          fi
+          if [ "$SOURCE" != "develop" ]; then
+            echo "::error::Cette PR vise main depuis la branche $SOURCE."
+            echo "Seule develop peut alimenter main. Ouvrez la PR vers develop."
+            exit 1
+          fi
+          echo "Origine conforme : develop vers main."
