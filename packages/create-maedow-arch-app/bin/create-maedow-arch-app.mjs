@@ -19,10 +19,11 @@ const DOCS_URL = "https://github.com/maedow-arch/maedow-arch-docs";
 const MODES = ["full", "light"];
 const TEMPLATES = ["demo", "blank"];
 const STYLES = ["vanilla", "tailwind"];
+const FRAMEWORKS = ["next", "vite"];
 const DEFAULT_MODE = "full";
 const DEFAULT_TEMPLATE = "demo";
 const DEFAULT_STYLE = "vanilla";
-const FRAMEWORK = "next";
+const DEFAULT_FRAMEWORK = "next";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const templatesDir = join(__dirname, "..", "templates");
@@ -60,6 +61,7 @@ function parseArgs(argv) {
   let mode = null;
   let template = null;
   let style = null;
+  let framework = null;
 
   const take = (value, name) => {
     if (value === undefined) fail(`L'option ${name} attend une valeur.`, usage());
@@ -80,6 +82,14 @@ function parseArgs(argv) {
       style = take(argv[++i], "--css");
     } else if (arg.startsWith("--css=")) {
       style = arg.slice("--css=".length);
+    } else if (arg === "--framework" || arg === "-f") {
+      framework = take(argv[++i], "--framework");
+    } else if (arg.startsWith("--framework=")) {
+      framework = arg.slice("--framework=".length);
+    } else if (arg === "--next") {
+      framework = "next";
+    } else if (arg === "--vite") {
+      framework = "vite";
     } else if (arg === "--tailwind") {
       style = "tailwind";
     } else if (arg === "--vanilla") {
@@ -96,6 +106,7 @@ function parseArgs(argv) {
       mode = mode ?? DEFAULT_MODE;
       template = template ?? DEFAULT_TEMPLATE;
       style = style ?? DEFAULT_STYLE;
+      framework = framework ?? DEFAULT_FRAMEWORK;
     } else if (arg === "--help" || arg === "-h") {
       console.log(usage());
       process.exit(0);
@@ -106,7 +117,7 @@ function parseArgs(argv) {
     }
   }
 
-  return { projectName: positional[0], mode, template, style };
+  return { projectName: positional[0], mode, template, style, framework };
 }
 
 function usage() {
@@ -117,6 +128,7 @@ function usage() {
     "  -m, --mode <full|light>       Profil d'architecture. Par défaut : full.",
     "  -t, --template <demo|blank>   Contenu de départ. Par défaut : demo.",
     "  -c, --css <vanilla|tailwind>  Style. Par défaut : vanilla.",
+    "  -f, --framework <next|vite>   Framework hôte. Par défaut : next.",
     "  -y, --yes                     Accepte les valeurs par défaut, sans question.",
     "  -h, --help                    Affiche cette aide.",
     "",
@@ -133,6 +145,11 @@ function usage() {
     "Styles :",
     "  vanilla   CSS natif, aucune dépendance de style.",
     "  tailwind  Tailwind CSS 4, configuré et prêt à l'emploi.",
+    "",
+    "Frameworks, voir architecture.md §10 :",
+    "  next   Next.js App Router. Le routing suit l'arborescence de app/.",
+    "  vite   React sur Vite, avec react-router. Les routes sont déclarées",
+    "         dans app/routes.tsx. Seule la couche app/ diffère.",
   ].join("\n");
 }
 
@@ -283,7 +300,7 @@ function countFiles(dir) {
  * ------------------------------------------------------------------ */
 
 const args = parseArgs(process.argv.slice(2));
-let { projectName, mode, template, style } = args;
+let { projectName, mode, template, style, framework } = args;
 
 if (!projectName) {
   fail("Il manque le nom du projet.", usage());
@@ -311,8 +328,14 @@ if (template !== null && !TEMPLATES.includes(template)) {
 if (style !== null && !STYLES.includes(style)) {
   fail(`Style inconnu : « ${style} ». Choix possibles : ${STYLES.join(", ")}.`, usage());
 }
+if (framework !== null && !FRAMEWORKS.includes(framework)) {
+  fail(
+    `Framework inconnu : « ${framework} ». Choix possibles : ${FRAMEWORKS.join(", ")}.`,
+    usage()
+  );
+}
 
-if ((mode === null || template === null || style === null) && isInteractive) {
+if ((mode === null || template === null || style === null || framework === null) && isInteractive) {
   const rl = createInterface({ input: stdin, output: stdout });
   try {
     if (mode === null) {
@@ -356,6 +379,25 @@ if ((mode === null || template === null || style === null) && isInteractive) {
         DEFAULT_STYLE
       );
     }
+    if (framework === null) {
+      framework = await askChoice(
+        rl,
+        "Quel framework hôte ?",
+        [
+          {
+            value: "next",
+            label: "Next.js App Router",
+            hint: "Le routing suit l'arborescence de app/.",
+          },
+          {
+            value: "vite",
+            label: "React sur Vite",
+            hint: "Les routes sont déclarées dans app/routes.tsx.",
+          },
+        ],
+        DEFAULT_FRAMEWORK
+      );
+    }
   } finally {
     rl.close();
   }
@@ -364,6 +406,7 @@ if ((mode === null || template === null || style === null) && isInteractive) {
 mode = mode ?? DEFAULT_MODE;
 template = template ?? DEFAULT_TEMPLATE;
 style = style ?? DEFAULT_STYLE;
+framework = framework ?? DEFAULT_FRAMEWORK;
 
 const pm = detectPackageManager();
 const cmd = COMMANDS[pm];
@@ -372,7 +415,7 @@ console.log(
   `\n📦 Création de « ${projectName} », profil ${mode}, contenu ${template}, style ${style}.`
 );
 
-const layers = layersFor({ framework: FRAMEWORK, mode, template, style });
+const layers = layersFor({ framework, mode, template, style });
 
 mkdirSync(targetDir, { recursive: true });
 for (const layer of layers) {

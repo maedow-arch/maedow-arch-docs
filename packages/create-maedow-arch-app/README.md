@@ -36,6 +36,27 @@ Les frontières restent vérifiées dans les deux cas : une feature n'importe ja
 
 Sans drapeau, la CLI pose la question lorsqu'elle est lancée depuis un terminal, et retient `full` sinon. Elle ne bloque jamais un script ni une intégration continue.
 
+## Choisir son framework
+
+```bash
+npx create-maedow-arch-app mon-projet --framework next   # par défaut
+npx create-maedow-arch-app mon-projet --framework vite
+```
+
+**Next.js App Router** déclare ses routes par l'arborescence de `app/`.
+
+**React sur Vite** les déclare dans `app/routes.tsx`, avec `react-router`.
+
+Trois couches sur quatre ne bougent pas d'un framework à l'autre : `features/`, `core/`, `components/` et `lib/` ne connaissent ni routeur ni convention de fichiers. Seule la couche `app/` s'adapte, et sa définition reste la même : point d'entrée, routing, injection de dépendances.
+
+| Responsabilité | Next.js | Vite |
+| :--- | :--- | :--- |
+| Point d'entrée | `app/layout.tsx` | `app/main.tsx` |
+| Coquille et injection | `app/layout.tsx` | `app/App.tsx` |
+| Déclaration des routes | l'arborescence de `app/` | `app/routes.tsx` |
+
+Les frontières sont vraiment appliquées dans les deux cas, sans configuration ESLint distincte. Voir architecture.md §10.
+
 ## Choisir son style
 
 ```bash
