@@ -111,4 +111,12 @@ npm run site:dev          # lance le site en local
 
 Maedow Arch est un standard ouvert, sous licence MIT.
 
+Les contributions entrent par `develop`, jamais directement par `main` :
+
+```
+votre branche  ──PR▶  develop  ──PR▶  main
+```
+
+[`CONTRIBUTING.md`](./CONTRIBUTING.md) détaille le chemin complet, ce que la vérification automatique contrôle, et les deux règles propres à ce dépôt.
+
 Les retours d'usage réel constituent l'apport le plus utile : frictions rencontrées, cas limites, règles trop strictes ou pas assez. Ils passent par les issues du dépôt et alimentent [`FRICTIONS.md`](./FRICTIONS.md), le journal de ce qui a résisté en conditions réelles.
