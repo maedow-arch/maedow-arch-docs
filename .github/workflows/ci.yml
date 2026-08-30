@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       # La fixture invalide est celle qui prouve quelque chose : cinq imports
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: site/package-lock.json
       - run: npm ci
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - if: matrix.pm == 'pnpm'
         uses: pnpm/action-setup@v4
@@ -66,10 +66,20 @@ jobs:
       - name: Générer le projet
         run: node packages/create-maedow-arch-app/bin/create-maedow-arch-app.mjs app --mode ${{ matrix.mode }} --template ${{ matrix.template }}
 
-      - name: Installer, avec la config ESLint locale plutôt que celle du registre
+      # La config ESLint est empaquetée puis installée depuis son tarball, et
+      # non liée par `file:`. npm et bun résolvent un lien `file:` par un
+      # symlink : le paquet cherche alors ses peerDependencies depuis son
+      # emplacement réel, où elles n'existent pas. Un tarball reproduit
+      # exactement ce qu'un utilisateur reçoit du registre.
+      - name: Empaqueter la config ESLint locale
+        run: npm pack --pack-destination "$RUNNER_TEMP"
+        working-directory: packages/eslint-config-maedow-arch
+
+      - name: Installer
         working-directory: app
         run: |
-          npm pkg set devDependencies.eslint-config-maedow-arch=file:../packages/eslint-config-maedow-arch
+          TARBALL=$(ls "$RUNNER_TEMP"/eslint-config-maedow-arch-*.tgz | head -1)
+          npm pkg set devDependencies.eslint-config-maedow-arch="file:$TARBALL"
           ${{ matrix.pm == 'npm' && 'npm install --no-audit --no-fund' || '' }}${{ matrix.pm == 'pnpm' && 'pnpm install' || '' }}${{ matrix.pm == 'bun' && 'bun install' || '' }}
 
       - name: Lint, typecheck, build

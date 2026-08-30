@@ -155,3 +155,26 @@ Le lint, le typecheck et le build passent également.
 **Ce qu'on en a fait.** Rien à corriger, mais la vérification est désormais permanente. La CI exécute une matrice de six combinaisons, deux variantes de template sous npm, pnpm et bun, chacune allant jusqu'au test négatif.
 
 **La leçon.** Un risque théorique se vérifie, il ne se suppose pas. Celui-ci était plausible et documenté par le comportement de F-001, mais il ne se matérialise pas. L'inscrire ici évite qu'on le redoute à nouveau dans six mois, et la matrice de CI garantit qu'on le saura le jour où il apparaîtra vraiment.
+
+---
+
+## F-011 : le risque de résolution s'est produit, mais pas là où je l'attendais
+
+**Le contexte.** En F-010, j'avais anticipé que l'arborescence stricte de pnpm casserait la résolution de `eslint-plugin-boundaries` depuis `eslint-config-maedow-arch`, avec pour conséquence un lint vert qui ne vérifie rien. Mesure faite, pnpm tenait parfaitement.
+
+**Ce qui s'est passé.** À la première exécution de la matrice de CI, les quatre combinaisons sous pnpm passaient, et les huit autres échouaient. Sous npm comme sous bun :
+
+```
+Cannot find package 'eslint-plugin-boundaries' imported from
+packages/eslint-config-maedow-arch/index.js
+```
+
+**Cause.** La CI installait la config locale par un lien `file:`. npm et bun résolvent ce lien par un symlink vers le dossier réel du dépôt, qui n'a pas de `node_modules`. Le paquet y cherchait donc ses peerDependencies, sans les trouver. pnpm, lui, matérialise le paquet dans le store et la résolution aboutit, d'où l'inversion complète du résultat attendu.
+
+**Ce que cela ne change pas pour les utilisateurs.** Un projet qui installe `eslint-config-maedow-arch` depuis le registre place le paquet dans son propre `node_modules`, où la résolution remonte naturellement jusqu'au plugin. Vérifié à plusieurs reprises sur des projets réels. L'échec était donc un artefact du banc d'essai, pas un défaut du paquet.
+
+**Ce qu'on en a fait.** La CI empaquette désormais la config par `npm pack` et installe le tarball obtenu, ce qui reproduit exactement ce qu'un utilisateur reçoit. Reproduit puis vérifié en local avant d'être poussé : `lint EXIT 0` là où la CI renvoyait 2.
+
+**La leçon, et elle en dit long.** Le risque était réel, mon diagnostic de son emplacement était faux. J'avais désigné pnpm parce que son arborescence stricte est réputée fragile sur ce point, et c'est npm, le plus courant, qui trébuchait. Un risque anticipé n'est pas un risque compris : seule la matrice l'a localisé.
+
+C'est aussi F-004 qui revient sous un autre visage. Tester par un lien vers le dépôt et tester par le paquet publié ne sont pas le même test, et c'est la deuxième fois que cette confusion produit un défaut.
