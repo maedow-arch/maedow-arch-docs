@@ -1,13 +1,13 @@
 {
   "name": "create-maedow-arch-app",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Scaffold un projet suivant Maedow Arch (app/features/core/components/lib, Result Pattern, ESLint boundaries)",
   "type": "module",
   "bin": {
-    "create-maedow-arch-app": "./bin/create-maedow-arch-app.mjs"
+    "create-maedow-arch-app": "dist/create-maedow-arch-app.mjs"
   },
   "files": [
-    "bin",
+    "dist",
     "templates",
     "README.md",
     "LICENSE"
@@ -35,5 +35,13 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@clack/prompts": "^1.7.0",
+    "esbuild": "^0.28.2"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "prepublishOnly": "node build.mjs"
   }
 }

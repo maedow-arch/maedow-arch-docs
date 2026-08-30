@@ -7,6 +7,9 @@ out
 build
 .source
 *.tsbuildinfo
+
+# Bundle produit par esbuild, reconstruit à chaque publication
+packages/create-maedow-arch-app/dist
 next-env.d.ts
 
 # Déploiement

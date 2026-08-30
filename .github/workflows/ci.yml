@@ -74,8 +74,17 @@ jobs:
       - if: matrix.pm == 'bun'
         uses: oven-sh/setup-bun@v2
 
+      # On construit le bundle et on génère avec lui, pas avec la source : c'est
+      # l'artefact que l'utilisateur reçoit. La source, elle, importe
+      # @clack/prompts depuis node_modules, ce que le paquet publié ne fait pas.
+      - name: Construire la CLI
+        working-directory: packages/create-maedow-arch-app
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+
       - name: Générer le projet
-        run: node packages/create-maedow-arch-app/bin/create-maedow-arch-app.mjs app --framework ${{ matrix.framework }} --mode ${{ matrix.mode }} --template ${{ matrix.template }} --css ${{ matrix.css }}
+        run: node packages/create-maedow-arch-app/dist/create-maedow-arch-app.mjs app --framework ${{ matrix.framework }} --mode ${{ matrix.mode }} --template ${{ matrix.template }} --css ${{ matrix.css }}
 
       # La config ESLint est empaquetée puis installée depuis son tarball, et
       # non liée par `file:`. npm et bun résolvent un lien `file:` par un

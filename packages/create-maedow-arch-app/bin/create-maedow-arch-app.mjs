@@ -11,7 +11,7 @@ import {
 } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { createInterface } from "node:readline/promises";
+import { intro, outro, select, isCancel, cancel, log } from "@clack/prompts";
 import { stdin, stdout } from "node:process";
 
 const DOCS_URL = "https://github.com/maedow-arch/maedow-arch-docs";
@@ -170,26 +170,17 @@ function fail(message, extra) {
  */
 const isInteractive = stdin.isTTY && stdout.isTTY && !process.env.CI;
 
-async function askChoice(rl, question, choices, fallback) {
-  const lines = [`\n${question}`];
-  choices.forEach((choice, index) => {
-    const mark = choice.value === fallback ? " (défaut)" : "";
-    lines.push(`  ${index + 1}. ${choice.label}${mark}`);
-    lines.push(`     ${choice.hint}`);
-  });
-  console.log(lines.join("\n"));
+/** Une annulation par Ctrl+C doit s'arrêter proprement, sans dossier à moitié créé. */
+function ensureNotCancelled(value) {
+  if (isCancel(value)) {
+    cancel("Création annulée.");
+    process.exit(0);
+  }
+  return value;
+}
 
-  const answer = (await rl.question("> ")).trim().toLowerCase();
-  if (answer === "") return fallback;
-
-  const byIndex = choices[Number(answer) - 1];
-  if (byIndex) return byIndex.value;
-
-  const byName = choices.find((choice) => choice.value === answer);
-  if (byName) return byName.value;
-
-  console.log(`  Réponse non reconnue, on garde « ${fallback} ».`);
-  return fallback;
+async function ask(message, options, initialValue) {
+  return ensureNotCancelled(await select({ message, options, initialValue }));
 }
 
 /* ------------------------------------------------------------------ *
@@ -336,70 +327,50 @@ if (framework !== null && !FRAMEWORKS.includes(framework)) {
 }
 
 if ((mode === null || template === null || style === null || framework === null) && isInteractive) {
-  const rl = createInterface({ input: stdin, output: stdout });
-  try {
-    if (mode === null) {
-      mode = await askChoice(
-        rl,
-        "Quel profil d'architecture ?",
-        [
-          { value: "full", label: "Full", hint: "Les quatre couches. Pour un produit qui dure." },
-          {
-            value: "light",
-            label: "Light",
-            hint: "Sans couche core. Pour un site vitrine, un prototype, un MVP.",
-          },
-        ],
-        DEFAULT_MODE
-      );
-    }
-    if (template === null) {
-      template = await askChoice(
-        rl,
-        "Quel contenu de départ ?",
-        [
-          {
-            value: "demo",
-            label: "Démonstration",
-            hint: "Un compteur borné, décliné selon le profil choisi.",
-          },
-          { value: "blank", label: "Vierge", hint: "L'arborescence seule, sans exemple." },
-        ],
-        DEFAULT_TEMPLATE
-      );
-    }
-    if (style === null) {
-      style = await askChoice(
-        rl,
-        "Quel style ?",
-        [
-          { value: "vanilla", label: "CSS natif", hint: "Aucune dépendance de style." },
-          { value: "tailwind", label: "Tailwind CSS 4", hint: "Configuré et prêt à l'emploi." },
-        ],
-        DEFAULT_STYLE
-      );
-    }
-    if (framework === null) {
-      framework = await askChoice(
-        rl,
-        "Quel framework hôte ?",
-        [
-          {
-            value: "next",
-            label: "Next.js App Router",
-            hint: "Le routing suit l'arborescence de app/.",
-          },
-          {
-            value: "vite",
-            label: "React sur Vite",
-            hint: "Les routes sont déclarées dans app/routes.tsx.",
-          },
-        ],
-        DEFAULT_FRAMEWORK
-      );
-    }
-  } finally {
-    rl.close();
+  intro("Maedow Arch");
+
+  if (framework === null) {
+    framework = await ask(
+      "Quel framework hôte ?",
+      [
+        { value: "next", label: "Next.js", hint: "App Router, routing par l'arborescence de app/" },
+        { value: "vite", label: "React sur Vite", hint: "routes déclarées dans app/routes.tsx" },
+      ],
+      DEFAULT_FRAMEWORK
+    );
+  }
+
+  if (mode === null) {
+    mode = await ask(
+      "Quel profil d'architecture ?",
+      [
+        { value: "full", label: "Full", hint: "les quatre couches, pour un produit qui dure" },
+        { value: "light", label: "Light", hint: "sans couche core, pour un site vitrine ou un MVP" },
+      ],
+      DEFAULT_MODE
+    );
+  }
+
+  if (template === null) {
+    template = await ask(
+      "Quel contenu de départ ?",
+      [
+        { value: "demo", label: "Démonstration", hint: "un compteur borné, décliné selon le profil" },
+        { value: "blank", label: "Vierge", hint: "l'arborescence seule, sans exemple" },
+      ],
+      DEFAULT_TEMPLATE
+    );
+  }
+
+  if (style === null) {
+    style = await ask(
+      "Quel style ?",
+      [
+        { value: "vanilla", label: "CSS natif", hint: "aucune dépendance de style" },
+        { value: "tailwind", label: "Tailwind CSS 4", hint: "configuré et prêt à l'emploi" },
+      ],
+      DEFAULT_STYLE
+    );
   }
 }
 
@@ -411,9 +382,11 @@ framework = framework ?? DEFAULT_FRAMEWORK;
 const pm = detectPackageManager();
 const cmd = COMMANDS[pm];
 
-console.log(
-  `\n📦 Création de « ${projectName} » : ${framework}, profil ${mode}, contenu ${template}, style ${style}.`
-);
+// En non interactif, aucune question n'a été posée : la session clack n'est
+// pas ouverte, et la sortie flotterait hors du rail.
+if (!isInteractive) intro("Maedow Arch");
+
+log.info(`${projectName} : ${framework}, profil ${mode}, contenu ${template}, style ${style}`);
 
 const layers = layersFor({ framework, mode, template, style });
 
@@ -444,34 +417,42 @@ pruneGitkeeps(targetDir);
  * Ce qu'on dit à l'utilisateur
  * ------------------------------------------------------------------ */
 
-console.log(`✅ ${countFiles(targetDir)} fichiers écrits dans ./${projectName}\n`);
+const steps = [`cd ${projectName}`, cmd.install, cmd.run("dev")];
 
-console.log("Démarrer :");
-console.log(`  cd ${projectName}`);
-console.log(`  ${cmd.install}`);
-console.log(`  ${cmd.run("dev")}\n`);
+log.success(`${countFiles(targetDir)} fichiers écrits dans ./${projectName}`);
+log.step(["Démarrer :", ...steps.map((s) => `  ${s}`)].join("\n"));
 
-if (template === "demo" && mode === "full") {
-  console.log("La démonstration :");
-  console.log("  Un compteur borné, dont les règles vivent dans src/core/counter/");
-  console.log("  et se testent sans monter le moindre composant.");
-  console.log(`  ${cmd.run("test")}   lance ces tests\n`);
-} else if (template === "demo") {
-  console.log("La démonstration :");
-  console.log("  Un compteur borné, dont les règles vivent dans la feature.");
-  console.log("  Le README explique quand basculer vers le profil full.\n");
+if (template === "demo") {
+  const where = mode === "full" ? "src/core/counter/" : "la feature";
+  const suite =
+    mode === "full"
+      ? `  ${cmd.run("test")} lance les neuf tests du domaine, sans React ni DOM.`
+      : "  Le README explique quand basculer vers le profil full.";
+  log.step(
+    [
+      "La démonstration :",
+      `  Un compteur borné, dont les règles vivent dans ${where}.`,
+      suite,
+    ].join("\n")
+  );
 }
 
-console.log("Générateurs :");
-console.log(`  ${cmd.run("generate:feature")} <nom>   un écran dans src/features/`);
-if (mode === "full") {
-  console.log(`  ${cmd.run("generate:domain")} <nom>    une entité métier dans src/core/`);
-} else {
-  console.log(`  ${cmd.run("generate:domain")} <nom>    un domaine, début de bascule vers full`);
-}
-console.log("");
+log.step(
+  [
+    "Générateurs :",
+    `  ${cmd.run("generate:feature")} <nom>   un écran dans src/features/`,
+    `  ${cmd.run("generate:domain")} <nom>    ` +
+      (mode === "full" ? "une entité métier dans src/core/" : "un domaine, début de bascule vers full"),
+  ].join("\n")
+);
 
-console.log("Frontières :");
-console.log(`  ${cmd.run("lint")}   vérifie que les features restent étanches\n`);
+log.step(
+  [
+    "Frontières :",
+    `  ${cmd.run("lint")} vérifie que les features restent étanches.`,
+    "  Pour vous assurer qu'elles sont actives, ajoutez un import interdit :",
+    "  le lint doit échouer.",
+  ].join("\n")
+);
 
-console.log(`📖 ${DOCS_URL}\n`);
+outro(DOCS_URL);
