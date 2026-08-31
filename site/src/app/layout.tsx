@@ -20,6 +20,12 @@ import { MODE_BOOTSTRAP_SCRIPT } from "@/lib/mode";
  *
  * `next/font/google` auto-héberge les fichiers au build : aucune requête vers
  * un domaine tiers, et aucun décalage de mise en page au chargement.
+ *
+ * Les deux Google Sans sont trop récentes pour la table de métriques dont Next
+ * se sert afin de fabriquer une police de repli calibrée. Il avertissait à
+ * chaque compilation qu'il renonçait à la produire. On le lui dit explicitement,
+ * en nommant nous-mêmes le repli : le message disparaît, et le comportement
+ * réel ne change pas, puisqu'il y renonçait déjà.
  */
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -31,6 +37,8 @@ const googleSansFlex = Google_Sans_Flex({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
+  adjustFontFallback: false,
+  fallback: ["system-ui", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
 });
 
 const googleSansCode = Google_Sans_Code({
@@ -38,6 +46,8 @@ const googleSansCode = Google_Sans_Code({
   variable: "--font-mono-code",
   display: "swap",
   axes: ["MONO"],
+  adjustFontFallback: false,
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
 });
 
 const geistMono = Geist_Mono({

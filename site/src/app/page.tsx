@@ -7,6 +7,7 @@ import { CopyCommand } from "@/components/CopyCommand";
 import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
 import { TechMarquee } from "@/components/TechMarquee";
+import { AvantApres } from "@/components/AvantApres";
 import { BentoGrid } from "@/components/BentoGrid";
 import { REPO_URL } from "@/lib/links";
 
@@ -107,6 +108,8 @@ export default function HomePage() {
         <TechMarquee />
 
         <BentoGrid />
+
+        <AvantApres />
       </main>
 
       <Footer />
