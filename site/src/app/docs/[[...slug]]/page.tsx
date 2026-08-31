@@ -9,6 +9,7 @@ import type { Metadata } from "next";
 import { REPO_URL } from "@/lib/links";
 import { ModeFull, ModeLight } from "@/components/ModeOnly";
 import { ModeToc } from "@/components/ModeToc";
+import { Mermaid } from "@/components/Mermaid";
 
 export default async function Page(props: { params: Promise<{ slug?: string[] }> }) {
   const params = await props.params;
@@ -66,6 +67,7 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
             Step,
             ModeFull,
             ModeLight,
+            Mermaid,
           }}
         />
       </DocsBody>

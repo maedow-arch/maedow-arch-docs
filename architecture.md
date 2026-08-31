@@ -20,28 +20,16 @@
 
 ## Vue d'Ensemble des Couches Maedow Arch
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        1. APP ROUTING & ENTRY                          │
-│         (app/ ou pages/ : Pages, Layouts, API Route Handlers)          │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ assemble
-                                    ▼
-┌───────────────────────────────────┴────────────────────────────────────┐
-│                        2. FEATURES (SURFACES UI)                       │
-│  (features/<feature>/ : Écrans, Hooks locaux, Composants dédiés)       │
-│  (features/_shared/   : Composants métier transverses partagés)        │
-└─────────────────┬───────────────────────────────────┬──────────────────┘
-                  │ consomme                          │ consomme
-                  ▼                                   ▼
-┌─────────────────┴──────────────────┐ ┌──────────────┴──────────────────┐
-│        3. CORE (DOMAINE PUR)       │ │     4. COMPONENTS & LIB        │
-│ (core/<module>/ : Types, Services) │ │ (components/ui/, lib/utils.ts) │
-│ - Modèles & Entités purs (.ts)     │ │ - Primitives UI agnostiques    │
-│ - Moteurs d'états / Réducteurs     │ │ - Fonctions d'aide pures       │
-│ - Contrats d'interfaces (Ports)    │ │ - Helpers génériques           │
-│ - ZÉRO JSX / ZÉRO dépendance UI    │ │ - ZÉRO logique métier          │
-└────────────────────────────────────┘ └────────────────────────────────┘
+```mermaid
+flowchart TD
+    APP["1 · APP ROUTING ET ENTRY<br/>app/ ou pages/<br/>Pages, layouts, API route handlers"]
+    FEAT["2 · FEATURES, LES SURFACES UI<br/>features/[feature]/ : écrans, hooks locaux, composants dédiés<br/>features/_shared/ : composants métier transverses partagés"]
+    CORE["3 · CORE, LE DOMAINE PUR<br/>core/[module]/ : types, services<br/>Modèles et entités purs, moteurs d'états, contrats de ports<br/>ZÉRO JSX, ZÉRO dépendance UI"]
+    LIB["4 · COMPONENTS ET LIB<br/>components/ui/, lib/utils.ts<br/>Primitives UI agnostiques, fonctions d'aide pures<br/>ZÉRO logique métier"]
+
+    APP -->|assemble| FEAT
+    FEAT -->|consomme| CORE
+    FEAT -->|consomme| LIB
 ```
 
 ---
