@@ -29,6 +29,7 @@ function Carte({
 }) {
   return (
     <div
+      data-anime="carte"
       className={`relative flex flex-col overflow-hidden rounded-2xl border border-fd-border bg-fd-card p-7 ${className}`}
     >
       {etiquette ? (
@@ -44,10 +45,16 @@ function Carte({
 export async function BentoGrid() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-20">
-      <h2 className="font-heading mb-3 text-3xl font-bold tracking-tight text-balance text-fd-foreground sm:text-4xl">
+      <h2
+        data-anime="titre"
+        className="font-heading mb-3 text-3xl font-bold tracking-tight text-balance text-fd-foreground sm:text-4xl"
+      >
         Ce que la machine vérifie à votre place
       </h2>
-      <p className="mb-12 max-w-2xl text-lg text-pretty text-fd-muted-foreground">
+      <p
+        data-anime="intro"
+        className="mb-12 max-w-2xl text-lg text-pretty text-fd-muted-foreground"
+      >
         Une architecture qui repose sur la discipline se dégrade au premier sprint tendu. Celle-ci
         tient parce qu&rsquo;un outil refuse ce qui la contredit.
       </p>
@@ -141,7 +148,11 @@ export async function BentoGrid() {
         <Carte className="md:col-span-4" etiquette="À chaque commit">
           <div className="flex flex-1 flex-col justify-center gap-5">
             <div>
-              <p className="font-heading text-4xl font-extrabold tracking-tight text-fd-foreground">
+              <p
+                data-anime="compte"
+                data-valeur="20"
+                className="font-heading text-4xl font-extrabold tracking-tight text-fd-foreground tabular-nums"
+              >
                 20
               </p>
               <p className="text-sm text-fd-muted-foreground">
@@ -149,7 +160,11 @@ export async function BentoGrid() {
               </p>
             </div>
             <div className="border-t border-fd-border pt-5">
-              <p className="font-heading text-4xl font-extrabold tracking-tight text-fd-foreground">
+              <p
+                data-anime="compte"
+                data-valeur="23"
+                className="font-heading text-4xl font-extrabold tracking-tight text-fd-foreground tabular-nums"
+              >
                 23
               </p>
               <p className="text-sm text-fd-muted-foreground">
@@ -165,7 +180,10 @@ export async function BentoGrid() {
 
         {/* Le seul aplat plein de la page : l'appel à l'action. Un second
             annulerait le premier. */}
-        <div className="flex flex-col justify-between gap-6 rounded-2xl bg-fd-primary p-7 text-fd-primary-foreground md:col-span-12 md:flex-row md:items-center md:p-9">
+        <div
+          data-anime="carte"
+          className="flex flex-col justify-between gap-6 rounded-2xl bg-fd-primary p-7 text-fd-primary-foreground md:col-span-12 md:flex-row md:items-center md:p-9"
+        >
           <div>
             <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold tracking-[0.14em] uppercase opacity-80">
               <Sparkles className="size-3.5" />

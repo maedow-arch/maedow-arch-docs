@@ -32,6 +32,7 @@ async function Volet({
 
   return (
     <div
+      data-anime="volet"
       className={`flex flex-col overflow-hidden rounded-2xl border bg-fd-card ${
         refus ? "border-fd-border" : "border-fd-primary/40"
       }`}
@@ -65,10 +66,16 @@ async function Volet({
 export async function AvantApres() {
   return (
     <section className="mx-auto max-w-6xl border-t border-fd-border px-6 py-20">
-      <h2 className="font-heading mb-3 text-3xl font-bold tracking-tight text-balance text-fd-foreground sm:text-4xl">
+      <h2
+        data-anime="titre"
+        className="font-heading mb-3 text-3xl font-bold tracking-tight text-balance text-fd-foreground sm:text-4xl"
+      >
         Une règle de gestion n&rsquo;a rien à faire dans un composant
       </h2>
-      <p className="mb-12 max-w-2xl text-lg text-pretty text-fd-muted-foreground">
+      <p
+        data-anime="intro"
+        className="mb-12 max-w-2xl text-lg text-pretty text-fd-muted-foreground"
+      >
         Le seuil de remise ci-dessous est une décision de l&rsquo;entreprise. À gauche, il faut
         monter un arbre React pour la tester. À droite, c&rsquo;est une fonction.
       </p>

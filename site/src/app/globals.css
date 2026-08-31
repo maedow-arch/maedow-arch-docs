@@ -324,3 +324,26 @@ pre code {
 .dark .maedow-extrait span {
   color: var(--shiki-dark);
 }
+
+/*
+ * Le défilement doux, natif.
+ *
+ * Il ne s'applique qu'aux sauts d'ancre : cliquer une entrée du sommaire ou un
+ * lien vers une section. Le défilement à la molette, lui, reste celui que le
+ * lecteur a réglé dans son système.
+ *
+ * C'est un choix contre les bibliothèques qui interpolent le défilement entier.
+ * Sur un site vitrine elles flattent ; sur une documentation, le défilement est
+ * l'outil principal de lecture, et le détourner déplace aussi la molette à
+ * crans, les touches de pagination, le glisser de la barre et le saut du
+ * navigateur vers un résultat de recherche.
+ */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

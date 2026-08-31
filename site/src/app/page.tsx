@@ -6,6 +6,8 @@ import { GithubIcon } from "@/components/GithubIcon";
 import { CopyCommand } from "@/components/CopyCommand";
 import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
+import { SceneHero } from "@/components/SceneHero";
+import { Scene } from "@/components/Scene";
 import { TechMarquee } from "@/components/TechMarquee";
 import { AvantApres } from "@/components/AvantApres";
 import { BentoGrid } from "@/components/BentoGrid";
@@ -59,58 +61,69 @@ export default function HomePage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative overflow-hidden">
-          <div
-            className="maedow-dots maedow-dots-fade pointer-events-none absolute inset-0 opacity-70"
-            aria-hidden
-          />
-          <div className="relative mx-auto max-w-4xl px-6 pt-20 pb-14 text-center">
-            {/* Le nom, posé en deux étages. Le « Arch » du logo se déplie ici
+        <SceneHero>
+          <section className="relative overflow-hidden">
+            <div
+              data-hero="fond"
+              className="maedow-dots maedow-dots-fade pointer-events-none absolute inset-0 opacity-70"
+              aria-hidden
+            />
+            <div className="relative mx-auto max-w-4xl px-6 pt-20 pb-14 text-center">
+              {/* Le nom, posé en deux étages. Le « Arch » du logo se déplie ici
                 en « Architecture » : la page d'accueil est le seul endroit où
                 la marque a la place de s'écrire en entier. Le second étage
                 prend la couleur d'accent, comme dans le logo. */}
-            <h1 className="font-heading mb-6 text-6xl leading-[0.92] font-extrabold tracking-[-0.04em] text-fd-foreground sm:text-7xl lg:text-8xl">
-              Maedow
-              <br />
-              <span className="text-fd-primary">Architecture</span>
-            </h1>
+              <h1
+                data-hero="titre"
+                className="font-heading mb-6 text-6xl leading-[0.92] font-extrabold tracking-[-0.04em] text-fd-foreground sm:text-7xl lg:text-8xl"
+              >
+                Maedow
+                <br />
+                <span className="text-fd-primary">Architecture</span>
+              </h1>
 
-            <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-pretty text-fd-muted-foreground">
-              Le domaine métier reste séparé de l&rsquo;interface et l&rsquo;infrastructure
-              interchangeable. Les frontières ne dépendent pas de la mémoire de l&rsquo;équipe : le
-              linter les vérifie.
-            </p>
+              <p
+                data-hero="promesse"
+                className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-pretty text-fd-muted-foreground"
+              >
+                Le domaine métier reste séparé de l&rsquo;interface et l&rsquo;infrastructure
+                interchangeable. Les frontières ne dépendent pas de la mémoire de l&rsquo;équipe :
+                le linter les vérifie.
+              </p>
 
-            {/* La commande qui crée un projet, là où le visiteur convaincu la
+              {/* La commande qui crée un projet, là où le visiteur convaincu la
                 cherche : sous la promesse, avant la recherche. */}
-            <div className="mx-auto mb-8 max-w-xl">
-              <CopyCommand command="npx create-maedow-arch-app mon-projet" tone="terminal" />
-            </div>
+              <div data-hero="commande" className="mx-auto mb-8 max-w-xl">
+                <CopyCommand command="npx create-maedow-arch-app mon-projet" tone="terminal" />
+              </div>
 
-            <div className="mx-auto mb-6 max-w-2xl">
-              <FullSearchTrigger className="w-full rounded-xl border border-fd-primary/25 bg-fd-card px-4 py-4 text-base" />
-            </div>
+              <div data-hero="recherche" className="mx-auto mb-6 max-w-2xl">
+                <FullSearchTrigger className="w-full rounded-xl border border-fd-primary/25 bg-fd-card px-4 py-4 text-base" />
+              </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
-              <span className="text-fd-muted-foreground">Aller droit au but :</span>
-              {SHORTCUTS.map((shortcut) => (
-                <Link
-                  key={shortcut.label}
-                  href={shortcut.href}
-                  className="rounded-lg border border-fd-primary/25 px-3 py-1.5 font-medium text-fd-primary transition-colors hover:bg-fd-primary/10"
-                >
-                  {shortcut.label}
-                </Link>
-              ))}
+              <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
+                <span className="text-fd-muted-foreground">Aller droit au but :</span>
+                {SHORTCUTS.map((shortcut) => (
+                  <Link
+                    key={shortcut.label}
+                    href={shortcut.href}
+                    data-hero="raccourci"
+                    className="rounded-lg border border-fd-primary/25 px-3 py-1.5 font-medium text-fd-primary transition-colors hover:bg-fd-primary/10"
+                  >
+                    {shortcut.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </SceneHero>
 
         <TechMarquee />
 
-        <BentoGrid />
-
-        <AvantApres />
+        <Scene>
+          <BentoGrid />
+          <AvantApres />
+        </Scene>
       </main>
 
       <Footer />
