@@ -128,6 +128,8 @@ Pour empêcher `features/_shared/` de devenir un dépotoir avec le temps, deux r
 
 ## Règle de Dépendance et Frontières Maedow Arch (`eslint-plugin-boundaries`)
 
+Ces frontières portent les codes **MA-001**, **MA-002** et **MA-003** du [registre des règles](./rules.md), et ce sont les codes que citent les messages de lint. Le registre dit, pour chacune des neuf règles du standard, si elle est vérifiée par la machine ou tenue par l'équipe : c'est là qu'il faut regarder avant de se demander si une exigence sera attrapée automatiquement.
+
 ```javascript
 // eslint.config.mjs
 import boundaries from "eslint-plugin-boundaries";

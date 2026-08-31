@@ -8,6 +8,10 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ## [Non publié]
 
+### Modifié
+
+- **Les messages de lint citent un code, plus un titre de section.** Un titre se réécrit et le renvoi casse en silence, ce qui est arrivé quand la numérotation des titres a été retirée du corpus. `MA-002 : une feature ne peut pas en importer une autre` reste juste quelle que soit la façon dont le corpus évolue ensuite, et relie le message, la section, la fixture et l'entrée de ce journal.
+
 ### Corrigé
 
 - **Les générateurs produisaient du TypeScript invalide sur un nom composé.** `generate:feature user-profile` écrivait `User-profileScreen`, qui n'est pas un identifiant : une majuscule posée sur la seule première lettre laisse le tiret au milieu. Les noms sont désormais découpés sur les tirets, points et underscores, et un nom qui ne donnerait pas d'identifiant exploitable est refusé avant que le moindre fichier ne soit écrit.
@@ -15,6 +19,8 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ### Ajouté
 
+- **Un registre des règles, avec un code stable par règle.** [`rules.md`](./rules.md) recense les neuf règles normatives du standard et dit pour chacune si elle est vérifiée par la machine ou tenue par l'équipe. Un standard qui laisse croire que tout est appliqué est moins crédible qu'un standard qui distingue les deux. Le registre rejoint le corpus comme quatrième document du site.
+- **MA-007, aucun cycle d'import entre modules.** Le corpus ne l'énonçait pas, alors qu'elle conditionne la testabilité qu'il revendique : deux modules qui s'importent mutuellement ne peuvent plus être lus, testés ni déplacés séparément. Un cycle ne viole aucune frontière de couche, ce qui le rend invisible à MA-001, MA-002 et MA-003 puisqu'il se forme à l'intérieur d'une même couche.
 - **Le corpus décrit le passage de Light à Full.** La bascule n'est pas une migration mais une addition, et elle se produit au moment où un domaine devient nécessaire. La section explique aussi pourquoi `core/` reste vide en Light plutôt que d'être livré avec un Result Pattern inutilisé, et pourquoi le mouvement inverse n'est volontairement pas outillé.
 - **Le noyau de la CLI est testé unitairement.** Quatorze assertions couvrent l'analyse des arguments, l'empilement des couches, la fusion des fragments de `package.json` et la nouvelle pascalisation, avec le lanceur de test de Node et sans dépendance ajoutée. Elles attrapent en deux secondes ce que vingt jobs d'intégration ne voyaient pas.
 - **Profil de lecture Light ou Full sur le site.** Un sélecteur en tête de la barre latérale masque les sections qui n'appartiennent pas au profil choisi. Le masquage se fait en CSS et le profil est posé avant la première peinture : la bascule ne reconstruit pas la page et aucune section n'apparaît pour disparaître ensuite. Les entrées de sommaire correspondantes sont retirées avec elles.

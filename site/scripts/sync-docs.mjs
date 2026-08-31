@@ -38,6 +38,13 @@ const PAGES = [
       "La règle « Zéro Modèle dans le JSX » et la typologie des 5 catégories de modèles de Maedow Arch.",
   },
   {
+    source: "rules.md",
+    out: "rules.mdx",
+    title: "Registre des règles",
+    description:
+      "Les neuf règles normatives de Maedow Arch, leur code stable, et pour chacune si elle est vérifiée par la machine ou tenue par l'équipe.",
+  },
+  {
     source: "conventions.md",
     out: "conventions.mdx",
     title: "Conventions & Standards",
