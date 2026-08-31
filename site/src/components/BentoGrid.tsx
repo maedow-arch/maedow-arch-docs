@@ -58,8 +58,8 @@ export async function BentoGrid() {
         <Carte className="md:col-span-7" etiquette="La règle">
           <LayerFlow nu />
           <p className="mt-6 text-sm leading-relaxed text-fd-muted-foreground">
-            La dépendance descend, jamais l&rsquo;inverse. Un écran peut appeler le domaine, le domaine
-            ignore qu&rsquo;un écran existe. Tout le reste vient de là.
+            La dépendance descend, jamais l&rsquo;inverse. Un écran peut appeler le domaine, le
+            domaine ignore qu&rsquo;un écran existe. Tout le reste vient de là.
           </p>
         </Carte>
 
@@ -76,7 +76,8 @@ export async function BentoGrid() {
               </code>
             </pre>
             <p className="mt-4 text-sm leading-relaxed text-fd-muted-foreground">
-              Pas une convention d&rsquo;équipe que l&rsquo;on se rappelle. Une erreur, à chaque commit.
+              Pas une convention d&rsquo;équipe que l&rsquo;on se rappelle. Une erreur, à chaque
+              commit.
             </p>
           </Carte>
 
@@ -131,8 +132,8 @@ export async function BentoGrid() {
   | { ok: false; error: E };`}
           />
           <p className="mt-4 text-sm leading-relaxed text-fd-muted-foreground">
-            L&rsquo;échec est une donnée typée que le compilateur oblige à traiter, pas une exception que
-            l&rsquo;on oublie d&rsquo;attraper.
+            L&rsquo;échec est une donnée typée que le compilateur oblige à traiter, pas une
+            exception que l&rsquo;on oublie d&rsquo;attraper.
           </p>
         </Carte>
 

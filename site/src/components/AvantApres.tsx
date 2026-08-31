@@ -69,8 +69,8 @@ export async function AvantApres() {
         Une règle de gestion n&rsquo;a rien à faire dans un composant
       </h2>
       <p className="mb-12 max-w-2xl text-lg text-pretty text-fd-muted-foreground">
-        Le seuil de remise ci-dessous est une décision de l&rsquo;entreprise. À gauche, il faut monter un
-        arbre React pour la tester. À droite, c&rsquo;est une fonction.
+        Le seuil de remise ci-dessous est une décision de l&rsquo;entreprise. À gauche, il faut
+        monter un arbre React pour la tester. À droite, c&rsquo;est une fonction.
       </p>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">

@@ -76,8 +76,9 @@ export default function HomePage() {
             </h1>
 
             <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-pretty text-fd-muted-foreground">
-              Le domaine métier reste séparé de l&rsquo;interface et l&rsquo;infrastructure interchangeable. Les
-              frontières ne dépendent pas de la mémoire de l&rsquo;équipe : le linter les vérifie.
+              Le domaine métier reste séparé de l&rsquo;interface et l&rsquo;infrastructure
+              interchangeable. Les frontières ne dépendent pas de la mémoire de l&rsquo;équipe : le
+              linter les vérifie.
             </p>
 
             {/* La commande qui crée un projet, là où le visiteur convaincu la
