@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Primitive from "fumadocs-core/toc";
+import { ScrollProvider } from "fumadocs-core/toc";
 import { useActiveAnchors, type TOCItemType } from "fumadocs-core/toc";
 import { MODE_ATTRIBUTE, type Mode } from "@/lib/mode";
 
@@ -35,6 +36,8 @@ type Trace = {
   /** Longueur totale du tracé, et portion à colorer, en unités de tracé. */
   total: number;
   actif: { debut: number; longueur: number } | null;
+  /** Une section est-elle réellement active, ou garde-t-on la dernière place ? */
+  visible: boolean;
 };
 
 export function ModeToc({ items }: { items: TOCItemType[] }) {
@@ -50,6 +53,7 @@ export function ModeToc({ items }: { items: TOCItemType[] }) {
    * peinte.
    */
   const cheminPrecedent = useRef<string | null>(null);
+  const dernierePortion = useRef<{ debut: number; longueur: number } | null>(null);
   const [animer, setAnimer] = useState(false);
 
   /*
@@ -149,9 +153,17 @@ export function ModeToc({ items }: { items: TOCItemType[] }) {
       total: parcouru,
       actif:
         premierActif === null || dernierActif === null
-          ? null
+          ? // Aucune section active : le segment s'efface, mais il garde la
+            // position qu'il occupait. Le remettre à zéro le ferait repartir du
+            // haut du tracé au retour, et c'est ce voyage que l'œil remarque.
+            (dernierePortion.current ?? null)
           : { debut: premierActif, longueur: dernierActif - premierActif },
+      visible: premierActif !== null,
     });
+
+    if (premierActif !== null && dernierActif !== null) {
+      dernierePortion.current = { debut: premierActif, longueur: dernierActif - premierActif };
+    }
   }, []);
 
   useEffect(() => {
@@ -199,29 +211,31 @@ export function ModeToc({ items }: { items: TOCItemType[] }) {
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
-            opacity={trace.actif ? 1 : 0}
+            opacity={trace.visible ? 1 : 0}
             strokeDasharray={`${trace.actif?.longueur ?? 0} ${trace.total}`}
             strokeDashoffset={-(trace.actif?.debut ?? 0)}
           />
         </svg>
       ) : null}
 
-      {visibles.map((item) => {
-        const estActif = actifs.includes(item.url.replace(/^#/, ""));
-        return (
-          <Primitive.TOCItem
-            key={item.url}
-            href={item.url}
-            data-toc-entree=""
-            data-toc-profondeur={item.depth}
-            data-toc-actif={estActif}
-            style={{ paddingInlineStart: decalage(item.depth) + 12 }}
-            className="py-1.5 text-sm text-fd-muted-foreground transition-colors hover:text-fd-foreground data-[active=true]:text-fd-primary"
-          >
-            {item.title}
-          </Primitive.TOCItem>
-        );
-      })}
+      <ScrollProvider containerRef={conteneur}>
+        {visibles.map((item) => {
+          const estActif = actifs.includes(item.url.replace(/^#/, ""));
+          return (
+            <Primitive.TOCItem
+              key={item.url}
+              href={item.url}
+              data-toc-entree=""
+              data-toc-profondeur={item.depth}
+              data-toc-actif={estActif}
+              style={{ paddingInlineStart: decalage(item.depth) + 12 }}
+              className="py-1.5 text-sm text-fd-muted-foreground transition-colors hover:text-fd-foreground data-[active=true]:text-fd-primary"
+            >
+              {item.title}
+            </Primitive.TOCItem>
+          );
+        })}
+      </ScrollProvider>
     </div>
   );
 }
