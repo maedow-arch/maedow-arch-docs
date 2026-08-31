@@ -6,7 +6,7 @@ import { HomePage } from "./HomePage";
  *
  * Sous Next.js, ce rôle est tenu par l'arborescence de `app/`. Ici il est
  * explicite, et c'est la seule différence de fond entre les deux frameworks.
- * Voir architecture.md §10.
+ * Voir « Maedow Arch hors Next.js » dans architecture.md.
  *
  * Une route associe un chemin à un écran de feature, et rien de plus : la
  * couche `app/` assemble, elle ne décide pas.

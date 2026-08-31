@@ -5,7 +5,7 @@
 
 ---
 
-## 1. Règle d'Or Maedow Arch : Isolation des Responsabilités
+## Règle d'Or Maedow Arch : Isolation des Responsabilités
 
 1. **Les fichiers `.tsx` ne contiennent que du code de présentation** (JSX, layout, binding d'événements UI légers).
 2. **Les fichiers `.ts` encapsulent toute la logique** (types, transformations, appels de services, validateurs, hooks).
@@ -13,7 +13,7 @@
 
 ---
 
-## 2. Conventions de Nommage et Extensions Maedow Arch
+## Conventions de Nommage et Extensions Maedow Arch
 
 | Type d'Élément | Format | Extension | Exemple |
 | :--- | :--- | :--- | :--- |
@@ -28,7 +28,7 @@
 
 ---
 
-## 3. Typage et TypeScript Strict sous Maedow Arch
+## Typage et TypeScript Strict sous Maedow Arch
 
 Pour éviter les erreurs silencieuses à l'exécution, les règles suivantes sont imposées :
 
@@ -58,7 +58,7 @@ export type OrganizationId = string & { readonly __brand: unique symbol };
 
 ---
 
-## 4. Gestion des Erreurs : Données Typées vs Exceptions (Result Pattern)
+## Gestion des Erreurs : Données Typées vs Exceptions (Result Pattern)
 
 Dans Maedow Arch, **les erreurs prévisibles et fonctionnelles sont modélisées comme des données**, pas comme des exceptions système.
 
@@ -85,7 +85,7 @@ export async function processCheckout(orderId: string): Promise<Result<{ transac
 }
 ```
 
-### 4.1. Helpers Obligatoires pour le Result Pattern (Anti-Verbosité)
+### Helpers Obligatoires pour le Result Pattern (Anti-Verbosité)
 
 Sans helpers, le Result Pattern devient rapidement plus verbeux que les exceptions qu'il remplace (`if (!result.ok) { ... }` répété partout). Tout projet Maedow Arch doit définir ces helpers dès l'introduction du pattern :
 
@@ -127,7 +127,7 @@ match(checkoutResult, {
 
 ---
 
-## 5. Sécurité & Gestion des Données Sensibles
+## Sécurité & Gestion des Données Sensibles
 
 1. **Isolation Serveur / Client** :
    * Tout module manipulant des clés API secrètes, des tokens d'administration ou des accès directs à la base de données doit être restreint au serveur (`import "server-only"` ou convention `.server.ts`).
@@ -139,7 +139,7 @@ match(checkoutResult, {
 
 ---
 
-## 6. Générateurs de Code & Productivité (Scaffolding Maedow Arch)
+## Générateurs de Code & Productivité (Scaffolding Maedow Arch)
 
 Pour réduire le coût de création de fichiers liés au découplage de Maedow Arch, configurez un script de génération dans votre `package.json` :
 

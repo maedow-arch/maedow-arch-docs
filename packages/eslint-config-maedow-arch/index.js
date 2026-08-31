@@ -49,7 +49,7 @@ export default [
         {
           default: "disallow",
           message:
-            "Maedow Arch : {{from.type}} ne peut pas importer {{to.type}}. Voir architecture.md §6.",
+            "Maedow Arch : {{from.type}} ne peut pas importer {{to.type}}. Voir « Règle de dépendance et frontières » dans architecture.md.",
           policies: [
             // app/ orchestre : il peut tout importer.
             {

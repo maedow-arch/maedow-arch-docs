@@ -5,7 +5,7 @@
 
 ---
 
-## 1. Vision et Piliers Fondamentaux de Maedow Arch
+## Vision et Piliers Fondamentaux de Maedow Arch
 
 **Maedow Arch** repose sur 6 principes cardinaux :
 
@@ -18,7 +18,7 @@
 
 ---
 
-## 2. Vue d'Ensemble des Couches Maedow Arch
+## Vue d'Ensemble des Couches Maedow Arch
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -46,11 +46,11 @@
 
 ---
 
-## 3. Matrice des Rôles par Couche
+## Matrice des Rôles par Couche
 
 | Couche | Répertoire | Responsabilité | Ce qu'elle CONTIENT | Ce qu'elle NE CONTIENT JAMAIS |
 | :--- | :--- | :--- | :--- | :--- |
-| **App** | `app/` | Point d'entrée, routing, injection de dépendances. | Les fichiers d'amorçage et de routing du framework hôte. Sous Next.js : `page.tsx`, `layout.tsx`, `route.ts`, middlewares. Voir §10. | Logique métier détaillée, requêtes directes non encapsulées. |
+| **App** | `app/` | Point d'entrée, routing, injection de dépendances. | Les fichiers d'amorçage et de routing du framework hôte. Sous Next.js : `page.tsx`, `layout.tsx`, `route.ts`, middlewares. Voir [Maedow Arch hors Next.js](#maedow-arch-hors-nextjs). | Logique métier détaillée, requêtes directes non encapsulées. |
 | **Features** | `features/<feature>/` | Écrans et modules fonctionnels utilisateur. | Composants `.tsx`, hooks React dédiés, adaptateurs de vue. | Définitions de modèles de données partagés, logique de persistance brute. |
 | **Shared Features** | `features/_shared/` | Composants UI métier utilisés par $\ge$ 2 features. | Composants composites métier partagés (`UserAvatarCard`, `AddressPicker`). | Primitives UI agnostiques (qui vont dans `components/ui/`). |
 | **Core** | `core/<module>/` | Cœur métier, domaine pur, persistance, contrats. | Types/Interfaces purs (`.ts`), machines d'états, validateurs, interfaces de repositories. | **ZÉRO fichier `.tsx`**, aucun import React/DOM. |
@@ -61,11 +61,11 @@
 
 <ModeFull>
 
-## 4. Agnosticisme Technique : Adapters & Infrastructure dans Maedow Arch
+## Agnosticisme Technique : Adapters & Infrastructure dans Maedow Arch
 
 > **Règle de Lazy Abstraction (Introduction Différée des Contrats)** : un `contract.ts` + un système d'adapters ne doit être introduit **qu'au moment où une deuxième implémentation réelle est nécessaire** (migration de base, multi-tenant avec fournisseurs différents, besoin de mock avancé en test). Tant qu'un seul fournisseur (une seule DB, un seul provider d'auth) est utilisé et qu'aucun changement n'est prévu à court terme, l'accès direct dans `core/<domaine>/repository.ts` est conforme à Maedow Arch. Abstraire par anticipation sans second cas d'usage concret est un anti-pattern Maedow Arch : ça ajoute de l'indirection sans bénéfice mesurable.
 
-### 4.1. Gestion de l'Authentification (Auth Agnostic)
+### Gestion de l'Authentification (Auth Agnostic)
 
 Le code applicatif interagit avec une abstraction d'identité :
 
@@ -89,7 +89,7 @@ export interface AuthService {
   * `core/auth/authjs.adapter.ts` (NextAuth / Auth.js)
   * `core/auth/jwt.adapter.ts` (API backend externe / JWT custom)
 
-### 4.2. Gestion de la Persistance (Database Agnostic)
+### Gestion de la Persistance (Database Agnostic)
 
 Le domaine définit ses interfaces de Repository (Ports) :
 
@@ -115,7 +115,7 @@ export interface UserRepository {
 
 </ModeFull>
 
-## 5. Composition de Features & Éléments Partagés (`features/_shared/`)
+## Composition de Features & Éléments Partagés (`features/_shared/`)
 
 Pour respecter la règle de Maedow Arch « *Une feature n'importe pas une autre feature* », les éléments d'interface composites transverses sont placés dans `features/_shared/` :
 
@@ -129,7 +129,7 @@ features/
     └── AddressPicker.tsx     # Dépend de core/, mais réutilisable
 ```
 
-### 5.1. Règle de Dégradation de `features/_shared/` (Anti Fourre-Tout)
+### Règle de Dégradation de `features/_shared/` (Anti Fourre-Tout)
 
 Pour empêcher `features/_shared/` de devenir un dépotoir avec le temps, deux règles s'appliquent :
 
@@ -138,7 +138,7 @@ Pour empêcher `features/_shared/` de devenir un dépotoir avec le temps, deux r
 
 ---
 
-## 6. Règle de Dépendance et Frontières Maedow Arch (`eslint-plugin-boundaries`)
+## Règle de Dépendance et Frontières Maedow Arch (`eslint-plugin-boundaries`)
 
 ```javascript
 // eslint.config.mjs
@@ -180,7 +180,7 @@ export default [
 
 ---
 
-## 7. Structure Recommandée d'un Projet sous Maedow Arch
+## Structure Recommandée d'un Projet sous Maedow Arch
 
 ```text
 src/
@@ -225,7 +225,7 @@ src/
 
 ---
 
-## 8. Génération Rapide de Code (Scaffolding Anti-Boilerplate)
+## Génération Rapide de Code (Scaffolding Anti-Boilerplate)
 
 Pour accélérer le développement sous Maedow Arch :
 
@@ -239,7 +239,7 @@ npm run generate:domain billing
 
 ---
 
-## 9. Mode Light vs Mode Full : Quand Appliquer Maedow Arch Intégralement
+## Mode Light vs Mode Full : Quand Appliquer Maedow Arch Intégralement
 
 La Maedow Arch complète (4 couches, contracts, adapters, générateurs) est conçue pour des produits qui grandissent dans le temps (SaaS, applications métier durables). Elle est disproportionnée pour un site vitrine, un prototype ou une landing page. Pour éviter la sur-ingénierie, **Maedow Arch définit deux profils explicites** :
 
@@ -249,18 +249,18 @@ La Maedow Arch complète (4 couches, contracts, adapters, générateurs) est con
 | Durée de vie prévue | Courte (< 6 mois) ou usage unique | Longue, avec évolutions régulières |
 | Logique métier | Faible ou inexistante | Significative (règles, calculs, transitions d'état) |
 | Structure recommandée | `app/`, `features/`, `components/` et `lib/`, avec la logique directement dans la feature et **sans couche `core/`** | Structure complète : `app/ → features/ → core/ → lib/` |
-| Contracts / Adapters | Aucun, accès direct à la donnée | Introduits uniquement via la Règle de Lazy Abstraction (§4) |
-| Result Pattern | Optionnel | Recommandé, avec helpers (voir `conventions.md` §4.1) |
+| Contracts / Adapters | Aucun, accès direct à la donnée | Introduits uniquement via la Règle de Lazy Abstraction, voir [Agnosticisme technique](#agnosticisme-technique--adapters--infrastructure-dans-maedow-arch) |
+| Result Pattern | Optionnel | Recommandé, avec helpers, voir « Helpers obligatoires pour le Result Pattern » dans `conventions.md` |
 
-### 9.1. Ce que Light conserve
+### Ce que Light conserve
 
 Light retire la couche domaine, rien d'autre. `components/ui/` et `lib/` restent légitimes : un site vitrine a des boutons et des helpers de formatage sans que cela constitue de la sur-ingénierie, et les garder à part rend la bascule ultérieure indolore.
 
-Les **règles de frontières du §6 s'appliquent identiquement dans les deux profils**. Une feature n'importe jamais une autre feature, `components/` demeure présentationnel, `lib/` ne dépend de rien. Ces contraintes ne coûtent rien et valent quelle que soit la taille du projet. Les deux profils ne sont donc pas deux jeux de règles, mais une relation d'inclusion : Light ne peuple pas `core/`, il ne l'autorise pas différemment.
+Les **règles de frontières s'appliquent identiquement dans les deux profils**, voir [Règle de dépendance et frontières](#règle-de-dépendance-et-frontières-maedow-arch-eslint-plugin-boundaries). Une feature n'importe jamais une autre feature, `components/` demeure présentationnel, `lib/` ne dépend de rien. Ces contraintes ne coûtent rien et valent quelle que soit la taille du projet. Les deux profils ne sont donc pas deux jeux de règles, mais une relation d'inclusion : Light ne peuple pas `core/`, il ne l'autorise pas différemment.
 
 Conséquence pratique : `eslint-config-maedow-arch` sert les deux profils sans configuration distincte.
 
-### 9.2. Choisir son profil à l'installation
+### Choisir son profil à l'installation
 
 ```bash
 npx create-maedow-arch-app mon-projet --mode full    # les quatre couches
@@ -275,7 +275,7 @@ Chaque profil se décline en deux contenus : `--template demo` livre un compteur
 
 ---
 
-## 10. Maedow Arch hors Next.js
+## Maedow Arch hors Next.js
 
 Le standard revendique l'agnosticisme technique. Il doit donc valoir au-delà du framework qui a servi à le formuler.
 
@@ -291,13 +291,13 @@ Le standard revendique l'agnosticisme technique. Il doit donc valoir au-delà du
 
 L'interdiction, elle, ne change jamais : aucune logique métier détaillée dans cette couche, quel que soit le framework.
 
-### 10.1. Ce que cela implique pour les frontières
+### Ce que cela implique pour les frontières
 
-Rien. Les règles du §6 portent sur des répertoires, pas sur des fichiers : `app` peut tout importer, une feature n'en importe pas une autre, `core` ignore l'interface. Ces énoncés ne mentionnent aucun framework.
+Rien. Les [règles de frontières](#règle-de-dépendance-et-frontières-maedow-arch-eslint-plugin-boundaries) portent sur des répertoires, pas sur des fichiers : `app` peut tout importer, une feature n'en importe pas une autre, `core` ignore l'interface. Ces énoncés ne mentionnent aucun framework.
 
-`eslint-config-maedow-arch` sert donc les deux, sans configuration distincte. C'est le même constat qu'en §9.1 pour les profils Light et Full : les axes de variation d'un projet ne changent pas ses frontières.
+`eslint-config-maedow-arch` sert donc les deux, sans configuration distincte. C'est le même constat que dans [Ce que Light conserve](#ce-que-light-conserve) pour les profils Light et Full : les axes de variation d'un projet ne changent pas ses frontières.
 
-### 10.2. Choisir son framework à l'installation
+### Choisir son framework à l'installation
 
 ```bash
 npx create-maedow-arch-app mon-projet --framework next   # Next.js App Router
@@ -306,7 +306,7 @@ npx create-maedow-arch-app mon-projet --framework vite   # React sur Vite
 
 Sans drapeau, la CLI pose la question lorsqu'elle est lancée depuis un terminal, et retient `next` sinon.
 
-### 10.3. Porter Maedow Arch vers un autre framework
+### Porter Maedow Arch vers un autre framework
 
 La démarche tient en trois questions, à poser dans cet ordre.
 

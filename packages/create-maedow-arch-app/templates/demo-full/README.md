@@ -53,7 +53,7 @@ npm run lint
 Il doit échouer :
 
 ```
-Maedow Arch : core ne peut pas importer feature. Voir architecture.md §6.
+Maedow Arch : core ne peut pas importer feature. Voir « Règle de dépendance et frontières » dans architecture.md.
 ```
 
 Un lint qui reste vert sur cet essai signale une configuration inactive, pas une architecture saine.
