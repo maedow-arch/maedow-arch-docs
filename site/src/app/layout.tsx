@@ -70,6 +70,16 @@ export default function Layout({ children }: { children: ReactNode }) {
     <html
       lang="fr"
       className={`${spaceGrotesk.variable} ${googleSansFlex.variable} ${googleSansCode.variable} ${geistMono.variable}`}
+      /*
+       * Le défilement doux de la feuille de style est déclaré ici pour que Next
+       * le connaisse. Sans cette mention, un changement de page ferait remonter
+       * la fenêtre en défilant sur toute la hauteur du document quitté : le
+       * lecteur verrait passer une page qu'il vient de quitter avant d'arriver
+       * sur celle qu'il a demandée. Next coupe l'effet le temps de la
+       * transition, et le garde pour les ancres, qui sont le seul endroit où on
+       * le veut.
+       */
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <head>
