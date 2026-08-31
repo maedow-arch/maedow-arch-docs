@@ -38,10 +38,28 @@ export function NavbarCondensee() {
       const barre = document.querySelector<HTMLElement>("[data-navbar]");
       if (!barre) return;
 
-      const entree = gsap.timeline({ defaults: { ease: COURBE.sortie } });
+      /*
+       * C'est le contenu de la barre qui descend, pas la barre elle-même.
+       * Animer le `header` y poserait une transformation, et une
+       * transformation sur un élément `sticky` crée un contexte qui l'empêche
+       * de coller.
+       */
+      const rangee = barre.firstElementChild;
+      const anime = [rangee, "[data-navbar-marque]", "[data-navbar-action]"];
+
+      const entree = gsap.timeline({
+        defaults: { ease: COURBE.sortie },
+        /*
+         * Les styles posés par l'animation sont retirés à l'arrivée. Sans ce
+         * nettoyage, la barre garde une opacité et une transformation en ligne
+         * qui ne servent plus, et le moindre recalcul ultérieur peut la
+         * réappliquer à contretemps.
+         */
+        onComplete: () => gsap.set(anime, { clearProps: "all" }),
+      });
 
       entree
-        .from(barre, { y: -64, duration: DUREE.bloc })
+        .from(rangee, { y: -28, autoAlpha: 0, duration: DUREE.bloc })
         .from("[data-navbar-marque]", { x: -12, autoAlpha: 0, duration: DUREE.fragment }, "-=0.35")
         .from(
           "[data-navbar-action]",
@@ -66,6 +84,8 @@ export function NavbarCondensee() {
 
       return () => {
         bascule.kill();
+        entree.kill();
+        gsap.set(anime, { clearProps: "all" });
         // Sans script, la barre garde son fond : on la rend telle qu'on l'a
         // trouvée plutôt que de la laisser transparente.
         delete barre.dataset.pose;

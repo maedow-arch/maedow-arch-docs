@@ -44,7 +44,7 @@ export default function HomePage() {
           </Link>
 
           <div className="ml-auto flex items-center gap-1">
-            <span data-navbar-action>
+            <span data-navbar-action className="inline-flex">
               <ThemeSwitch mode="light-dark" />
             </span>
             <a
