@@ -145,7 +145,7 @@ Vérifié par `tsc --noEmit` sur un projet réellement scaffoldé, contenant un 
 **Ce qu'on a mesuré.** Un projet généré, installé par `pnpm install`, puis soumis au test négatif. Les frontières se déclenchent normalement :
 
 ```
-Maedow Arch : core ne peut pas importer feature. Voir architecture.md §6
+Maedow Arch : core ne peut pas importer feature. Voir « Règle de dépendance et frontières » dans architecture.md
 lint sain          EXIT 0
 lint avec violation  EXIT 1
 ```

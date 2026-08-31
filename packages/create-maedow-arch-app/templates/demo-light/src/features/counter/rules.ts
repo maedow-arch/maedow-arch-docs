@@ -2,7 +2,7 @@
  * Mode Light : les règles vivent dans la feature.
  *
  * Le compteur a les mêmes bornes que dans la version Full, mais il n'y a pas
- * de couche `core/` séparée. C'est ce que recommande architecture.md §9 pour
+ * de couche `core/` séparée. C'est ce que recommande architecture.md, « Mode Light vs Mode Full », pour
  * un site vitrine, un prototype ou un MVP : la logique est faible, la sortir
  * dans un domaine dédié coûterait plus qu'elle ne rapporte.
  *
@@ -45,5 +45,5 @@ export function progress(counter: Counter): number {
  * `Result`, et la feature ne garde que la traduction pour l'affichage.
  *
  * La bascule se fait domaine par domaine, jamais en un refactor global.
- * Voir architecture.md §9.
+ * Voir « Mode Light vs Mode Full » dans architecture.md.
  */

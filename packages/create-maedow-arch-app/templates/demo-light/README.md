@@ -36,7 +36,7 @@ npm run lint
 Pour le vérifier, ajoutez un import interdit entre deux features et relancez le lint. Il doit échouer :
 
 ```
-Maedow Arch : feature ne peut pas importer feature. Voir architecture.md §6.
+Maedow Arch : feature ne peut pas importer feature. Voir « Règle de dépendance et frontières » dans architecture.md.
 ```
 
 ## Quand basculer en Mode Full

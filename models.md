@@ -5,7 +5,7 @@
 
 ---
 
-## 1. Le Principe Maedow Arch : Pourquoi Séparer les Modèles du JSX ?
+## Le Principe Maedow Arch : Pourquoi Séparer les Modèles du JSX ?
 
 Dans de nombreuses bases de code, les interfaces TypeScript sont écrites directement au-dessus des composants React (`.tsx`). **Maedow Arch** proscrit cette pratique pour 3 raisons fondamentales :
 
@@ -15,7 +15,9 @@ Dans de nombreuses bases de code, les interfaces TypeScript sont écrites direct
 
 ---
 
-## 2. La Typologie des Modèles dans Maedow Arch
+## La Typologie des Modèles dans Maedow Arch
+
+<ModeFull>
 
 Maedow Arch distingue 5 catégories de modèles claires :
 
@@ -40,7 +42,33 @@ Maedow Arch distingue 5 catégories de modèles claires :
                                                   └──────────────────────┘
 ```
 
-### 2.1. L'Entité Métier (`core/<domaine>/types.ts`)
+</ModeFull>
+
+<ModeLight>
+
+En Mode Light, la couche `core/` n'existe pas : les trois premières catégories, qui y vivent, n'ont pas lieu d'être. Deux formes subsistent, et la règle « zéro modèle dans le JSX » vaut identiquement.
+
+```
+┌──────────────────────┐
+│  Modèle de Vue       │
+│  (ViewModel / UI)    │
+│ (features/<f>/types) │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  Props de Composant  │
+│  (Composant.tsx)     │
+└──────────────────────┘
+```
+
+Les types métier d'un projet Light vivent dans `features/<feature>/types.ts`, au plus près de leur usage. Basculer vers le Mode Full consiste alors à les extraire vers `core/`, domaine par domaine, jamais en un seul refactor global.
+
+</ModeLight>
+
+<ModeFull>
+
+### L'Entité Métier (`core/<domaine>/types.ts`)
 Représente l'objet métier pur au sein du système.
 
 ```typescript
@@ -56,7 +84,7 @@ export interface Product {
 }
 ```
 
-### 2.2. Le Modèle de Persistance (`core/storage/` ou `core/database/`)
+### Le Modèle de Persistance (`core/storage/` ou `core/database/`)
 Représente la structure physique en base de données.
 
 ```typescript
@@ -72,7 +100,7 @@ export interface ProductRow {
 }
 ```
 
-### 2.3. Le DTO / Data Transfer Object avec Inférence Zod (`core/<domaine>/dto.ts`)
+### Le DTO / Data Transfer Object avec Inférence Zod (`core/<domaine>/dto.ts`)
 Définit la charge utile validée aux frontières (API, formulaires, webhooks) en tirant parti de `z.infer` :
 
 ```typescript
@@ -90,7 +118,9 @@ export const CreateProductSchema = z.object({
 export type CreateProductDTO = z.infer<typeof CreateProductSchema>;
 ```
 
-### 2.4. Le ViewModel d'Affichage (`features/<feature>/types.ts`)
+</ModeFull>
+
+### Le ViewModel d'Affichage (`features/<feature>/types.ts`)
 Adapté aux besoins d'un écran spécifique.
 
 ```typescript
@@ -104,7 +134,7 @@ export interface ProductListItemView {
 }
 ```
 
-### 2.5. Les Props de Composant (`Composant.tsx`)
+### Les Props de Composant (`Composant.tsx`)
 Seul type autorisé directement dans un fichier `.tsx`, décrivant uniquement les paramètres d'entrée du composant.
 
 ```tsx
@@ -129,7 +159,7 @@ export function ProductCard({ product, onSelect, className }: ProductCardProps) 
 
 ---
 
-## 3. Règle du Pragmatisme Typé Maedow Arch (Anti Over-Engineering)
+## Règle du Pragmatisme Typé Maedow Arch (Anti Over-Engineering)
 
 1. **Cas Simple (1:1)** : Si la vue utilise exactement les mêmes champs que l'entité du domaine, utilisez un type alias direct ou `Pick<Entity, ...>` :
    ```typescript
@@ -144,7 +174,7 @@ export function ProductCard({ product, onSelect, className }: ProductCardProps) 
 
 ---
 
-## 4. Matrice de Localisation des Fichiers Maedow Arch
+## Matrice de Localisation des Fichiers Maedow Arch
 
 | Type de Donnée / Logique | Extension | Dossier Cible | Exemple de Fichier |
 | :--- | :--- | :--- | :--- |
@@ -159,7 +189,7 @@ export function ProductCard({ product, onSelect, className }: ProductCardProps) 
 
 ---
 
-## 5. Exemple Comparatif Avant / Après
+## Exemple Comparatif Avant / Après
 
 ### ❌ Anti-Pattern : Modèle mélangé dans le JSX
 ```tsx
