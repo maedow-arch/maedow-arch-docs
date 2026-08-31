@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { verifierNom } from "./nom.mjs";
 
 const name = process.argv[2];
 if (!name) {
@@ -8,7 +9,9 @@ if (!name) {
   process.exit(1);
 }
 
-const pascal = name.charAt(0).toUpperCase() + name.slice(1);
+// Refuse avant d'écrire : un générateur qui s'arrête à mi-parcours laisse un
+// dossier à moitié rempli.
+const pascal = verifierNom(name, "generate:feature");
 const dir = join("src", "features", name);
 
 if (existsSync(dir)) {

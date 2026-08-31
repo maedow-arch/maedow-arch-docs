@@ -248,6 +248,22 @@ Les **règles de frontières s'appliquent identiquement dans les deux profils**,
 
 Conséquence pratique : `eslint-config-maedow-arch` sert les deux profils sans configuration distincte.
 
+### Passer de Light à Full
+
+La bascule n'est pas une migration, c'est une addition. Rien de ce qui existe ne bouge : `app/`, `features/`, `components/` et `lib/` gardent leur place et leurs règles, et la couche domaine apparaît à côté.
+
+Elle se produit au moment où un domaine devient nécessaire, et le générateur la porte :
+
+```bash
+npm run generate:domain order-item
+```
+
+Sur un projet Light, cette commande crée `core/common/result.ts` avant d'écrire le domaine, puis annonce le changement de profil. Il n'y a rien d'autre à faire, et surtout rien à déplacer.
+
+C'est pour cette raison que `core/` reste vide en Light plutôt que d'être livré avec un Result Pattern inutilisé : une couche présente mais vide invite à y écrire du domaine par anticipation, ce que la Règle de Lazy Abstraction interdit. La couche naît de son premier habitant.
+
+Le mouvement inverse n'est pas outillé, et c'est délibéré : retirer une couche domaine peuplée demande de décider où va chacune de ses règles, et cette décision n'appartient pas à un générateur.
+
 ### Choisir son profil à l'installation
 
 ```bash

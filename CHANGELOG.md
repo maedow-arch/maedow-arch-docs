@@ -8,8 +8,15 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ## [Non publié]
 
+### Corrigé
+
+- **Les générateurs produisaient du TypeScript invalide sur un nom composé.** `generate:feature user-profile` écrivait `User-profileScreen`, qui n'est pas un identifiant : une majuscule posée sur la seule première lettre laisse le tiret au milieu. Les noms sont désormais découpés sur les tirets, points et underscores, et un nom qui ne donnerait pas d'identifiant exploitable est refusé avant que le moindre fichier ne soit écrit.
+- **`generate:domain` était inutilisable en profil Light.** Le service généré importait `../common/result`, absent d'un projet Light puisque la couche domaine n'y existe pas. La commande fait maintenant naître cette couche et annonce la bascule vers Full, ce que le corpus décrit désormais à la section « Passer de Light à Full ».
+
 ### Ajouté
 
+- **Le corpus décrit le passage de Light à Full.** La bascule n'est pas une migration mais une addition, et elle se produit au moment où un domaine devient nécessaire. La section explique aussi pourquoi `core/` reste vide en Light plutôt que d'être livré avec un Result Pattern inutilisé, et pourquoi le mouvement inverse n'est volontairement pas outillé.
+- **Le noyau de la CLI est testé unitairement.** Quatorze assertions couvrent l'analyse des arguments, l'empilement des couches, la fusion des fragments de `package.json` et la nouvelle pascalisation, avec le lanceur de test de Node et sans dépendance ajoutée. Elles attrapent en deux secondes ce que vingt jobs d'intégration ne voyaient pas.
 - **Profil de lecture Light ou Full sur le site.** Un sélecteur en tête de la barre latérale masque les sections qui n'appartiennent pas au profil choisi. Le masquage se fait en CSS et le profil est posé avant la première peinture : la bascule ne reconstruit pas la page et aucune section n'apparaît pour disparaître ensuite. Les entrées de sommaire correspondantes sont retirées avec elles.
 - **Balises `<ModeFull>` et `<ModeLight>` dans le corpus.** Elles restent invisibles sur GitHub, qui rend normalement le markdown qu'elles entourent.
 
