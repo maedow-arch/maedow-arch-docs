@@ -21,25 +21,18 @@ Dans de nombreuses bases de code, les interfaces TypeScript sont écrites direct
 
 Maedow Arch distingue 5 catégories de modèles claires :
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        1. Entité Métier (Entity)                       │
-│              (core/<domaine>/types.ts : Identité & Règles)             │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │
-           ┌────────────────────────┼────────────────────────┐
-           ▼                        ▼                        ▼
-┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐
-│  2. Modèle de        │ │  3. DTO / Contrat    │ │  4. Modèle de Vue    │
-│     Persistance      │ │     d'API (Payload)  │ │     (ViewModel / UI) │
-│ (core/db/schema.ts)  │ │ (core/<dom>/dto.ts)  │ │ (features/<f>/types) │
-└──────────────────────┘ └──────────────────────┘ └──────────────────────┘
-                                                             │
-                                                             ▼
-                                                  ┌──────────────────────┐
-                                                  │ 5. Props Composant   │
-                                                  │ (Composant.tsx)      │
-                                                  └──────────────────────┘
+```mermaid
+flowchart TD
+    ENT["1 · ENTITÉ MÉTIER<br/>core/[domaine]/types.ts<br/>Identité et règles"]
+    PERS["2 · MODÈLE DE PERSISTANCE<br/>core/db/schema.ts"]
+    DTO["3 · DTO, LE CONTRAT D'API<br/>core/[domaine]/dto.ts"]
+    VUE["4 · MODÈLE DE VUE<br/>features/[feature]/types.ts"]
+    PROPS["5 · PROPS DE COMPOSANT<br/>Composant.tsx"]
+
+    ENT --> PERS
+    ENT --> DTO
+    ENT --> VUE
+    VUE --> PROPS
 ```
 
 </ModeFull>
@@ -48,18 +41,12 @@ Maedow Arch distingue 5 catégories de modèles claires :
 
 En Mode Light, la couche `core/` n'existe pas : les trois premières catégories, qui y vivent, n'ont pas lieu d'être. Deux formes subsistent, et la règle « zéro modèle dans le JSX » vaut identiquement.
 
-```
-┌──────────────────────┐
-│  Modèle de Vue       │
-│  (ViewModel / UI)    │
-│ (features/<f>/types) │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│  Props de Composant  │
-│  (Composant.tsx)     │
-└──────────────────────┘
+```mermaid
+flowchart TD
+    VUE["MODÈLE DE VUE<br/>features/[feature]/types.ts"]
+    PROPS["PROPS DE COMPOSANT<br/>Composant.tsx"]
+
+    VUE --> PROPS
 ```
 
 Les types métier d'un projet Light vivent dans `features/<feature>/types.ts`, au plus près de leur usage. Basculer vers le Mode Full consiste alors à les extraire vers `core/`, domaine par domaine, jamais en un seul refactor global.

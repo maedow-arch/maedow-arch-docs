@@ -8,7 +8,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { REPO_URL } from "@/lib/links";
 import { ModeFull, ModeLight } from "@/components/ModeOnly";
-import { ModeTocSync } from "@/components/ModeTocSync";
+import { ModeToc } from "@/components/ModeToc";
+import { Mermaid } from "@/components/Mermaid";
 
 export default async function Page(props: { params: Promise<{ slug?: string[] }> }) {
   const params = await props.params;
@@ -21,7 +22,20 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
     <DocsPage
       toc={page.data.toc ?? []}
       full={page.data.full}
-      tableOfContent={{ style: "clerk", single: false }}
+      /* La liste native est neutralisée et remplacée par la nôtre : la sienne
+         ne supporte pas qu'une entrée disparaisse selon le profil de lecture.
+         Vidée de sa hauteur, elle abandonne son tracé d'elle-même. */
+      tableOfContent={{
+        style: "clerk",
+        single: false,
+        list: { className: "hidden" },
+        footer: <ModeToc items={page.data.toc ?? []} />,
+      }}
+      tableOfContentPopover={{
+        style: "clerk",
+        list: { className: "hidden" },
+        footer: <ModeToc items={page.data.toc ?? []} />,
+      }}
       editOnGithub={{
         owner: "maedow-arch",
         repo: "maedow-arch-docs",
@@ -53,9 +67,9 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
             Step,
             ModeFull,
             ModeLight,
+            Mermaid,
           }}
         />
-        <ModeTocSync />
       </DocsBody>
     </DocsPage>
   );

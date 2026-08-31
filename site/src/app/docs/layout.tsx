@@ -1,6 +1,6 @@
 import { DocsLayout } from "fumadocs-ui/layouts/notebook";
 import type { ReactNode } from "react";
-import { ArrowRight, BookOpen, Layers, ScrollText, Shapes } from "lucide-react";
+import { BookOpen, Layers, ScrollText, Shapes } from "lucide-react";
 import { source } from "@/lib/source";
 import { Logo } from "@/components/Logo";
 import { REPO_URL } from "@/lib/links";
@@ -39,26 +39,6 @@ const TABS = [
   },
 ];
 
-/*
- * Le seul aplat magenta plein de la barre latérale. La maquette place ici un
- * appel unique, et c'est ce qui lui donne sa force : un second bouton de cette
- * intensité annulerait le premier.
- */
-function SidebarCta() {
-  return (
-    <a
-      href={`${REPO_URL}/blob/main/CHANGELOG.md`}
-      target="_blank"
-      rel="noreferrer"
-      className="group flex items-center gap-3 rounded-xl bg-fd-primary px-4 py-3 text-fd-primary-foreground transition-opacity hover:opacity-90"
-    >
-      <span className="size-2 shrink-0 rounded-full bg-current opacity-70" />
-      <span className="flex-1 text-sm font-semibold">Voir le journal</span>
-      <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-    </a>
-  );
-}
-
 export default function RootDocsLayout({ children }: { children: ReactNode }) {
   return (
     <DocsLayout
@@ -78,7 +58,6 @@ export default function RootDocsLayout({ children }: { children: ReactNode }) {
         /* Le profil de lecture ouvre la barre latérale : c'est le premier
            choix à faire, il conditionne ce que les pages montreront. */
         banner: <ModeSwitcher />,
-        footer: <SidebarCta />,
       }}
     >
       {children}
