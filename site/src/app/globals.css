@@ -132,12 +132,13 @@ h4,
 }
 
 /*
- * Tout ce qui est code passe par Geist Mono, y compris le code inline du corpus
- * et les éléments que Fumadocs rend sans la classe `font-mono`.
+ * Tout ce qui est code passe par Google Sans Code, y compris le code inline du
+ * corpus et les éléments que Fumadocs rend sans la classe `font-mono`. Seul le
+ * bloc terminal de la page d'accueil garde Geist Mono, qui lui est propre.
  *
- * `font-variant-ligatures: none` est délibéré : Geist Mono ligature `!=`, `=>`
- * et `->`. C'est agréable dans un éditeur, trompeur dans une documentation où
- * le lecteur doit reconnaître les caractères qu'il devra taper.
+ * `font-variant-ligatures: none` est délibéré : ces fontes ligaturent `!=`,
+ * `=>` et `->`. C'est agréable dans un éditeur, trompeur dans une documentation
+ * où le lecteur doit reconnaître les caractères qu'il devra taper.
  */
 code,
 kbd,
@@ -146,6 +147,19 @@ pre {
   font-family: var(--font-mono-code), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-variation-settings: "MONO" 1;
   font-variant-ligatures: none;
+}
+
+/*
+ * Un bloc de code de cette documentation est d'abord une suite de commandes à
+ * exécuter une par une. Serrées, elles forment un pavé que l'œil lit comme un
+ * paragraphe. L'interligne les rend dénombrables d'un coup d'œil, et laisse au
+ * curseur de sélection de quoi viser une ligne sans en attraper deux.
+ *
+ * Le code inline n'est pas concerné : il vit dans une phrase, dont il doit
+ * suivre l'interligne.
+ */
+pre code {
+  line-height: 1.9;
 }
 
 /*
@@ -169,7 +183,115 @@ pre {
   display: none;
 }
 
-/* Les entrées de sommaire des sections masquées, retirées par le même chemin. */
-[data-mode-hidden-toc="true"] {
-  display: none;
+/*
+ * Les barres de défilement.
+ *
+ * Celle du système est large, opaque et dessinée pour une fenêtre entière. Dans
+ * une colonne de sommaire de 260 pixels, elle prend la place d'un mot et attire
+ * l'œil plus que le texte qu'elle accompagne. Réduite et teintée, elle indique
+ * la position sans se disputer la lecture.
+ *
+ * Les deux syntaxes coexistent : la standard, comprise par Firefox, et celle de
+ * WebKit, qui ignore encore la première sur plusieurs versions en service.
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-fd-border) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-fd-border);
+  border-radius: 999px;
+  /* La bordure transparente amincit le curseur sans réduire sa zone de saisie,
+     qui reste confortable au pointeur. */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-fd-muted-foreground);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/*
+ * Le bandeau des technologies.
+ *
+ * La liste est écrite deux fois côte à côte, et l'ensemble glisse d'exactement
+ * la moitié de sa largeur : au moment où la première copie sort du cadre, la
+ * seconde occupe sa position de départ, et la boucle ne se voit pas.
+ */
+@keyframes maedow-defile-gauche {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - 0.75rem));
+  }
+}
+
+@keyframes maedow-defile-droite {
+  from {
+    transform: translateX(calc(-100% - 0.75rem));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.maedow-marquee-gauche {
+  animation: maedow-defile-gauche 42s linear infinite;
+}
+
+.maedow-marquee-droite {
+  animation: maedow-defile-droite 52s linear infinite;
+}
+
+/* Personne ne devrait courir après un nom qu'il cherche à lire. */
+.maedow-marquee:hover .maedow-marquee-gauche,
+.maedow-marquee:hover .maedow-marquee-droite {
+  animation-play-state: paused;
+}
+
+.maedow-marquee-fondu {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 6rem,
+    black calc(100% - 6rem),
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 6rem,
+    black calc(100% - 6rem),
+    transparent
+  );
+}
+
+/*
+ * Le mouvement est un agrément, jamais le porteur de l'information : la liste
+ * reste entière et lisible à l'arrêt.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .maedow-marquee-gauche,
+  .maedow-marquee-droite {
+    animation: none;
+  }
+
+  .maedow-marquee {
+    overflow-x: auto;
+  }
 }

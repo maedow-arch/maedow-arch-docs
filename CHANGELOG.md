@@ -15,6 +15,7 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ### Modifié
 
+- **Les schémas d'architecture sont dessinés, plus dessinés en caractères.** Les trois diagrammes du corpus, les quatre couches et la typologie des modèles dans ses deux profils, passent en blocs `mermaid`. GitHub les rend nativement dans les `.md`, le site les rend aux couleurs du thème courant : la source reste un texte que l'on corrige en une ligne, là où une image se serait figée hors du thème, hors du lecteur d'écran et hors du dépôt.
 - **Les titres du corpus ne sont plus numérotés.** Ils portaient une numérotation manuelle qu'il fallait reprendre à chaque insertion, et qui interdisait surtout de masquer une section sans laisser un trou visible dans le sommaire. Les renvois `§N` deviennent des liens d'ancre à l'intérieur d'un document, et le nom de la section ailleurs, y compris dans les messages de lint et les commentaires des templates.
 - **La typologie des modèles s'adapte au profil de lecture.** En Mode Light, où la couche `core/` n'existe pas, les trois catégories qui y vivent laissent place à un schéma à deux formes et à la marche à suivre pour basculer vers Full.
 - **Le corpus marque la section Agnosticisme technique comme propre au Mode Full.** Le §9 le déclarait déjà : en Light, ni contracts ni adapters. Un lecteur en Light ne la voit plus.
