@@ -7,21 +7,104 @@ Maedow Arch définit un standard d'ingénierie logicielle universel, modulaire e
 
 ## Démarrage
 
+<Steps>
+
+<Step>
+
+### Générer le projet
+
+Le CLI demande le framework, le mode et la feuille de style, puis écrit l'arborescence complète.
+
+<Tabs groupId="gestionnaire" persist items={["npm", "pnpm", "bun"]}>
+
+<Tab value="npm">
+
 ```bash
 npx create-maedow-arch-app mon-projet
+```
+
+</Tab>
+
+<Tab value="pnpm">
+
+```bash
+pnpm create maedow-arch-app mon-projet
+```
+
+</Tab>
+
+<Tab value="bun">
+
+```bash
+bun create maedow-arch-app mon-projet
+```
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+<Step>
+
+### Installer et lancer
+
+<Tabs groupId="gestionnaire" persist items={["npm", "pnpm", "bun"]}>
+
+<Tab value="npm">
+
+```bash
 cd mon-projet
 npm install
 npm run dev
 ```
 
-Le projet généré porte déjà la structure complète (`app/ → features/ → core/ → lib/`), le Result Pattern avec ses helpers, et les générateurs :
+</Tab>
+
+<Tab value="pnpm">
+
+```bash
+cd mon-projet
+pnpm install
+pnpm dev
+```
+
+</Tab>
+
+<Tab value="bun">
+
+```bash
+cd mon-projet
+bun install
+bun run dev
+```
+
+</Tab>
+
+</Tabs>
+
+Le projet porte déjà la structure complète (`app/ → features/ → core/ → lib/`) et le Result Pattern avec ses helpers.
+
+</Step>
+
+<Step>
+
+### Créer un domaine ou une feature
+
+Les générateurs écrivent les fichiers à leur place, avec les imports que les frontières autorisent.
 
 ```bash
 npm run generate:domain billing
 npm run generate:feature checkout
 ```
 
-Les frontières entre couches ne reposent pas sur la discipline. Elles sont vérifiées au lint :
+</Step>
+
+<Step>
+
+### Vérifier que les frontières mordent
+
+Elles ne reposent pas sur la discipline de l'équipe, mais sur le lint.
 
 ```bash
 npm run lint
@@ -30,6 +113,16 @@ npm run lint
 ```
 Maedow Arch : core ne peut pas importer components. Voir architecture.md §6.
 ```
+
+</Step>
+
+</Steps>
+
+<Callout type="info" title="Light ou Full">
+Le CLI pose la question à la génération. Le mode Full déploie les quatre couches,
+le mode Light assume qu'un site vitrine n'en a pas besoin. Le critère de choix est
+détaillé dans [Blueprint & 4 Couches](/docs/architecture).
+</Callout>
 
 ## Les trois piliers
 
