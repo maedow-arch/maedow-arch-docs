@@ -228,22 +228,23 @@ pre code {
 /*
  * Le bandeau des technologies.
  *
- * La liste est écrite deux fois côte à côte, et l'ensemble glisse d'exactement
- * la moitié de sa largeur : au moment où la première copie sort du cadre, la
- * seconde occupe sa position de départ, et la boucle ne se voit pas.
+ * La piste porte six copies de la liste et glisse d'exactement sa moitié : à
+ * mi-course, la quatrième copie occupe la place de la première, et la boucle se
+ * referme sans raccord visible. Le nombre de copies et la moitié parcourue vont
+ * ensemble, changer l'un sans l'autre ferait sauter le bandeau.
  */
 @keyframes maedow-defile-gauche {
   from {
     transform: translateX(0);
   }
   to {
-    transform: translateX(calc(-100% - 0.75rem));
+    transform: translateX(-50%);
   }
 }
 
 @keyframes maedow-defile-droite {
   from {
-    transform: translateX(calc(-100% - 0.75rem));
+    transform: translateX(-50%);
   }
   to {
     transform: translateX(0);
@@ -251,11 +252,11 @@ pre code {
 }
 
 .maedow-marquee-gauche {
-  animation: maedow-defile-gauche 42s linear infinite;
+  animation: maedow-defile-gauche 60s linear infinite;
 }
 
 .maedow-marquee-droite {
-  animation: maedow-defile-droite 52s linear infinite;
+  animation: maedow-defile-droite 75s linear infinite;
 }
 
 /* Personne ne devrait courir après un nom qu'il cherche à lire. */
@@ -294,4 +295,32 @@ pre code {
   .maedow-marquee {
     overflow-x: auto;
   }
+}
+
+/*
+ * Les extraits colorés hors de la documentation.
+ *
+ * Shiki produit les deux thèmes d'un coup et dépose sur chaque fragment une
+ * couleur par thème, sous forme de variable. La bascule se fait donc ici, en
+ * CSS : aucun second rendu, aucun JavaScript, et rien qui clignote au
+ * changement de thème.
+ */
+.maedow-extrait pre {
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  overflow-x: auto;
+}
+
+.maedow-extrait code {
+  background: transparent;
+  font-size: inherit;
+}
+
+.maedow-extrait span {
+  color: var(--shiki-light);
+}
+
+.dark .maedow-extrait span {
+  color: var(--shiki-dark);
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Ban, GitBranch, Sparkles } from "lucide-react";
 import { LayerFlow } from "@/components/LayerFlow";
 import { CopyCommand } from "@/components/CopyCommand";
+import { Extrait } from "@/components/Extrait";
 import { NPM_CLI_URL, NPM_ESLINT_URL } from "@/lib/links";
 
 /**
@@ -40,7 +41,7 @@ function Carte({
   );
 }
 
-export function BentoGrid() {
+export async function BentoGrid() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-20">
       <h2 className="font-heading mb-3 text-3xl font-bold tracking-tight text-balance text-fd-foreground sm:text-4xl">
@@ -48,7 +49,7 @@ export function BentoGrid() {
       </h2>
       <p className="mb-12 max-w-2xl text-lg text-pretty text-fd-muted-foreground">
         Une architecture qui repose sur la discipline se dégrade au premier sprint tendu. Celle-ci
-        tient parce qu’un outil refuse ce qui la contredit.
+        tient parce qu&rsquo;un outil refuse ce qui la contredit.
       </p>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
@@ -57,8 +58,8 @@ export function BentoGrid() {
         <Carte className="md:col-span-7" etiquette="La règle">
           <LayerFlow nu />
           <p className="mt-6 text-sm leading-relaxed text-fd-muted-foreground">
-            La dépendance descend, jamais l’inverse. Un écran peut appeler le domaine, le domaine
-            ignore qu’un écran existe. Tout le reste vient de là.
+            La dépendance descend, jamais l&rsquo;inverse. Un écran peut appeler le domaine, le
+            domaine ignore qu&rsquo;un écran existe. Tout le reste vient de là.
           </p>
         </Carte>
 
@@ -75,7 +76,8 @@ export function BentoGrid() {
               </code>
             </pre>
             <p className="mt-4 text-sm leading-relaxed text-fd-muted-foreground">
-              Pas une convention d’équipe que l’on se rappelle. Une erreur, à chaque commit.
+              Pas une convention d&rsquo;équipe que l&rsquo;on se rappelle. Une erreur, à chaque
+              commit.
             </p>
           </Carte>
 
@@ -123,17 +125,15 @@ export function BentoGrid() {
 
         {/* Le Result Pattern, dans sa forme réelle. */}
         <Carte className="md:col-span-4" etiquette="Les erreurs">
-          <pre className="overflow-x-auto text-xs leading-relaxed">
-            <code className="text-fd-foreground">
-              {"type Result<T, E> =\n  "}
-              <span className="text-fd-primary">{"| { ok: true; value: T }"}</span>
-              {"\n  "}
-              <span className="text-fd-muted-foreground">{"| { ok: false; error: E }"}</span>
-            </code>
-          </pre>
+          <Extrait
+            langage="ts"
+            code={`type Result<T, E> =
+  | { ok: true; value: T }
+  | { ok: false; error: E };`}
+          />
           <p className="mt-4 text-sm leading-relaxed text-fd-muted-foreground">
-            L’échec est une donnée typée que le compilateur oblige à traiter, pas une exception que
-            l’on oublie d’attraper.
+            L&rsquo;échec est une donnée typée que le compilateur oblige à traiter, pas une
+            exception que l&rsquo;on oublie d&rsquo;attraper.
           </p>
         </Carte>
 
@@ -172,7 +172,7 @@ export function BentoGrid() {
               Une commande
             </p>
             <h3 className="font-heading text-2xl font-bold tracking-tight text-balance sm:text-3xl">
-              L’arborescence, les frontières et les générateurs, déjà en place.
+              L&rsquo;arborescence, les frontières et les générateurs, déjà en place.
             </h3>
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
               <a href={NPM_CLI_URL} target="_blank" rel="noreferrer" className="underline">

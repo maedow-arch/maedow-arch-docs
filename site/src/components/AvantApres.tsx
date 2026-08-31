@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { Extrait } from "@/components/Extrait";
 
 /**
  * La règle « zéro modèle dans le JSX », montrée sur un cas.
@@ -12,18 +13,20 @@ import { ArrowRight } from "lucide-react";
  * L'exemple est volontairement banal. Une remise par palier n'impressionne
  * personne, et c'est le but : le lecteur doit reconnaître son propre code.
  */
-function Volet({
+async function Volet({
   titre,
-  legende,
+  constat,
+  consequence,
   ton,
   fichier,
-  children,
+  code,
 }: {
   titre: string;
-  legende: string;
+  constat: string;
+  consequence: string;
   ton: "refus" | "tenue";
   fichier: string;
-  children: React.ReactNode;
+  code: string;
 }) {
   const refus = ton === "refus";
 
@@ -41,38 +44,43 @@ function Volet({
         >
           {titre}
         </p>
-        <p className="mt-1 text-sm leading-relaxed text-fd-muted-foreground">{legende}</p>
+        {/* Le constat et sa conséquence occupent une ligne chacun. Sans cette
+            coupure, un volet tenait sur une ligne et l'autre sur deux, et les
+            deux blocs de code ne commençaient pas à la même hauteur. */}
+        <p className="mt-1 text-sm leading-relaxed text-fd-muted-foreground">
+          {constat}
+          <br />
+          {consequence}
+        </p>
       </div>
 
-      <div className="flex-1 overflow-x-auto px-6 py-5">
+      <div className="flex-1 px-6 py-5">
         <p className="mb-3 text-xs text-fd-muted-foreground">{fichier}</p>
-        <pre className="text-xs leading-relaxed">
-          <code className="text-fd-foreground">{children}</code>
-        </pre>
+        <Extrait code={code} />
       </div>
     </div>
   );
 }
 
-export function AvantApres() {
+export async function AvantApres() {
   return (
     <section className="mx-auto max-w-6xl border-t border-fd-border px-6 py-20">
       <h2 className="font-heading mb-3 text-3xl font-bold tracking-tight text-balance text-fd-foreground sm:text-4xl">
-        Une règle de gestion n’a rien à faire dans un composant
+        Une règle de gestion n&rsquo;a rien à faire dans un composant
       </h2>
       <p className="mb-12 max-w-2xl text-lg text-pretty text-fd-muted-foreground">
-        Le seuil de remise ci-dessous est une décision de l’entreprise. À gauche, il faut monter un
-        arbre React pour la tester. À droite, c’est une fonction.
+        Le seuil de remise ci-dessous est une décision de l&rsquo;entreprise. À gauche, il faut
+        monter un arbre React pour la tester. À droite, c&rsquo;est une fonction.
       </p>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Volet
           titre="Sans la règle"
-          legende="Le métier est pris dans le rendu. Pour le vérifier, il faut simuler une interface."
+          constat="Le métier est pris dans le rendu."
+          consequence="Pour le vérifier, il faut simuler une interface."
           ton="refus"
           fichier="Facture.tsx"
-        >
-          {`export function Facture({ lignes }) {
+          code={`export function Facture({ lignes }) {
   const total = lignes.reduce(
     (s, l) => s + l.prix * l.qte,
     0,
@@ -81,15 +89,15 @@ export function AvantApres() {
 
   return <p>{total - remise} €</p>;
 }`}
-        </Volet>
+        />
 
         <Volet
           titre="Avec la règle"
-          legende="Le métier vit en TypeScript pur. Il se teste sans navigateur et se réutilise côté serveur."
+          constat="Le métier vit en TypeScript pur."
+          consequence="Il se teste sans navigateur, et se réutilise côté serveur."
           ton="tenue"
           fichier="core/facturation/service.ts, puis features/facturation/Facture.tsx"
-        >
-          {`export function montantARegler(lignes: Ligne[]) {
+          code={`export function montantARegler(lignes: Ligne[]) {
   const total = lignes.reduce(
     (s, l) => s + l.prix * l.qte,
     0,
@@ -99,7 +107,7 @@ export function AvantApres() {
 
 // Le composant ne fait plus que montrer.
 <p>{montantARegler(lignes)} €</p>`}
-        </Volet>
+        />
       </div>
 
       <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-fd-border bg-fd-muted/30 p-6 sm:flex-row sm:items-center sm:justify-between">
