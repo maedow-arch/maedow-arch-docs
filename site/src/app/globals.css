@@ -295,3 +295,31 @@ pre code {
     overflow-x: auto;
   }
 }
+
+/*
+ * Les extraits colorés hors de la documentation.
+ *
+ * Shiki produit les deux thèmes d'un coup et dépose sur chaque fragment une
+ * couleur par thème, sous forme de variable. La bascule se fait donc ici, en
+ * CSS : aucun second rendu, aucun JavaScript, et rien qui clignote au
+ * changement de thème.
+ */
+.maedow-extrait pre {
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  overflow-x: auto;
+}
+
+.maedow-extrait code {
+  background: transparent;
+  font-size: inherit;
+}
+
+.maedow-extrait span {
+  color: var(--shiki-light);
+}
+
+.dark .maedow-extrait span {
+  color: var(--shiki-dark);
+}

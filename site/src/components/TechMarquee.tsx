@@ -57,9 +57,9 @@ export function TechMarquee() {
     <section className="border-y border-fd-border bg-fd-muted/20 py-10">
       <div className="mx-auto max-w-6xl px-6">
         <p className="mb-6 text-center text-sm text-fd-muted-foreground">
-          L’architecture ne bouge pas quand ceci change.{" "}
+          L&rsquo;architecture ne bouge pas quand ceci change.{" "}
           <span className="text-fd-foreground">
-            Le domaine ignore la base, l’authentification et le framework.
+            Le domaine ignore la base, l&rsquo;authentification et le framework.
           </span>
         </p>
       </div>
