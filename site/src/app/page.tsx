@@ -33,6 +33,7 @@ export default function HomePage() {
         <nav className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-6">
           <Link
             href="/"
+            data-navbar-marque
             aria-label="Maedow Arch, accueil"
             className="text-fd-foreground transition-opacity hover:opacity-80"
           >
@@ -43,11 +44,14 @@ export default function HomePage() {
           </Link>
 
           <div className="ml-auto flex items-center gap-1">
-            <ThemeSwitch mode="light-dark" />
+            <span data-navbar-action>
+              <ThemeSwitch mode="light-dark" />
+            </span>
             <a
               href={REPO_URL}
               target="_blank"
               rel="noreferrer"
+              data-navbar-action
               aria-label="Dépôt GitHub"
               className="rounded-md p-2 text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-foreground"
             >
@@ -55,6 +59,7 @@ export default function HomePage() {
             </a>
             <Link
               href="/docs"
+              data-navbar-action
               className="rounded-lg bg-fd-primary px-3 py-2 text-sm font-semibold text-fd-primary-foreground transition-opacity hover:opacity-90 sm:px-4"
             >
               <span className="sm:hidden">Docs</span>

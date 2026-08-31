@@ -352,16 +352,19 @@ html {
  * La barre de navigation posée sur le haut de page.
  *
  * `data-pose="true"` signifie que rien n'est encore passé dessous : la barre
- * n'a alors aucune séparation à marquer, et son fond comme son trait
- * couperaient une ouverture qui gagne à respirer. Le script pose l'attribut,
- * la feuille de style décide de l'apparence, si bien que les couleurs suivent
- * le thème sans être écrites deux fois.
+ * laisse alors voir le motif de l'ouverture au lieu de poser un fond opaque
+ * par-dessus. Le script pose l'attribut, la feuille de style décide de
+ * l'apparence, si bien que les couleurs suivent le thème sans être écrites
+ * deux fois.
  *
- * L'absence d'attribut est l'état complet, avec fond et bordure : sans script,
- * la barre reste celle qu'elle a toujours été.
+ * Le trait du bas, lui, ne bouge pas. Il ne sépare pas ce qui défile de ce qui
+ * reste, il délimite la barre : la faire flotter sans contour la détacherait de
+ * la page au lieu de l'y poser.
+ *
+ * L'absence d'attribut est l'état complet : sans script, la barre reste celle
+ * qu'elle a toujours été.
  */
 [data-navbar][data-pose="true"] {
   background-color: transparent;
-  border-bottom-color: transparent;
   backdrop-filter: none;
 }

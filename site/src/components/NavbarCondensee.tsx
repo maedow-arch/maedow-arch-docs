@@ -1,27 +1,34 @@
 "use client";
 
-import { ScrollTrigger, enregistrerAnimation, gsap, useGSAP } from "@/lib/animation";
+import { COURBE, DUREE, ScrollTrigger, enregistrerAnimation, gsap, useGSAP } from "@/lib/animation";
 
 enregistrerAnimation();
 
 /**
- * La barre de navigation s'efface tant qu'on est en haut de la page.
+ * La barre de navigation : son entrée, puis sa réaction au défilement.
  *
- * En haut, elle n'a rien à séparer : la hero commence juste dessous, et sa
- * bordure comme son fond coupent une composition qui gagne à respirer. Dès que
- * le contenu passe dessous, elle reprend son fond et son trait, parce qu'il
- * faut alors distinguer ce qui reste de ce qui défile.
+ * **L'entrée.** La barre descend et ses éléments se posent, avant le titre.
+ * L'ordre compte : le lecteur situe d'abord où il est, ensuite ce qu'on lui
+ * dit. Une barre qui apparaîtrait après le titre donnerait l'impression que le
+ * site s'est chargé en deux fois.
  *
- * Ce n'est donc pas un effet ajouté à une barre qui fonctionnait : c'est la
- * barre qui cesse d'annoncer une séparation qui n'existe pas encore.
+ * **Le défilement.** En haut de page, la barre laisse voir le motif de
+ * l'ouverture plutôt que de poser un fond opaque par-dessus. Dès que le contenu
+ * passe dessous, elle reprend son fond, parce qu'il faut alors qu'un texte qui
+ * défile ne traverse pas la barre en restant lisible. Son trait du bas, lui, ne
+ * bouge jamais : il ne marque pas cette séparation, il délimite la barre.
+ *
+ * Le déclencheur couvre tout le document (`end: 99999`). Un `ScrollTrigger`
+ * n'appelle ses rappels que pendant qu'il est actif : sans fin explicite,
+ * l'intervalle se referme aussitôt et la bascule n'a jamais lieu.
  *
  * Le composant ne rend aucune balise, volontairement. La barre est `sticky`, et
  * l'envelopper dans un conteneur la rendrait collante à l'intérieur de ce
  * conteneur, c'est-à-dire nulle part.
  *
- * L'habillage est laissé au CSS. GSAP décide du moment, la feuille de style
- * décide de l'apparence : les couleurs suivent ainsi le thème clair ou sombre
- * sans qu'aucune valeur ne soit écrite deux fois.
+ * L'habillage reste au CSS : le script décide du moment, la feuille de style de
+ * l'apparence, si bien que les couleurs suivent le thème sans être écrites deux
+ * fois.
  */
 export function NavbarCondensee() {
   useGSAP(() => {
@@ -31,17 +38,34 @@ export function NavbarCondensee() {
       const barre = document.querySelector<HTMLElement>("[data-navbar]");
       if (!barre) return;
 
+      const entree = gsap.timeline({ defaults: { ease: COURBE.sortie } });
+
+      entree
+        .from(barre, { y: -64, duration: DUREE.bloc })
+        .from("[data-navbar-marque]", { x: -12, autoAlpha: 0, duration: DUREE.fragment }, "-=0.35")
+        .from(
+          "[data-navbar-action]",
+          { y: -8, autoAlpha: 0, duration: DUREE.fragment, stagger: 0.07 },
+          "-=0.3"
+        );
+
+      /*
+       * `start: "top -8"` place la bascule huit pixels sous le haut du
+       * document, et `end: 99999` la maintient jusqu'en bas : le déclencheur
+       * reste actif tant qu'on n'est pas revenu tout en haut.
+       */
       barre.dataset.pose = "true";
 
-      const declencheur = ScrollTrigger.create({
-        start: 8,
-        onUpdate: (self) => {
-          barre.dataset.pose = self.scroll() > 8 ? "false" : "true";
+      const bascule = ScrollTrigger.create({
+        start: "top -8",
+        end: 99999,
+        onToggle: (self) => {
+          barre.dataset.pose = self.isActive ? "false" : "true";
         },
       });
 
       return () => {
-        declencheur.kill();
+        bascule.kill();
         // Sans script, la barre garde son fond : on la rend telle qu'on l'a
         // trouvée plutôt que de la laisser transparente.
         delete barre.dataset.pose;
