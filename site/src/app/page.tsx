@@ -31,40 +31,49 @@ export default function HomePage() {
         className="sticky top-0 z-40 border-b border-fd-border bg-fd-background/80 backdrop-blur transition-[background-color,border-color,backdrop-filter] duration-300"
       >
         <nav className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-6">
-          <Link
-            href="/"
-            data-navbar-marque
-            aria-label="Maedow Arch, accueil"
-            className="text-fd-foreground transition-opacity hover:opacity-80"
-          >
-            {/* Sous 400 pixels, quatre éléments à largeur fixe ne tiennent pas :
+          {/* Le rôle est porté par une enveloppe neutre, jamais par le lien
+              lui-même : celui-ci a une transition CSS sur l'opacité pour son
+              survol, et une transition intercepte chaque valeur que GSAP écrit
+              en ligne pour l'interpoler à son tour. Les deux mécanismes se
+              combattent, et l'élément saute à l'arrivée au lieu de suivre la
+              courbe. */}
+          <span data-navbar-marque className="inline-flex">
+            <Link
+              href="/"
+              aria-label="Maedow Arch, accueil"
+              className="text-fd-foreground transition-opacity hover:opacity-80"
+            >
+              {/* Sous 400 pixels, quatre éléments à largeur fixe ne tiennent pas :
                 la marque suffit à identifier le site, le libellé revient dès
                 qu'il y a la place. */}
-            <Logo className="max-[400px]:[&>span:last-child]:hidden" />
-          </Link>
+              <Logo className="max-[400px]:[&>span:last-child]:hidden" />
+            </Link>
+          </span>
 
           <div className="ml-auto flex items-center gap-1">
             <span data-navbar-action className="inline-flex">
               <ThemeSwitch mode="light-dark" />
             </span>
-            <a
-              href={REPO_URL}
-              target="_blank"
-              rel="noreferrer"
-              data-navbar-action
-              aria-label="Dépôt GitHub"
-              className="rounded-md p-2 text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-foreground"
-            >
-              <GithubIcon className="size-4" />
-            </a>
-            <Link
-              href="/docs"
-              data-navbar-action
-              className="rounded-lg bg-fd-primary px-3 py-2 text-sm font-semibold text-fd-primary-foreground transition-opacity hover:opacity-90 sm:px-4"
-            >
-              <span className="sm:hidden">Docs</span>
-              <span className="max-sm:hidden">Documentation</span>
-            </Link>
+            <span data-navbar-action className="inline-flex">
+              <a
+                href={REPO_URL}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Dépôt GitHub"
+                className="rounded-md p-2 text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-foreground"
+              >
+                <GithubIcon className="size-4" />
+              </a>
+            </span>
+            <span data-navbar-action className="inline-flex">
+              <Link
+                href="/docs"
+                className="rounded-lg bg-fd-primary px-3 py-2 text-sm font-semibold text-fd-primary-foreground transition-opacity hover:opacity-90 sm:px-4"
+              >
+                <span className="sm:hidden">Docs</span>
+                <span className="max-sm:hidden">Documentation</span>
+              </Link>
+            </span>
           </div>
         </nav>
       </header>
