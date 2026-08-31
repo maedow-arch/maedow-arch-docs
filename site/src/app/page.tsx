@@ -6,6 +6,7 @@ import { GithubIcon } from "@/components/GithubIcon";
 import { CopyCommand } from "@/components/CopyCommand";
 import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
+import { DefilementDoux } from "@/components/DefilementDoux";
 import { NavbarCondensee } from "@/components/NavbarCondensee";
 import { SceneHero } from "@/components/SceneHero";
 import { Scene } from "@/components/Scene";
@@ -25,6 +26,7 @@ const SHORTCUTS = [
 export default function HomePage() {
   return (
     <>
+      <DefilementDoux />
       <NavbarCondensee />
       <header
         data-navbar
