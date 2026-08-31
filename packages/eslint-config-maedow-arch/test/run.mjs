@@ -35,6 +35,17 @@ const EXPECTED_VIOLATIONS = [
   { file: "features/_shared/Card.tsx", code: "MA-003", cas: "shared-feature ⇸ feature" },
   { file: "features/checkout/Screen.tsx", code: "MA-002", cas: "feature ⇸ feature" },
   { file: "lib/bad.ts", code: "MA-001", cas: "lib ⇸ core" },
+
+  // MA-004. Le premier cas est celui qui justifie la règle de syntaxe : aucun
+  // import de React n'y figure, le runtime JSX automatique s'en passe.
+  { file: "core/audit/Widget.tsx", code: "MA-004", cas: "du JSX dans core/, sans import" },
+  { file: "core/audit/useTheme.ts", code: "MA-004", cas: "une dépendance UI dans core/" },
+
+  // Les trois façons de contourner un chemin relatif. Les fixtures n'en
+  // employaient aucune : rien ne garantissait qu'elles soient interceptées.
+  { file: "core/pricing/viaAlias.ts", code: "MA-001", cas: "par l'alias @/" },
+  { file: "features/checkout/viaTypeOnly.ts", code: "MA-002", cas: "par un import de type" },
+  { file: "features/checkout/viaBarrel.ts", code: "MA-002", cas: "au travers d'un barrel" },
 ];
 
 /** La config du package, plus le parser TypeScript que l'utilisateur apporte. */
@@ -84,15 +95,18 @@ if (validProblems.length === 0) {
 }
 
 // --- 2. La fixture invalide doit lever exactement les violations attendues -----
-console.log("\n▸ Fixture invalid/ : 5 imports interdits, un par fichier");
+console.log(
+  `
+▸ Fixture invalid/ : ${EXPECTED_VIOLATIONS.length} violations attendues, avec leur code`
+);
 const invalidProblems = await lint("invalid");
 
 for (const expected of EXPECTED_VIOLATIONS) {
+  // Le code est cherché dans le message, sans contrainte sur la règle qui l'a
+  // produit : MA-004 passe par deux règles ESLint distinctes, et `boundaries`
+  // n'est plus le seul chemin par lequel une violation remonte.
   const found = invalidProblems.find(
-    (problem) =>
-      problem.file === expected.file &&
-      problem.ruleId === "boundaries/dependencies" &&
-      problem.message.startsWith(expected.code)
+    (problem) => problem.file === expected.file && problem.message.includes(expected.code)
   );
   if (found) {
     console.log(`  ✓ ${expected.file} : ${expected.code}, ${expected.cas}`);
@@ -109,9 +123,17 @@ for (const expected of EXPECTED_VIOLATIONS) {
   }
 }
 
-const unexpected = invalidProblems.length - EXPECTED_VIOLATIONS.length;
-if (unexpected > 0) {
-  fail(`${unexpected} remontée(s) inattendue(s) dans invalid/`);
+/*
+ * Une remontée non déclarée est signalée avec son contenu. Un compte seul
+ * oblige à rejouer le lint à la main pour savoir ce qui a changé, et c'est
+ * exactement le moment où l'on est tenté d'ajuster le compte sans regarder.
+ */
+const declared = new Set(EXPECTED_VIOLATIONS.map((v) => `${v.file}|${v.code}`));
+const unexpected = invalidProblems.filter(
+  (problem) => ![...declared].some((key) => key.startsWith(`${problem.file}|`))
+);
+for (const problem of unexpected) {
+  fail(`remontée non déclarée dans ${problem.file} : ${problem.message}`);
 }
 
 console.log(
