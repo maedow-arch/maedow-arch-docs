@@ -34,7 +34,7 @@ export function Footer() {
     <footer className="relative border-t border-fd-border mt-auto">
       <div className="absolute inset-0 maedow-dots opacity-40 pointer-events-none" aria-hidden />
       <div className="relative max-w-6xl mx-auto px-6 py-14 grid grid-cols-2 md:grid-cols-4 gap-10">
-        <div className="col-span-2 md:col-span-1">
+        <div data-anime="colonne" className="col-span-2 md:col-span-1">
           <Link href="/" className="text-fd-foreground hover:opacity-80 transition-opacity">
             <Logo />
           </Link>
@@ -48,7 +48,7 @@ export function Footer() {
         </div>
 
         {COLUMNS.map((column) => (
-          <div key={column.heading}>
+          <div key={column.heading} data-anime="colonne">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-fd-foreground mb-4">
               {column.heading}
             </h2>

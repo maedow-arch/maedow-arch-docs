@@ -157,8 +157,14 @@ pre {
  *
  * Le code inline n'est pas concerné : il vit dans une phrase, dont il doit
  * suivre l'interligne.
+ *
+ * La règle vise les blocs de la documentation, reconnaissables au cadre que
+ * Fumadocs leur donne. Les extraits de la page d'accueil en sont exclus : une
+ * arborescence est une forme avant d'être un texte, et l'espacer la fait
+ * ressembler à une liste. Sur un écran étroit, la carte y gagnait le double de
+ * sa hauteur utile.
  */
-pre code {
+figure.shiki pre code {
   line-height: 1.9;
 }
 
@@ -323,4 +329,48 @@ pre code {
 
 .dark .maedow-extrait span {
   color: var(--shiki-dark);
+}
+
+/*
+ * Le défilement doux, natif.
+ *
+ * Il ne s'applique qu'aux sauts d'ancre : cliquer une entrée du sommaire ou un
+ * lien vers une section. Le défilement à la molette, lui, reste celui que le
+ * lecteur a réglé dans son système.
+ *
+ * C'est un choix contre les bibliothèques qui interpolent le défilement entier.
+ * Sur un site vitrine elles flattent ; sur une documentation, le défilement est
+ * l'outil principal de lecture, et le détourner déplace aussi la molette à
+ * crans, les touches de pagination, le glisser de la barre et le saut du
+ * navigateur vers un résultat de recherche.
+ */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/*
+ * La barre de navigation posée sur le haut de page.
+ *
+ * `data-pose="true"` signifie que rien n'est encore passé dessous : la barre
+ * laisse alors voir le motif de l'ouverture au lieu de poser un fond opaque
+ * par-dessus. Le script pose l'attribut, la feuille de style décide de
+ * l'apparence, si bien que les couleurs suivent le thème sans être écrites
+ * deux fois.
+ *
+ * Le trait du bas, lui, ne bouge pas. Il ne sépare pas ce qui défile de ce qui
+ * reste, il délimite la barre : la faire flotter sans contour la détacherait de
+ * la page au lieu de l'y poser.
+ *
+ * L'absence d'attribut est l'état complet : sans script, la barre reste celle
+ * qu'elle a toujours été.
+ */
+[data-navbar][data-pose="true"] {
+  background-color: transparent;
+  backdrop-filter: none;
 }
