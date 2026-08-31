@@ -1,4 +1,4 @@
 {
   "title": "Documentation",
-  "pages": ["index", "architecture", "models", "conventions"]
+  "pages": ["index", "architecture", "models", "conventions", "rules"]
 }

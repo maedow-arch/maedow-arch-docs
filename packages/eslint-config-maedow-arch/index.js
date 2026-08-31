@@ -48,8 +48,15 @@ export default [
         "error",
         {
           default: "disallow",
+          // Le message par défaut porte MA-001, le flux général. Les deux cas qui
+          // ont leur propre code reçoivent leur propre message plus bas : le
+          // plugin préfère le message d'une politique à celui de la règle.
+          //
+          // Un code est cité plutôt qu'un titre de section. Un titre se
+          // réécrit, et le renvoi casse en silence ; c'est arrivé au commit
+          // 71c0a3f, quand la numérotation des titres a été retirée.
           message:
-            "Maedow Arch : {{from.type}} ne peut pas importer {{to.type}}. Voir « Règle de dépendance et frontières » dans architecture.md.",
+            "MA-001 : le flux de dépendance est unidirectionnel. {{from.type}} ne peut pas importer {{to.type}}. Voir rules.md.",
           policies: [
             // app/ orchestre : il peut tout importer.
             {
@@ -103,6 +110,21 @@ export default [
             {
               from: { element: { type: "lib" } },
               allow: { to: { element: { type: "lib" } } },
+            },
+            // Les deux interdictions qui portent un code à elles seules. Elles
+            // viennent après les autorisations, y compris celle des imports
+            // internes à une feature, qui reste donc permise.
+            {
+              from: { element: { type: "feature" } },
+              disallow: { to: { element: { type: "feature" } } },
+              message:
+                "MA-002 : une feature ne peut pas en importer une autre. Passez par features/_shared/, core/ ou components/. Voir rules.md.",
+            },
+            {
+              from: { element: { type: "shared-feature" } },
+              disallow: { to: { element: { type: "feature" } } },
+              message:
+                "MA-003 : features/_shared ne connaît aucune feature. Ce qui dépend d'une feature n'est pas transverse. Voir rules.md.",
             },
           ],
         },

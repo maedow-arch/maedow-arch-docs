@@ -21,13 +21,20 @@ import maedowArchConfig from "../index.js";
 const here = dirname(fileURLToPath(import.meta.url));
 const fixtures = join(here, "fixtures");
 
-/** Violations attendues dans la fixture `invalid/`, une par fichier. */
+/**
+ * Violations attendues dans la fixture `invalid/`, une par fichier.
+ *
+ * On vérifie le code du registre, pas le libellé. Un libellé se réécrit sans
+ * que la règle change ; un code ne bouge pas, et c'est précisément ce qu'il
+ * garantit. Un test qui attendrait la phrase exacte casserait à la première
+ * reformulation, et on prendrait l'habitude de le corriger sans le lire.
+ */
 const EXPECTED_VIOLATIONS = [
-  { file: "core/billing/render.ts", from: "core", to: "components" },
-  { file: "core/billing/service.ts", from: "core", to: "feature" },
-  { file: "features/_shared/Card.tsx", from: "shared-feature", to: "feature" },
-  { file: "features/checkout/Screen.tsx", from: "feature", to: "feature" },
-  { file: "lib/bad.ts", from: "lib", to: "core" },
+  { file: "core/billing/render.ts", code: "MA-001", cas: "core ⇸ components" },
+  { file: "core/billing/service.ts", code: "MA-001", cas: "core ⇸ feature" },
+  { file: "features/_shared/Card.tsx", code: "MA-003", cas: "shared-feature ⇸ feature" },
+  { file: "features/checkout/Screen.tsx", code: "MA-002", cas: "feature ⇸ feature" },
+  { file: "lib/bad.ts", code: "MA-001", cas: "lib ⇸ core" },
 ];
 
 /** La config du package, plus le parser TypeScript que l'utilisateur apporte. */
@@ -85,13 +92,13 @@ for (const expected of EXPECTED_VIOLATIONS) {
     (problem) =>
       problem.file === expected.file &&
       problem.ruleId === "boundaries/dependencies" &&
-      problem.message.includes(`${expected.from} ne peut pas importer ${expected.to}`)
+      problem.message.startsWith(expected.code)
   );
   if (found) {
-    console.log(`  ✓ ${expected.file} : ${expected.from} ⇸ ${expected.to}`);
+    console.log(`  ✓ ${expected.file} : ${expected.code}, ${expected.cas}`);
   } else {
     fail(
-      `violation NON détectée dans ${expected.file} (${expected.from} → ${expected.to}). ` +
+      `violation NON détectée dans ${expected.file} (${expected.code}, ${expected.cas}). ` +
         `Remontées pour ce fichier : ${
           invalidProblems
             .filter((p) => p.file === expected.file)
