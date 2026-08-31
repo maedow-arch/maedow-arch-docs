@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { verifierNom } from "./nom.mjs";
+import { assurerLaCoucheDomaine } from "./bascule-full.mjs";
 
 const name = process.argv[2];
 if (!name) {
@@ -8,13 +10,19 @@ if (!name) {
   process.exit(1);
 }
 
-const pascal = name.charAt(0).toUpperCase() + name.slice(1);
+// Refuse avant d'écrire : un générateur qui s'arrête à mi-parcours laisse un
+// dossier à moitié rempli.
+const pascal = verifierNom(name, "generate:domain");
 const dir = join("src", "core", name);
 
 if (existsSync(dir)) {
   console.error(`Le domaine "${name}" existe déjà dans ${dir}`);
   process.exit(1);
 }
+
+// Sur un projet en profil Light, la couche domaine n'existe pas encore.
+// Générer un domaine, c'est précisément la faire naître.
+const bascule = assurerLaCoucheDomaine();
 
 mkdirSync(dir, { recursive: true });
 
@@ -32,6 +40,15 @@ writeFileSync(
   join(dir, "service.ts"),
   `import type { Result } from "../common/result";\nimport type { ${pascal} } from "./types";\nimport type { Create${pascal}DTO } from "./validation";\n\n// ⚠️ Règle de Lazy Abstraction : n'introduis un contract.ts + adapters\n// que lorsqu'une deuxième implémentation réelle est nécessaire.\n// Tant qu'un seul fournisseur de données existe, accède-y directement ici.\n\nexport async function create${pascal}(input: Create${pascal}DTO): Promise<Result<${pascal}>> {\n  // TODO: logique métier\n  return { ok: false, error: "not_implemented" };\n}\n`
 );
+
+if (bascule) {
+  console.log("");
+  console.log("🔀 Ce projet passe du profil Light au profil Full.");
+  console.log("   La couche domaine vient d'être créée avec son Result Pattern :");
+  console.log("   - src/core/common/result.ts");
+  console.log("   Le corpus décrit ce passage à la section Mode Light ou Full.");
+  console.log("");
+}
 
 console.log(`✅ Domaine "${name}" généré dans ${dir}/`);
 console.log(`   - types.ts`);

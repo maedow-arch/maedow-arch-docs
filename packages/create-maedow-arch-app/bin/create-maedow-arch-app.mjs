@@ -13,17 +13,23 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { intro, outro, select, isCancel, cancel, log } from "@clack/prompts";
 import { stdin, stdout } from "node:process";
+import {
+  MODES,
+  TEMPLATES,
+  STYLES,
+  FRAMEWORKS,
+  DEFAULT_MODE,
+  DEFAULT_TEMPLATE,
+  DEFAULT_STYLE,
+  DEFAULT_FRAMEWORK,
+  NOM_DE_PACKAGE,
+  ErreurUsage,
+  parseArgs,
+  layersFor,
+  buildPackageJson,
+} from "./noyau.mjs";
 
 const DOCS_URL = "https://github.com/maedow-arch/maedow-arch-docs";
-
-const MODES = ["full", "light"];
-const TEMPLATES = ["demo", "blank"];
-const STYLES = ["vanilla", "tailwind"];
-const FRAMEWORKS = ["next", "vite"];
-const DEFAULT_MODE = "full";
-const DEFAULT_TEMPLATE = "demo";
-const DEFAULT_STYLE = "vanilla";
-const DEFAULT_FRAMEWORK = "next";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const templatesDir = join(__dirname, "..", "templates");
@@ -55,70 +61,6 @@ const COMMANDS = {
 /* ------------------------------------------------------------------ *
  * Arguments
  * ------------------------------------------------------------------ */
-
-function parseArgs(argv) {
-  const positional = [];
-  let mode = null;
-  let template = null;
-  let style = null;
-  let framework = null;
-
-  const take = (value, name) => {
-    if (value === undefined) fail(`L'option ${name} attend une valeur.`, usage());
-    return value;
-  };
-
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    if (arg === "--mode" || arg === "-m") {
-      mode = take(argv[++i], "--mode");
-    } else if (arg.startsWith("--mode=")) {
-      mode = arg.slice("--mode=".length);
-    } else if (arg === "--template" || arg === "-t") {
-      template = take(argv[++i], "--template");
-    } else if (arg.startsWith("--template=")) {
-      template = arg.slice("--template=".length);
-    } else if (arg === "--css" || arg === "-c") {
-      style = take(argv[++i], "--css");
-    } else if (arg.startsWith("--css=")) {
-      style = arg.slice("--css=".length);
-    } else if (arg === "--framework" || arg === "-f") {
-      framework = take(argv[++i], "--framework");
-    } else if (arg.startsWith("--framework=")) {
-      framework = arg.slice("--framework=".length);
-    } else if (arg === "--next") {
-      framework = "next";
-    } else if (arg === "--vite") {
-      framework = "vite";
-    } else if (arg === "--tailwind") {
-      style = "tailwind";
-    } else if (arg === "--vanilla") {
-      style = "vanilla";
-    } else if (arg === "--light") {
-      mode = "light";
-    } else if (arg === "--full") {
-      mode = "full";
-    } else if (arg === "--blank") {
-      template = "blank";
-    } else if (arg === "--demo") {
-      template = "demo";
-    } else if (arg === "--yes" || arg === "-y") {
-      mode = mode ?? DEFAULT_MODE;
-      template = template ?? DEFAULT_TEMPLATE;
-      style = style ?? DEFAULT_STYLE;
-      framework = framework ?? DEFAULT_FRAMEWORK;
-    } else if (arg === "--help" || arg === "-h") {
-      console.log(usage());
-      process.exit(0);
-    } else if (arg.startsWith("-")) {
-      fail(`Option inconnue : ${arg}`, usage());
-    } else {
-      positional.push(arg);
-    }
-  }
-
-  return { projectName: positional[0], mode, template, style, framework };
-}
 
 function usage() {
   return [
@@ -195,48 +137,12 @@ async function ask(message, options, initialValue) {
  * L'ordre compte : le framework pose la coquille, le mode ajoute ou retire la
  * couche domaine, le style habille, et la démonstration se pose par-dessus.
  */
-function layersFor({ framework, mode, template, style }) {
-  const layers = ["base", `framework-${framework}`, `mode-${mode}`, `css-${style}`];
-  if (template === "demo") {
-    layers.push("demo-shared", `demo-${style}`, `demo-${mode}`, `demo-app-${framework}`);
-  }
-  return layers.filter((layer) => existsSync(join(templatesDir, layer)));
-}
-
-/** Fusion en profondeur, la valeur de droite l'emportant sur celle de gauche. */
-function deepMerge(target, source) {
-  for (const [key, value] of Object.entries(source)) {
-    if (value && typeof value === "object" && !Array.isArray(value)) {
-      target[key] = deepMerge(target[key] ?? {}, value);
-    } else {
-      target[key] = value;
-    }
-  }
-  return target;
-}
 
 /**
  * Le package.json est assemblé depuis les fragments de chaque couche, plutôt
  * qu'écrit en autant d'exemplaires qu'il existe de combinaisons. Les
  * dépendances sont triées, comme le ferait npm.
  */
-function buildPackageJson(layers) {
-  let merged = {};
-  for (const layer of layers) {
-    const fragmentPath = join(templatesDir, layer, "package.fragment.json");
-    if (existsSync(fragmentPath)) {
-      merged = deepMerge(merged, JSON.parse(readFileSync(fragmentPath, "utf-8")));
-    }
-  }
-  for (const field of ["dependencies", "devDependencies"]) {
-    if (merged[field]) {
-      merged[field] = Object.fromEntries(
-        Object.entries(merged[field]).sort(([a], [b]) => a.localeCompare(b))
-      );
-    }
-  }
-  return merged;
-}
 
 /* ------------------------------------------------------------------ *
  * Génération
@@ -299,7 +205,18 @@ function countFiles(dir) {
  * Programme
  * ------------------------------------------------------------------ */
 
-const args = parseArgs(process.argv.slice(2));
+let args;
+try {
+  args = parseArgs(process.argv.slice(2));
+} catch (erreur) {
+  if (!(erreur instanceof ErreurUsage)) throw erreur;
+  fail(erreur.message, usage());
+}
+
+if (args.aide) {
+  console.log(usage());
+  process.exit(0);
+}
 let { projectName, mode, template, style, framework } = args;
 
 if (!projectName) {
@@ -307,7 +224,7 @@ if (!projectName) {
 }
 
 // Le nom finit dans un package.json : on refuse ce que npm refuserait.
-if (!/^[a-z0-9][a-z0-9._-]*$/.test(projectName)) {
+if (!NOM_DE_PACKAGE.test(projectName)) {
   fail(
     `« ${projectName} » n'est pas un nom de package valide.\n` +
       "   Minuscules, chiffres, tirets, points et underscores, en commençant par une lettre ou un chiffre."
@@ -405,7 +322,7 @@ if (!isInteractive) intro("Maedow Arch");
 
 log.info(`${projectName} : ${framework}, profil ${mode}, contenu ${template}, style ${style}`);
 
-const layers = layersFor({ framework, mode, template, style });
+const layers = layersFor({ framework, mode, template, style }, templatesDir);
 
 mkdirSync(targetDir, { recursive: true });
 for (const layer of layers) {
@@ -416,7 +333,7 @@ for (const layer of layers) {
 // plutôt qu'écrit en autant d'exemplaires qu'il existe de combinaisons.
 writeFileSync(
   join(targetDir, "package.json"),
-  `${JSON.stringify(buildPackageJson(layers), null, 2)}\n`
+  `${JSON.stringify(buildPackageJson(layers, templatesDir), null, 2)}\n`
 );
 rmSync(join(targetDir, "package.fragment.json"), { force: true });
 

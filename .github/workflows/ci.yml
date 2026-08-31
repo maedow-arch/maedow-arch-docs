@@ -21,6 +21,20 @@ jobs:
       # passerait le test positif sans rien vérifier.
       - run: npm run test:boundaries
 
+  # Douze assertions couvrent en deux secondes ce que vingt jobs d'intégration
+  # ne voyaient pas : la matrice n'exerçait qu'un profil pour le générateur de
+  # domaine, et que des noms d'un seul mot.
+  cli:
+    name: Noyau de la CLI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+        working-directory: packages/create-maedow-arch-app
+
   format:
     name: Formatage
     runs-on: ubuntu-latest
@@ -131,11 +145,34 @@ jobs:
         working-directory: app
         run: npm run test
 
-      - name: Générateurs
+      # Les noms comportent un tiret. C'est l'angle mort qui a laissé passer un
+      # défaut produisant du TypeScript invalide : la matrice n'exerçait que des
+      # noms d'un seul mot, sur lesquels la pascalisation fautive fonctionnait.
+      - name: Générateurs de features, noms simples et composés
         working-directory: app
         run: |
-          if [ "${{ matrix.mode }}" = "full" ]; then npm run generate:domain billing; fi
           npm run generate:feature checkout
+          npm run generate:feature user-profile
+          test -f src/features/user-profile/UserProfile.test.tsx
+          npm run lint
+
+      # Le générateur de domaine tourne dans les deux profils, et c'est le
+      # second angle mort : il n'était lancé qu'en Full, alors qu'en Light il
+      # écrivait un import vers un fichier absent.
+      #
+      # En Light, la couche domaine n'existe pas encore : le premier domaine la
+      # fait naître, et le projet bascule vers Full. L'ordre compte, la
+      # vérification d'absence doit précéder la première génération.
+      - name: Domaine, et bascule du profil Light vers Full
+        working-directory: app
+        run: |
+          if [ "${{ matrix.mode }}" = "light" ]; then
+            test ! -d src/core || (echo "::error::Un projet Light ne devrait pas avoir de couche core." && exit 1)
+          fi
+          npm run generate:domain order-item
+          test -f src/core/common/result.ts
+          npm run generate:domain billing
+          npm run typecheck
           npm run lint
 
       # La violation testée diffère selon le profil, mais l'exigence est la
