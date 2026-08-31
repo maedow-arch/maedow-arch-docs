@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Ban, GitBranch, Layers, Sparkles } from "lucide-react";
+import { ArrowRight, Ban, GitBranch, Sparkles } from "lucide-react";
 import { LayerFlow } from "@/components/LayerFlow";
 import { CopyCommand } from "@/components/CopyCommand";
 import { NPM_CLI_URL, NPM_ESLINT_URL } from "@/lib/links";
@@ -189,14 +189,6 @@ export function BentoGrid() {
           </div>
         </div>
       </div>
-
-      <p className="mt-10 flex flex-wrap items-center justify-center gap-2 text-sm text-fd-muted-foreground">
-        <Layers className="size-4" />
-        Le corpus complet tient en trois documents.
-        <Link href="/docs" className="font-medium text-fd-primary hover:underline">
-          Les lire
-        </Link>
-      </p>
     </section>
   );
 }

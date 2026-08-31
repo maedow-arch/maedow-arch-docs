@@ -107,9 +107,9 @@ export default function HomePage() {
 
         <TechMarquee />
 
-        <AvantApres />
-
         <BentoGrid />
+
+        <AvantApres />
       </main>
 
       <Footer />
