@@ -25,7 +25,7 @@ Les codes ne sont jamais réattribués. Une règle retirée laisse son code vaca
 | **MA-001** | Le flux `app → features → core → lib` est unidirectionnel | vérifiée | `boundaries/dependencies` |
 | **MA-002** | Une feature n'importe jamais une autre feature | vérifiée | `boundaries/dependencies` |
 | **MA-003** | `features/_shared/` ne connaît aucune feature | vérifiée | `boundaries/dependencies` |
-| **MA-004** | Zéro fichier `.tsx` et zéro JSX dans `core/` | tenue par l'équipe | revue |
+| **MA-004** | Zéro fichier `.tsx` et zéro JSX dans `core/` | vérifiée | `no-restricted-syntax`, `no-restricted-imports` |
 | **MA-005** | `any` interdit, `unknown` et gardes de type à la place | tenue par l'équipe | revue |
 | **MA-006** | Double assertion `as unknown as` interdite | tenue par l'équipe | revue |
 | **MA-007** | Aucun cycle d'import entre modules | tenue par l'équipe | revue |
@@ -60,9 +60,13 @@ Fixture : `features/_shared/Card.tsx`.
 
 ## MA-004 · Zéro `.tsx` et zéro JSX dans `core/`
 
-**Tenue par l'équipe.** C'est la règle non outillée la plus visible, et la plus facile à enfreindre sans mauvaise intention : le runtime JSX automatique ne demande aucun import de React, si bien qu'un composant peut vivre dans `core/` sans qu'aucune règle d'import ne se déclenche.
+**Vérifiée.** Deux règles la portent, et il en faut bien deux. Le runtime JSX automatique ne demande aucun import de React : un composant peut donc vivre dans `core/` sans qu'aucune règle d'import ne se déclenche, ce qui a été constaté avant d'écrire la règle. `no-restricted-imports` seul aurait donné l'illusion d'une protection, en n'attrapant que le cas devenu rare où quelqu'un écrit encore `import React from "react"`.
+
+La règle vise le contenu, pas l'extension. Un fichier `.tsx` sans JSX dans `core/` ne casse rien, et un `.ts` ne peut pas en contenir : le parser le refuserait avant nous.
 
 Énoncé dans [architecture.md](./architecture.md), tableau des couches : « **ZÉRO fichier `.tsx`**, aucun import React/DOM ».
+
+Fixtures : `core/audit/Widget.tsx` pour le JSX sans import, `core/audit/useTheme.ts` pour la dépendance d'interface.
 
 ## MA-005 · `any` interdit
 
