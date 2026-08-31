@@ -18,9 +18,13 @@ const LAYERS = [
   { name: "lib", gloss: "utilitaires purs" },
 ];
 
-export function LayerFlow() {
+/**
+ * `nu` retire le cadre : la figure est alors posée dans une carte qui porte
+ * déjà le sien, et deux bordures imbriquées se voient toujours.
+ */
+export function LayerFlow({ nu = false }: { nu?: boolean }) {
   return (
-    <figure className="rounded-2xl border border-fd-border bg-fd-card p-7 sm:p-9">
+    <figure className={nu ? "" : "rounded-2xl border border-fd-border bg-fd-card p-7 sm:p-9"}>
       <figcaption className="mb-7 text-xs font-semibold tracking-[0.14em] text-fd-muted-foreground uppercase">
         Le flux de dépendance
       </figcaption>

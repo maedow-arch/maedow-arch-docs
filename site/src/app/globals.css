@@ -224,3 +224,74 @@ pre code {
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/*
+ * Le bandeau des technologies.
+ *
+ * La liste est écrite deux fois côte à côte, et l'ensemble glisse d'exactement
+ * la moitié de sa largeur : au moment où la première copie sort du cadre, la
+ * seconde occupe sa position de départ, et la boucle ne se voit pas.
+ */
+@keyframes maedow-defile-gauche {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - 0.75rem));
+  }
+}
+
+@keyframes maedow-defile-droite {
+  from {
+    transform: translateX(calc(-100% - 0.75rem));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.maedow-marquee-gauche {
+  animation: maedow-defile-gauche 42s linear infinite;
+}
+
+.maedow-marquee-droite {
+  animation: maedow-defile-droite 52s linear infinite;
+}
+
+/* Personne ne devrait courir après un nom qu'il cherche à lire. */
+.maedow-marquee:hover .maedow-marquee-gauche,
+.maedow-marquee:hover .maedow-marquee-droite {
+  animation-play-state: paused;
+}
+
+.maedow-marquee-fondu {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 6rem,
+    black calc(100% - 6rem),
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 6rem,
+    black calc(100% - 6rem),
+    transparent
+  );
+}
+
+/*
+ * Le mouvement est un agrément, jamais le porteur de l'information : la liste
+ * reste entière et lisible à l'arrêt.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .maedow-marquee-gauche,
+  .maedow-marquee-droite {
+    animation: none;
+  }
+
+  .maedow-marquee {
+    overflow-x: auto;
+  }
+}
