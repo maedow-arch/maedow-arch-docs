@@ -94,7 +94,7 @@ export default function HomePage() {
                 prend la couleur d'accent, comme dans le logo. */}
               <h1
                 data-hero="titre"
-                className="font-heading mb-6 text-6xl leading-[0.92] font-extrabold tracking-[-0.04em] text-fd-foreground sm:text-7xl lg:text-8xl"
+                className="font-heading mb-6 text-[clamp(2.25rem,11vw,3.75rem)] leading-[0.92] font-extrabold tracking-[-0.04em] text-fd-foreground sm:text-7xl lg:text-8xl"
               >
                 Maedow
                 <br />

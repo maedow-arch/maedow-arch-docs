@@ -157,8 +157,14 @@ pre {
  *
  * Le code inline n'est pas concerné : il vit dans une phrase, dont il doit
  * suivre l'interligne.
+ *
+ * La règle vise les blocs de la documentation, reconnaissables au cadre que
+ * Fumadocs leur donne. Les extraits de la page d'accueil en sont exclus : une
+ * arborescence est une forme avant d'être un texte, et l'espacer la fait
+ * ressembler à une liste. Sur un écran étroit, la carte y gagnait le double de
+ * sa hauteur utile.
  */
-pre code {
+figure.shiki pre code {
   line-height: 1.9;
 }
 
