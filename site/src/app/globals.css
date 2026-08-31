@@ -347,3 +347,21 @@ html {
     scroll-behavior: auto;
   }
 }
+
+/*
+ * La barre de navigation posée sur le haut de page.
+ *
+ * `data-pose="true"` signifie que rien n'est encore passé dessous : la barre
+ * n'a alors aucune séparation à marquer, et son fond comme son trait
+ * couperaient une ouverture qui gagne à respirer. Le script pose l'attribut,
+ * la feuille de style décide de l'apparence, si bien que les couleurs suivent
+ * le thème sans être écrites deux fois.
+ *
+ * L'absence d'attribut est l'état complet, avec fond et bordure : sans script,
+ * la barre reste celle qu'elle a toujours été.
+ */
+[data-navbar][data-pose="true"] {
+  background-color: transparent;
+  border-bottom-color: transparent;
+  backdrop-filter: none;
+}

@@ -6,6 +6,7 @@ import { GithubIcon } from "@/components/GithubIcon";
 import { CopyCommand } from "@/components/CopyCommand";
 import { Logo } from "@/components/Logo";
 import { Footer } from "@/components/Footer";
+import { NavbarCondensee } from "@/components/NavbarCondensee";
 import { SceneHero } from "@/components/SceneHero";
 import { Scene } from "@/components/Scene";
 import { TechMarquee } from "@/components/TechMarquee";
@@ -24,7 +25,11 @@ const SHORTCUTS = [
 export default function HomePage() {
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-fd-border bg-fd-background/80 backdrop-blur">
+      <NavbarCondensee />
+      <header
+        data-navbar
+        className="sticky top-0 z-40 border-b border-fd-border bg-fd-background/80 backdrop-blur transition-[background-color,border-color,backdrop-filter] duration-300"
+      >
         <nav className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-6">
           <Link
             href="/"
@@ -126,7 +131,9 @@ export default function HomePage() {
         </Scene>
       </main>
 
-      <Footer />
+      <Scene>
+        <Footer />
+      </Scene>
     </>
   );
 }

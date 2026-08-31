@@ -160,6 +160,25 @@ export function Scene({ children, className }: { children: ReactNode; className?
         }
 
         /* ------------------------------------------------------------------
+         * Les colonnes du pied de page arrivent de la gauche vers la droite.
+         *
+         * Sobrement, et c'est le point : elles suivent immédiatement le seul
+         * aplat plein de la page. Une entrée appuyée ici entrerait en
+         * concurrence avec l'appel qu'elle vient de laisser derrière elle.
+         * ---------------------------------------------------------------- */
+        const colonnes = scope.querySelectorAll<HTMLElement>('[data-anime="colonne"]');
+        if (colonnes.length > 0) {
+          gsap.from(colonnes, {
+            y: 14,
+            autoAlpha: 0,
+            duration: DUREE.fragment,
+            ease: COURBE.sortie,
+            stagger: 0.07,
+            scrollTrigger: { trigger: colonnes[0]!, start: SEUIL, once: true },
+          });
+        }
+
+        /* ------------------------------------------------------------------
          * Les cartes de la grille entrent par lots.
          *
          * `batch` regroupe celles qui franchissent le seuil ensemble et leur
