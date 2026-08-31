@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { LogoMark } from "@/components/Logo";
 
 /**
  * Une commande shell avec bouton copier.
@@ -9,8 +10,21 @@ import { Check, Copy } from "lucide-react";
  * `navigator.clipboard` n'existe pas partout (contexte non sécurisé, permission
  * refusée) : en cas d'échec on ne change pas l'état, le lecteur voit que rien
  * ne s'est passé et peut sélectionner le texte à la main.
+ *
+ * Deux tons. `surface` suit le thème et s'intègre au corps de page. `terminal`
+ * reste sombre dans les deux thèmes, parce qu'un terminal est sombre : c'est le
+ * seul élément de la page qui montre l'outil plutôt que la documentation, et il
+ * doit se lire comme tel dès le premier coup d'œil.
  */
-export function CopyCommand({ command, compact = false }: { command: string; compact?: boolean }) {
+export function CopyCommand({
+  command,
+  compact = false,
+  tone = "surface",
+}: {
+  command: string;
+  compact?: boolean;
+  tone?: "surface" | "terminal";
+}) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -23,23 +37,47 @@ export function CopyCommand({ command, compact = false }: { command: string; com
     }
   }
 
+  const terminal = tone === "terminal";
+
   return (
     <div
-      className={`flex items-center justify-between gap-3 rounded-lg border border-fd-border bg-fd-muted/40 font-mono ${
-        compact ? "px-3 py-2 text-xs" : "px-5 py-4 text-sm"
-      }`}
+      className={
+        terminal
+          ? "flex items-center gap-3 rounded-xl border border-maedow-trait bg-maedow-espace px-5 py-4 font-snippet text-sm shadow-lg shadow-black/20"
+          : `flex items-center justify-between gap-3 rounded-lg border border-fd-border bg-fd-muted/40 font-mono ${
+              compact ? "px-3 py-2 text-xs" : "px-5 py-4 text-sm"
+            }`
+      }
     >
-      <code className="text-fd-foreground overflow-x-auto whitespace-nowrap">
-        <span className="text-fd-muted-foreground select-none">$ </span>
-        {command}
-      </code>
+      {terminal ? (
+        <>
+          <LogoMark className="size-4 text-maedow-magenta" />
+          <code className="overflow-x-auto whitespace-nowrap text-maedow-givre">
+            <span className="select-none text-maedow-brume">~ </span>
+            {command}
+          </code>
+        </>
+      ) : (
+        <code className="overflow-x-auto whitespace-nowrap text-fd-foreground">
+          <span className="select-none text-fd-muted-foreground">$ </span>
+          {command}
+        </code>
+      )}
       <button
         type="button"
         onClick={copy}
         aria-label={copied ? "Commande copiée" : `Copier : ${command}`}
-        className="shrink-0 p-1.5 rounded-md text-fd-muted-foreground hover:text-fd-foreground hover:bg-fd-accent transition-colors"
+        className={
+          terminal
+            ? "ms-auto shrink-0 rounded-md p-1.5 text-maedow-brume transition-colors hover:bg-white/10 hover:text-maedow-givre"
+            : "shrink-0 rounded-md p-1.5 text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-foreground"
+        }
       >
-        {copied ? <Check className="w-4 h-4 text-fd-primary" /> : <Copy className="w-4 h-4" />}
+        {copied ? (
+          <Check className={`size-4 ${terminal ? "text-maedow-magenta" : "text-fd-primary"}`} />
+        ) : (
+          <Copy className="size-4" />
+        )}
       </button>
     </div>
   );

@@ -1,0 +1,119 @@
+/*
+ * Thème Maedow Arch.
+ *
+ * La source est le Maedow Design System : huit couleurs dessinées pour une
+ * interface sombre. Un corpus d'architecture se lit longuement, et dans les
+ * deux thèmes. Trois valeurs manquaient donc, dérivées ici en conservant la
+ * teinte de marque et en descendant jusqu'au premier seuil AA.
+ *
+ * Le principe qui structure le fichier : le porteur de la marque change avec
+ * le fond.
+ *
+ *   sombre  le magenta porte le texte accentué, l'ultraviolet s'efface en
+ *           surface, car il ne fait que 1,68:1 sur le fond et serait illisible
+ *   clair   l'ultraviolet porte le texte, le magenta se réserve aux aplats
+ *           pleins, car il ne fait que 3,02:1 sur fond pâle
+ *
+ * Chaque valeur dérivée porte sa mesure en regard. Elles ont été calculées,
+ * pas estimées.
+ */
+
+@import "fumadocs-ui/css/lib/default-colors.css";
+
+@theme static {
+  /* Les huit couleurs du Maedow Design System, reprises sans retouche. */
+  --color-maedow-magenta: #ff00e6; /* Magenta Accent */
+  --color-maedow-ultraviolet: #5e0d7b; /* Ultraviolet Deep */
+  --color-maedow-espace: #100a1f; /* Deep Urban Space */
+  --color-maedow-ardoise: #1c152e; /* Dark Violet-Charcoal */
+  --color-maedow-ambre: #ffd700; /* Electric Amber */
+  --color-maedow-cyan: #00ffff; /* Neon Cyan */
+  --color-maedow-givre: #f5f5fa; /* Frost White */
+  --color-maedow-brume: #a8a0b8; /* Mist Gray */
+
+  /* Dérivées pour le thème clair, teinte conservée. */
+  --color-maedow-magenta-encre: #cc00b8; /* 4,54:1 sur givre */
+  --color-maedow-brume-encre: #766a8e; /* 4,58:1 sur givre */
+  --color-maedow-ambre-encre: #826e00; /* 4,62:1 sur givre */
+  --color-maedow-cyan-encre: #007d7d; /* 4,57:1 sur givre */
+
+  /* Surfaces et traits, les intervalles que la palette ne couvrait pas. */
+  --color-maedow-trait: #37295b; /* bordure sombre */
+  --color-maedow-voile: #241b3a; /* survol et surface intermédiaire sombre */
+  --color-maedow-nacre: #eceaf3; /* surface claire discrète */
+  --color-maedow-lisere: #e3e0ec; /* bordure claire */
+
+  /* L'erreur, seule famille absente de la palette, tirée vers le magenta. */
+  --color-maedow-alerte: #ff4d6d; /* 6,02:1 sur espace */
+  --color-maedow-alerte-encre: #c2003f; /* 5,74:1 sur givre */
+}
+
+/*
+ * Thème clair.
+ * Le fond est le Frost White de la palette, et non un blanc pur : les cartes
+ * s'en détachent en blanc, exactement comme sur la maquette de référence.
+ */
+@theme {
+  --color-fd-background: var(--color-maedow-givre);
+  --color-fd-foreground: var(--color-maedow-espace);
+
+  --color-fd-card: #ffffff;
+  --color-fd-card-foreground: var(--color-maedow-espace);
+  --color-fd-popover: #ffffff;
+  --color-fd-popover-foreground: var(--color-maedow-espace);
+
+  /* Le magenta encre tient les deux emplois : texte de lien et aplat de bouton. */
+  --color-fd-primary: var(--color-maedow-magenta-encre);
+  --color-fd-primary-foreground: var(--color-maedow-givre);
+
+  --color-fd-secondary: var(--color-maedow-nacre);
+  --color-fd-secondary-foreground: var(--color-maedow-espace);
+  --color-fd-muted: var(--color-maedow-nacre);
+  --color-fd-muted-foreground: var(--color-maedow-brume-encre);
+  --color-fd-accent: #f0ebf8;
+  --color-fd-accent-foreground: var(--color-maedow-ultraviolet);
+
+  --color-fd-border: var(--color-maedow-lisere);
+  --color-fd-ring: var(--color-maedow-magenta-encre);
+
+  /* Encarts : chaque famille descendue jusqu'au seuil AA sur fond pâle. */
+  --color-fd-info: var(--color-maedow-magenta-encre);
+  --color-fd-warning: var(--color-maedow-ambre-encre);
+  --color-fd-success: var(--color-maedow-cyan-encre);
+  --color-fd-error: var(--color-maedow-alerte-encre);
+  --color-fd-idea: var(--color-maedow-ultraviolet);
+}
+
+/*
+ * Thème sombre.
+ * Ici la palette s'applique telle quelle : c'est le terrain pour lequel elle a
+ * été dessinée, et toutes ses valeurs y passent AA ou mieux.
+ */
+.dark {
+  --color-fd-background: var(--color-maedow-espace);
+  --color-fd-foreground: var(--color-maedow-givre); /* 17,81:1 */
+
+  --color-fd-card: var(--color-maedow-ardoise);
+  --color-fd-card-foreground: var(--color-maedow-givre);
+  --color-fd-popover: var(--color-maedow-ardoise);
+  --color-fd-popover-foreground: var(--color-maedow-givre);
+
+  --color-fd-primary: var(--color-maedow-magenta); /* 5,89:1 */
+  --color-fd-primary-foreground: var(--color-maedow-espace);
+
+  --color-fd-secondary: var(--color-maedow-voile);
+  --color-fd-secondary-foreground: var(--color-maedow-givre);
+  --color-fd-muted: var(--color-maedow-ardoise);
+  --color-fd-muted-foreground: var(--color-maedow-brume); /* 7,73:1 */
+  --color-fd-accent: var(--color-maedow-voile);
+  --color-fd-accent-foreground: var(--color-maedow-givre);
+
+  --color-fd-border: var(--color-maedow-trait);
+  --color-fd-ring: var(--color-maedow-magenta);
+
+  --color-fd-info: var(--color-maedow-magenta);
+  --color-fd-warning: var(--color-maedow-ambre); /* 13,80:1 */
+  --color-fd-success: var(--color-maedow-cyan); /* 15,43:1 */
+  --color-fd-error: var(--color-maedow-alerte);
+  --color-fd-idea: var(--color-maedow-ambre);
+}

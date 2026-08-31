@@ -59,6 +59,8 @@
 
 ---
 
+<ModeFull>
+
 ## 4. Agnosticisme Technique : Adapters & Infrastructure dans Maedow Arch
 
 > **Règle de Lazy Abstraction (Introduction Différée des Contrats)** : un `contract.ts` + un système d'adapters ne doit être introduit **qu'au moment où une deuxième implémentation réelle est nécessaire** (migration de base, multi-tenant avec fournisseurs différents, besoin de mock avancé en test). Tant qu'un seul fournisseur (une seule DB, un seul provider d'auth) est utilisé et qu'aucun changement n'est prévu à court terme, l'accès direct dans `core/<domaine>/repository.ts` est conforme à Maedow Arch. Abstraire par anticipation sans second cas d'usage concret est un anti-pattern Maedow Arch : ça ajoute de l'indirection sans bénéfice mesurable.
@@ -110,6 +112,8 @@ export interface UserRepository {
   * `core/users/firestore.repository.ts` (Firebase / Firestore)
 
 ---
+
+</ModeFull>
 
 ## 5. Composition de Features & Éléments Partagés (`features/_shared/`)
 
