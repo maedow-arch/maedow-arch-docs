@@ -4,7 +4,7 @@ import { z } from "zod";
  * Contrat d'entrée du domaine, validé à la frontière.
  *
  * Le type n'est pas redéclaré à la main : il est inféré du schéma. C'est la
- * règle d'inférence Zod systématique de models.md §3.
+ * règle d'inférence Zod systématique de models.md, « Règle du pragmatisme typé ».
  */
 export const CounterSettingsSchema = z.object({
   value: z.number().int(),

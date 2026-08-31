@@ -7,7 +7,7 @@ import "./globals.css";
  * Point d'entrée de l'application.
  *
  * Couche `app/`, responsabilité « point d'entrée ». Sous Next.js, ce rôle est
- * tenu par `app/layout.tsx`. Voir architecture.md §10.
+ * tenu par `app/layout.tsx`. Voir « Maedow Arch hors Next.js » dans architecture.md.
  */
 const container = document.getElementById("root");
 if (!container) throw new Error("Élément #root introuvable dans index.html");

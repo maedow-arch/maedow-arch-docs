@@ -15,8 +15,14 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ### Modifié
 
+- **Les titres du corpus ne sont plus numérotés.** Ils portaient une numérotation manuelle qu'il fallait reprendre à chaque insertion, et qui interdisait surtout de masquer une section sans laisser un trou visible dans le sommaire. Les renvois `§N` deviennent des liens d'ancre à l'intérieur d'un document, et le nom de la section ailleurs, y compris dans les messages de lint et les commentaires des templates.
+- **La typologie des modèles s'adapte au profil de lecture.** En Mode Light, où la couche `core/` n'existe pas, les trois catégories qui y vivent laissent place à un schéma à deux formes et à la marche à suivre pour basculer vers Full.
 - **Le corpus marque la section Agnosticisme technique comme propre au Mode Full.** Le §9 le déclarait déjà : en Light, ni contracts ni adapters. Un lecteur en Light ne la voit plus.
 - **Refonte visuelle du site.** Palette issue du Maedow Design System, avec trois valeurs dérivées pour le thème clair, chacune mesurée au premier seuil AA. Quatre fontes et quatre rôles : Space Grotesk aux titres, Google Sans Flex au texte courant, Google Sans Code au code de la documentation, Geist Mono au seul bloc terminal de la page d'accueil.
+
+### Décidé
+
+- **Les renvois `§N` des entrées passées de ce journal ne sont pas réécrits.** Un journal décrit l'état du corpus au moment où il a changé. Réécrire ses entrées anciennes pour les aligner sur la structure d'aujourd'hui reviendrait à effacer ce qu'elles documentent.
 
 ## [0.7.0] : 2026-08-30
 

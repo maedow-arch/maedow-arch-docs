@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
  * Il vit dans `features/_shared/` parce qu'il porte une intention métier
  * (présenter un bloc de l'application), là où `components/ui/` ne porte qu'une
  * apparence. Il n'importe aucune feature : c'est la règle de dégradation
- * d'architecture.md §5.1.
+ * d'architecture.md, « Règle de dégradation de features/_shared/ ».
  */
 export function Panel({
   title,

@@ -40,7 +40,7 @@ Le flux de dépendance est unidirectionnel, `app → features → core → lib` 
 Une violation produit un message explicite :
 
 ```
-Maedow Arch : core ne peut pas importer components. Voir architecture.md §6.
+Maedow Arch : core ne peut pas importer components. Voir « Règle de dépendance et frontières » dans architecture.md.
 ```
 
 ## Dispositions supportées

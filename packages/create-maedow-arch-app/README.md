@@ -55,7 +55,7 @@ Trois couches sur quatre ne bougent pas d'un framework à l'autre : `features/`,
 | Coquille et injection | `app/layout.tsx` | `app/App.tsx` |
 | Déclaration des routes | l'arborescence de `app/` | `app/routes.tsx` |
 
-Les frontières sont vraiment appliquées dans les deux cas, sans configuration ESLint distincte. Voir architecture.md §10.
+Les frontières sont vraiment appliquées dans les deux cas, sans configuration ESLint distincte. Voir « Maedow Arch hors Next.js » dans architecture.md.
 
 ## Choisir son style
 
@@ -130,7 +130,7 @@ npm run lint
 ```
 
 ```
-Maedow Arch : core ne peut pas importer components. Voir architecture.md §6.
+Maedow Arch : core ne peut pas importer components. Voir « Règle de dépendance et frontières » dans architecture.md.
 ```
 
 Les règles vivent dans [`eslint-config-maedow-arch`](https://www.npmjs.com/package/eslint-config-maedow-arch), installé par défaut dans le projet généré.

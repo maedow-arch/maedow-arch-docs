@@ -17,7 +17,7 @@ export interface Counter {
  *
  * Franchir une borne n'est pas un incident technique, c'est une réponse
  * métier légitime. Elle est donc modélisée comme une donnée, pas levée comme
- * une exception. Voir conventions.md §4, le Result Pattern.
+ * une exception. Voir « Gestion des erreurs » dans conventions.md, le Result Pattern.
  */
 export type CounterError =
   | { readonly kind: "at_maximum"; readonly max: number }
