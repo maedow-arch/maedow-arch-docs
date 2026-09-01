@@ -52,13 +52,16 @@ export function CopyCommand({
       {terminal ? (
         <>
           <LogoMark className="size-4 text-maedow-magenta" />
-          <code className="overflow-x-auto whitespace-nowrap text-maedow-givre">
+          {/* `min-w-0` laisse le code rétrécir sous sa largeur intrinsèque :
+              sans lui, un élément de flex refuse de passer en dessous et le
+              défilement horizontal déclaré ici ne s'active jamais. */}
+          <code className="min-w-0 overflow-x-auto whitespace-nowrap text-maedow-givre">
             <span className="select-none text-maedow-brume">~ </span>
             {command}
           </code>
         </>
       ) : (
-        <code className="overflow-x-auto whitespace-nowrap text-fd-foreground">
+        <code className="min-w-0 overflow-x-auto whitespace-nowrap text-fd-foreground">
           <span className="select-none text-fd-muted-foreground">$ </span>
           {command}
         </code>

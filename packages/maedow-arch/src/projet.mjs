@@ -11,7 +11,20 @@ import { join, relative, dirname, resolve } from "node:path";
 
 const EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".mjs", ".cjs"];
 
-/** Ce qu'on ne lit jamais : ni les dépendances, ni les produits de build. */
+/**
+ * Ce qu'on ne parcourt pas, et ce n'est qu'une question de coût.
+ *
+ * Cette liste ne définit plus le périmètre de l'audit : c'est `classer` qui le
+ * définit, en ne retenant que les couches du standard. Elle évite seulement de
+ * descendre dans des arborescences qui se comptent en dizaines de milliers de
+ * fichiers, et dont aucun n'est du code écrit à la main.
+ *
+ * La distinction n'est pas cosmétique. Tant que cette liste tenait lieu de
+ * périmètre, tout dossier qu'elle n'avait pas prévu passait pour du code du
+ * standard : c'est ainsi qu'un `public/mockServiceWorker.js` généré s'est
+ * retrouvé compté comme une violation. Une liste d'exclusions laisse passer par
+ * défaut, et ne peut être complète qu'après coup.
+ */
 const IGNORES = new Set([
   "node_modules",
   ".git",
