@@ -79,6 +79,16 @@ sera écrasé au prochain build.
 Une ligne suffit, mais elle doit dire ce qui change pour celui qui applique le
 standard, pas ce qui change dans le fichier.
 
+## Auditer un projet avant de contribuer
+
+Si vous appliquez ce standard à un projet existant, la commande d'audit dit où vous en êtes :
+
+```bash
+npx maedow-arch check
+```
+
+Elle ne modifie rien, n'installe rien, et n'a pas besoin que le projet compile. Les frictions rencontrées pendant une migration réelle sont le retour le plus utile qu'on puisse faire à ce dépôt.
+
 ## Signaler une friction plutôt qu'un bug
 
 L'apport le plus utile à un standard n'est pas le correctif, c'est le

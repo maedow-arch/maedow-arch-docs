@@ -3,7 +3,7 @@ import { ArrowRight, Ban, GitBranch, Sparkles } from "lucide-react";
 import { LayerFlow } from "@/components/LayerFlow";
 import { CopyCommand } from "@/components/CopyCommand";
 import { Extrait } from "@/components/Extrait";
-import { NPM_CLI_URL, NPM_ESLINT_URL } from "@/lib/links";
+import { NPM_AUDIT_URL, NPM_CLI_URL, NPM_ESLINT_URL } from "@/lib/links";
 
 /**
  * La grille de la page d'accueil.
@@ -192,12 +192,22 @@ export async function BentoGrid() {
             <h3 className="font-heading text-2xl font-bold tracking-tight text-balance sm:text-3xl">
               L&rsquo;arborescence, les frontières et les générateurs, déjà en place.
             </h3>
+            {/* Le projet existant vient en second, mais il est le cas le plus
+                fréquent : personne n&rsquo;adopte une architecture en repartant
+                de zéro. */}
+            <p className="mt-3 text-sm opacity-90">
+              Un projet déjà commencé ? <code className="font-mono">npx maedow-arch check</code> dit
+              ce que l&rsquo;adoption coûterait, sans rien installer.
+            </p>
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
               <a href={NPM_CLI_URL} target="_blank" rel="noreferrer" className="underline">
                 create-maedow-arch-app
               </a>
               <a href={NPM_ESLINT_URL} target="_blank" rel="noreferrer" className="underline">
                 eslint-config-maedow-arch
+              </a>
+              <a href={NPM_AUDIT_URL} target="_blank" rel="noreferrer" className="underline">
+                maedow-arch
               </a>
             </div>
           </div>

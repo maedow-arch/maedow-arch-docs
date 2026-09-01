@@ -21,3 +21,4 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL
 export const REPO_URL = "https://github.com/maedow-arch/maedow-arch-docs";
 export const NPM_CLI_URL = "https://www.npmjs.com/package/create-maedow-arch-app";
 export const NPM_ESLINT_URL = "https://www.npmjs.com/package/eslint-config-maedow-arch";
+export const NPM_AUDIT_URL = "https://www.npmjs.com/package/maedow-arch";
