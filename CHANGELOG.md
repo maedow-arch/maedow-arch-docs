@@ -10,6 +10,9 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ### Ajouté
 
+- **Une page « Adopter sur un projet existant » dans la documentation.** La commande d'audit existait, la page d'accueil l'annonçait, mais rien n'expliquait comment lire son rapport ni conduire la migration. La page donne l'ordre des corrections et sa raison, ce que `--fix` ne touche pas, et le passage de l'audit à la configuration ESLint une fois la migration faite, en précisant que charger l'entrée par défaut et l'entrée stricte d'un coup sur une base existante est le meilleur moyen de tout désactiver la semaine suivante.
+- **La documentation propose deux chemins d'entrée**, selon que le projet existe déjà ou non. Le second était le seul documenté, alors que le premier est le plus fréquent.
+
 - **Le corpus entier est lisible à une seule adresse, sur `/llms.txt`.** Un agent qui veut connaître ce standard n'a plus à parcourir six pages de HTML. Le fichier est dérivé de la documentation et jamais recopié : il ne peut pas se périmer sans qu'elle se périme aussi. C'est un canal d'adoption réel pour un standard destiné à être appliqué par des développeurs qui travaillent avec des assistants.
 - **Un `AGENTS.md` à la racine**, qui dit ce qu'il faut savoir avant de modifier le dépôt : que le corpus est la source et les pages du site des fichiers générés, que chaque règle a besoin de sa fixture, et où chercher une réponse. `FRICTIONS.md` y est signalé comme le document le plus utile pour comprendre les décisions qui paraissent arbitraires.
 - **La commande d'audit est annoncée là où on la cherche.** `maedow-arch` était publié sur npm sans apparaître ni dans le tableau d'outillage du README, ni sur le site, ni dans le guide de contribution. Le démarrage rapide commence désormais par le projet qui existe déjà, qui est le cas le plus fréquent.
