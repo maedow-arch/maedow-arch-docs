@@ -227,3 +227,19 @@ Le même défaut avait déjà frappé le frontmatter de la page d'accueil de la 
 **La leçon.** Une substitution mécanique dans un fichier de configuration change sa syntaxe, pas seulement son texte. J'avais pourtant vu ce défaut une première fois, dans le frontmatter, sans en tirer la conclusion générale : chercher toutes les occurrences du même motif au lieu de corriger celle qui venait de se manifester.
 
 Et c'est le premier apport concret de Prettier, avant même la question du style : un formateur est aussi un analyseur syntaxique qui refuse ce qu'il ne comprend pas.
+
+---
+
+## F-015 : une règle active, chargée sans erreur, et qui ne regardait rien
+
+**Symptôme.** En écrivant l'entrée stricte, j'ajoute `import/no-cycle` et sa fixture : deux modules de `core/` qui s'importent mutuellement. Le test ne détecte aucun cycle. Aucune erreur, aucun avertissement, aucun message de configuration invalide. La règle est chargée, la fixture est lue, et le lint est vert.
+
+**Cause.** Pour suivre une chaîne d'imports, la règle n'analyse pas seulement le fichier courant : elle ouvre elle-même les fichiers importés. Le parser déclaré dans la configuration ESLint ne s'applique qu'au fichier courant, et `eslint-plugin-import` a besoin d'un réglage à lui, `import/parsers`, pour savoir analyser ce qu'il ouvre. Sans ce réglage, il ne comprend rien aux fichiers TypeScript qu'il ouvre, n'y trouve aucun import, et conclut donc qu'il n'y a pas de cycle.
+
+**Ce qui l'a rendu visible.** Le doute est venu d'un écart : le résolveur fonctionnait, `import/no-unresolved` signalait bien un import cassé. Le plugin voyait donc les imports. J'ai alors reconstruit le même cycle en JavaScript pur, et il a été détecté immédiatement. Vert en TypeScript, rouge en JavaScript, sur une configuration identique par ailleurs : c'est cet écart qui a désigné le coupable, et non la lecture du code de la règle.
+
+**Ce qu'on en a fait.** `import/parsers` est déclaré dans l'entrée stricte, avec le commentaire qui explique pourquoi il n'est pas facultatif. La fixture, elle, était déjà là : c'est elle qui a trouvé le défaut.
+
+**La leçon.** Le journal comptait déjà F-001, F-011 et F-012, trois formes du même mode de défaillance : un contrôle qui rend un verdict favorable sans avoir rien vérifié. Celle-ci en ajoute une quatrième, et la plus difficile à voir, parce que rien n'y est cassé. La configuration est valide, la règle est bien chargée, le plugin est bien résolu, et le fichier est bien lu. Seule une hypothèse implicite est fausse : que l'outil analyse de la même façon le fichier qu'on lui donne et ceux qu'il va chercher.
+
+D'où la règle du dépôt, à laquelle il n'y a pas d'exception : une règle n'entre pas dans une configuration sans une fixture qui échoue quand on la retire. Non pour documenter la règle, mais parce que c'est le seul moyen de savoir qu'elle regarde quelque chose. Écrite sans sa fixture, celle-ci serait entrée dans un paquet publié, et son premier utilisateur aurait cru ses cycles surveillés.
