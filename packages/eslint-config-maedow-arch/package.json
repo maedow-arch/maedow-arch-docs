@@ -1,11 +1,12 @@
 {
   "name": "eslint-config-maedow-arch",
-  "version": "0.1.2",
+  "version": "0.3.0",
   "description": "Règles ESLint de Maedow Arch. Applique les frontières app/features/core/components/lib au moyen d'eslint-plugin-boundaries",
   "main": "index.js",
   "type": "module",
   "exports": {
-    ".": "./index.js"
+    ".": "./index.js",
+    "./strict": "./strict.js"
   },
   "keywords": [
     "eslint",
@@ -33,11 +34,22 @@
   "peerDependencies": {
     "eslint": ">=9",
     "eslint-import-resolver-typescript": ">=4",
-    "eslint-plugin-boundaries": ">=7"
+    "eslint-plugin-boundaries": ">=7",
+    "eslint-plugin-import": ">=2.31",
+    "typescript-eslint": ">=8"
   },
   "files": [
     "index.js",
+    "strict.js",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "peerDependenciesMeta": {
+    "eslint-plugin-import": {
+      "optional": true
+    },
+    "typescript-eslint": {
+      "optional": true
+    }
+  }
 }

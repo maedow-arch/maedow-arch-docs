@@ -48,8 +48,15 @@ export default [
         "error",
         {
           default: "disallow",
+          // Le message par défaut porte MA-001, le flux général. Les deux cas qui
+          // ont leur propre code reçoivent leur propre message plus bas : le
+          // plugin préfère le message d'une politique à celui de la règle.
+          //
+          // Un code est cité plutôt qu'un titre de section. Un titre se
+          // réécrit, et le renvoi casse en silence ; c'est arrivé au commit
+          // 71c0a3f, quand la numérotation des titres a été retirée.
           message:
-            "Maedow Arch : {{from.type}} ne peut pas importer {{to.type}}. Voir « Règle de dépendance et frontières » dans architecture.md.",
+            "MA-001 : le flux de dépendance est unidirectionnel. {{from.type}} ne peut pas importer {{to.type}}. Voir rules.md.",
           policies: [
             // app/ orchestre : il peut tout importer.
             {
@@ -103,6 +110,81 @@ export default [
             {
               from: { element: { type: "lib" } },
               allow: { to: { element: { type: "lib" } } },
+            },
+            // Les deux interdictions qui portent un code à elles seules. Elles
+            // viennent après les autorisations, y compris celle des imports
+            // internes à une feature, qui reste donc permise.
+            {
+              from: { element: { type: "feature" } },
+              disallow: { to: { element: { type: "feature" } } },
+              message:
+                "MA-002 : une feature ne peut pas en importer une autre. Passez par features/_shared/, core/ ou components/. Voir rules.md.",
+            },
+            {
+              from: { element: { type: "shared-feature" } },
+              disallow: { to: { element: { type: "feature" } } },
+              message:
+                "MA-003 : features/_shared ne connaît aucune feature. Ce qui dépend d'une feature n'est pas transverse. Voir rules.md.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  /*
+   * MA-004 : zéro JSX et zéro dépendance UI dans core/.
+   *
+   * Le point qui rend la règle de syntaxe indispensable : le runtime JSX
+   * automatique n'exige aucun import de React. Un composant peut donc vivre
+   * dans core/ sans qu'aucune règle d'import ne se déclenche, et c'est vérifié
+   * plutôt que supposé, la fixture valide restant silencieuse avant l'ajout de
+   * cette règle.
+   *
+   * `no-restricted-imports` seul aurait donné l'illusion d'une protection : il
+   * n'attrape que le cas où quelqu'un écrit encore `import React from "react"`,
+   * qui est justement le cas devenu rare.
+   *
+   * La règle vise le contenu, pas l'extension. Un fichier `.tsx` sans JSX dans
+   * core/ ne casse rien, tandis qu'un `.ts` ne peut pas en contenir : le parser
+   * le refuserait avant nous.
+   */
+  {
+    files: ["**/core/**/*.{js,jsx,ts,tsx,mjs,cjs}"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "JSXElement",
+          message:
+            "MA-004 : core/ est le domaine pur, il ne contient pas de JSX. Un écran appartient à features/, une primitive à components/. Voir rules.md.",
+        },
+        {
+          selector: "JSXFragment",
+          message:
+            "MA-004 : core/ est le domaine pur, il ne contient pas de JSX. Un écran appartient à features/, une primitive à components/. Voir rules.md.",
+        },
+      ],
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "react",
+              message:
+                "MA-004 : core/ ne dépend d'aucune bibliothèque d'interface. Le domaine doit se tester sans monter d'arbre React. Voir rules.md.",
+            },
+            {
+              name: "react-dom",
+              message:
+                "MA-004 : core/ ne dépend d'aucune bibliothèque d'interface. Le domaine doit se tester sans monter d'arbre React. Voir rules.md.",
+            },
+          ],
+          patterns: [
+            {
+              group: ["react/*", "react-dom/*"],
+              message:
+                "MA-004 : core/ ne dépend d'aucune bibliothèque d'interface. Le domaine doit se tester sans monter d'arbre React. Voir rules.md.",
             },
           ],
         },

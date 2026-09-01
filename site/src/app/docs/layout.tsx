@@ -1,13 +1,13 @@
 import { DocsLayout } from "fumadocs-ui/layouts/notebook";
 import type { ReactNode } from "react";
-import { BookOpen, Layers, ScrollText, Shapes } from "lucide-react";
+import { BookOpen, Layers, ListChecks, ScrollText, Shapes } from "lucide-react";
 import { source } from "@/lib/source";
 import { Logo } from "@/components/Logo";
 import { REPO_URL } from "@/lib/links";
 import { ModeSwitcher } from "@/components/ModeSwitcher";
 
 /*
- * Les onglets de l'en-tête reprennent les quatre entrées réelles du corpus, et
+ * Les onglets de l'en-tête reprennent les cinq entrées réelles du corpus, et
  * rien de plus. Une rubrique sans page derrière serait une promesse en l'air,
  * c'est le défaut le plus courant des barres de navigation copiées d'une
  * maquette.
@@ -36,6 +36,12 @@ const TABS = [
     url: "/docs/conventions",
     icon: <ScrollText className="size-4" />,
     description: "TypeScript strict, Result Pattern, sécurité",
+  },
+  {
+    title: "Règles",
+    url: "/docs/rules",
+    icon: <ListChecks className="size-4" />,
+    description: "Les neuf règles, vérifiées par la machine ou tenues par l'équipe",
   },
 ];
 
