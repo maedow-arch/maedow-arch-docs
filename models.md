@@ -72,20 +72,99 @@ export interface Product {
 ```
 
 ### Le Modèle de Persistance (`core/storage/` ou `core/database/`)
-Représente la structure physique en base de données.
+
+Représente la structure physique en base de données, quand elle diffère de l'entité.
+
+**Quand elle ne diffère pas, ne la dupliquez pas.** Une table dont les colonnes reprennent les champs de l'entité au nommage près ne justifie pas un second type : c'est exactement le cas où la [Règle du Pragmatisme Typé](#règle-du-pragmatisme-typé-maedow-arch-anti-over-engineering) demande de s'abstenir. Un `ProductRow` qui n'apporte que le passage de `priceCents` à `price_cents` coûte un fichier, un mapper et deux endroits à modifier, sans rien protéger.
+
+La séparation se justifie quand **l'entité n'a pas la forme d'une table**, ce qui arrive dès qu'un agrégat en occupe plusieurs.
 
 ```typescript
-// core/storage/types.ts
-export interface ProductRow {
+// core/orders/types.ts
+// L'agrégat, tel que le domaine le manipule : un objet, avec ses lignes.
+export interface Customer {
   id: string;
+  name: string;
+  email: string;
+}
+
+export interface OrderLine {
   sku: string;
-  title: string;
-  price_cents: number;
-  created_at: string;
-  updated_at: string;
-  owner_id: string;
+  label: string;
+  quantity: number;
+  unitPriceCents: number;
+}
+
+export interface Order {
+  id: string;
+  placedAt: Date;
+  customer: Customer;
+  lines: OrderLine[];
+  totalCents: number;
 }
 ```
+
+```typescript
+// core/orders/rows.ts
+// Les trois tables, telles que la base les renvoie : à plat, liées par des
+// identifiants, et sans le total, qui se calcule.
+export interface OrderRow {
+  id: string;
+  customer_id: string;
+  placed_at: string;
+}
+
+export interface OrderLineRow {
+  order_id: string;
+  sku: string;
+  label: string;
+  quantity: number;
+  unit_price_cents: number;
+}
+
+export interface CustomerRow {
+  id: string;
+  full_name: string;
+  email: string;
+}
+```
+
+La séparation n'a de sens que si quelque chose reconstruit l'un depuis les autres. C'est ce mapper qui porte la valeur, et non les types :
+
+```typescript
+// core/orders/mapper.ts
+import type { Order, OrderLine } from "./types";
+import type { CustomerRow, OrderLineRow, OrderRow } from "./rows";
+
+function toLine(row: OrderLineRow): OrderLine {
+  return {
+    sku: row.sku,
+    label: row.label,
+    quantity: row.quantity,
+    unitPriceCents: row.unit_price_cents,
+  };
+}
+
+export function toOrder(row: OrderRow, customer: CustomerRow, lineRows: OrderLineRow[]): Order {
+  const lines = lineRows.filter((line) => line.order_id === row.id).map(toLine);
+
+  return {
+    id: row.id,
+    placedAt: new Date(row.placed_at),
+    customer: { id: customer.id, name: customer.full_name, email: customer.email },
+    lines,
+    totalCents: lines.reduce((total, line) => total + line.quantity * line.unitPriceCents, 0),
+  };
+}
+```
+
+Trois choses se voient ici, et aucune ne se verrait sur un exemple 1:1.
+
+**Le domaine ignore le nombre de tables.** Un service qui reçoit un `Order` ne sait pas s'il vient d'une jointure, de trois requêtes ou d'un cache. Changer ce point ne touche que le mapper.
+
+**Le total n'existe pas en base, il se calcule.** Une entité peut porter des champs dérivés que la persistance ne stocke pas, et c'est précisément ce qu'un type de ligne ne saurait pas exprimer.
+
+**Le mapper est une fonction pure, donc testable sans base de données.** C'est là que se logent les erreurs de reconstruction, et c'est la seule partie qu'il vaut la peine de tester dans cette couche.
 
 ### Le DTO / Data Transfer Object avec Inférence Zod (`core/<domaine>/dto.ts`)
 Définit la charge utile validée aux frontières (API, formulaires, webhooks) en tirant parti de `z.infer` :
@@ -104,6 +183,74 @@ export const CreateProductSchema = z.object({
 // ✅ Inférence automatique du type DTO à partir du validateur
 export type CreateProductDTO = z.infer<typeof CreateProductSchema>;
 ```
+
+### Le DTO de Sortie (`core/<domaine>/dto.ts`)
+
+Le DTO d'entrée décrit ce que le client a le droit d'**envoyer**. Le DTO de sortie décrit ce qu'il a le droit de **recevoir**, et il manque presque toujours.
+
+La fuite la plus courante n'est pas un secret dans un journal, c'est une entité rendue telle quelle :
+
+```typescript
+// ❌ Ce qui part vers le client dépend de la forme de l'entité
+export async function getUser(id: string) {
+  const user = await repository.findById(id);
+  return user; // passwordHash et internalNotes partent avec
+}
+```
+
+Rien n'échoue. Le type de retour est correct, les tests passent, et le champ qu'on vient d'ajouter à l'entité pour un besoin interne se retrouve dans la réponse HTTP le jour même. C'est ce qui rend le défaut durable : il ne se manifeste jamais du côté où on le cherche.
+
+Le remède est le symétrique exact du DTO d'entrée. Un schéma décrit la sortie, et la fonction de sérialisation passe par lui :
+
+```typescript
+// core/users/types.ts
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+  internalNotes: string;
+  role: "member" | "admin";
+}
+```
+
+```typescript
+// core/users/dto.ts
+import { z } from "zod";
+import type { User } from "./types";
+
+// Entrée : ce que le client a le droit d'envoyer.
+export const CreateUserSchema = z.object({
+  name: z.string().min(1),
+  email: z.email(),
+});
+
+export type CreateUserDTO = z.infer<typeof CreateUserSchema>;
+
+// Sortie : ce que le client a le droit de recevoir. Décrit, jamais déduit.
+export const PublicUserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.email(),
+  role: z.enum(["member", "admin"]),
+});
+
+export type PublicUserDTO = z.infer<typeof PublicUserSchema>;
+
+export function toPublicUser(user: User): PublicUserDTO {
+  return PublicUserSchema.parse(user);
+}
+```
+
+**La règle : ce qui sort vers le client est décrit, jamais laissé au hasard de la forme de l'entité.**
+
+Trois conséquences valent d'être dites.
+
+**Le schéma ne fait pas que valider, il filtre.** `parse` ne conserve que les clés qu'il décrit : `passwordHash` et `internalNotes` ne traversent pas, même si l'appelant les a oubliés dans l'objet transmis.
+
+**Un champ ajouté à l'entité ne sort pas tout seul.** C'est l'inverse d'un `Omit<User, "passwordHash">`, qui laisse passer par défaut et n'exclut que ce dont on s'est souvenu. Une liste d'exclusions est en retard d'un champ en permanence ; une liste d'inclusions ne l'est jamais.
+
+**Le retrait d'un champ de la sortie devient visible.** Il se lit dans le schéma, à un seul endroit, au lieu de se déduire de ce que chaque route renvoie.
 
 </ModeFull>
 
