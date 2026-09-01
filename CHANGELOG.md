@@ -6,39 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
-## [Non publié]
-
-### Modifié
-
-- **L'exemple de modèle de persistance ne contredit plus la Règle du Pragmatisme Typé.** Il montrait `Product` et `ProductRow` en 1:1, c'est-à-dire précisément le cas où le corpus demande de ne pas dupliquer. Il montre désormais un agrégat `Order` reconstruit depuis trois tables, avec son mapper : la séparation se justifie quand l'entité n'a pas la forme d'une table, et le corpus dit maintenant quand s'en abstenir.
-
-### Modifié
-
-- **Les tests sont colocalisés, et le template ne livre plus de dossiers `tests/` vides.** Il créait `src/tests/unit`, `integration` et `e2e`, trois dossiers vides qui promettaient une organisation par nature de test que les générateurs contredisaient en écrivant à côté du code. Un test séparé de son sujet se met à mentir au premier déplacement de fichier, ou survit en orphelin à une suppression.
-
-### Corrigé
-
-- **Le Result Pattern n'est plus écrit à deux endroits.** Le script de bascule vers Full en portait une copie, nécessaire puisqu'il vit dans le projet généré, mais écrite à la main. Les deux versions ont divergé deux fois en une journée, dont une par le seul passage du formateur. La copie est désormais injectée au moment du scaffolding depuis le fichier source.
-
-### Modifié
-
-- **Les messages de lint citent un code, plus un titre de section.** Un titre se réécrit et le renvoi casse en silence, ce qui est arrivé quand la numérotation des titres a été retirée du corpus. `MA-002 : une feature ne peut pas en importer une autre` reste juste quelle que soit la façon dont le corpus évolue ensuite, et relie le message, la section, la fixture et l'entrée de ce journal.
-
-### Corrigé
-
-- **Les générateurs produisaient du TypeScript invalide sur un nom composé.** `generate:feature user-profile` écrivait `User-profileScreen`, qui n'est pas un identifiant : une majuscule posée sur la seule première lettre laisse le tiret au milieu. Les noms sont désormais découpés sur les tirets, points et underscores, et un nom qui ne donnerait pas d'identifiant exploitable est refusé avant que le moindre fichier ne soit écrit.
-- **`generate:domain` était inutilisable en profil Light.** Le service généré importait `../common/result`, absent d'un projet Light puisque la couche domaine n'y existe pas. La commande fait maintenant naître cette couche et annonce la bascule vers Full, ce que le corpus décrit désormais à la section « Passer de Light à Full ».
+## [0.8.0] : 2026-09-01
 
 ### Ajouté
 
 - **Le chargement de données côté serveur hors Next.js, et la condition qui rend le portage possible.** La section traitait le point d'entrée, la coquille et les routes, mais restait muette sur les Server Components, qui sont précisément ce qui n'a pas d'équivalent ailleurs. Elle distingue désormais deux chemins au destin opposé : une route API se porte presque telle quelle, un Server Component doit être remplacé par un effet client, avec ses trois états, sa route intermédiaire et son annulation. Le tableau des six différences et le chiffre de 27 lignes contre 41 viennent d'un portage réellement effectué, pas d'une estimation.
-
-### Modifié
-
-- **« Trois couches sur quatre ne bougent pas » devient une condition, et non plus une promesse.** Elles ne bougent pas *si les écrans reçoivent leurs données au lieu d'aller les chercher*. Ce n'est pas le framework qui rend le portage possible, c'est la règle « zéro modèle dans le JSX » appliquée avant lui : un projet dont les écrans appellent eux-mêmes leurs sources verra le coût se répandre dans `features/`, et l'affirmation sera fausse pour lui. Le corpus donne le test à faire sur son propre code avant de se lancer.
-
-### Ajouté
-
 - **Un mode d'emploi pour `exactOptionalPropertyTypes`.** L'option est activée dans les deux `tsconfig` générés, et c'est celle qui saute en premier dans un vrai projet, en emportant le reste du strict avec elle. La section part des messages d'erreur, distingue `TS2375` d'une affectation de `TS2379` d'un argument, et donne quatre remèdes selon que le type vous appartient ou non. Elle dit aussi que le conseil de TypeScript, ajouter `undefined` au type cible, n'est le bon qu'un cas sur deux. Et elle fixe la limite : devant un client d'API à six champs facultatifs, une assertion confinée et commentée vaut mieux qu'une option retirée du `tsconfig.json`, la première se retirant le jour où le SDK corrige ses types là où la seconde emporte tout le projet.
 - **Le DTO de sortie, symétrique du DTO d'entrée.** Le corpus décrivait ce qu'un client a le droit d'envoyer, jamais ce qu'il a le droit de recevoir. La fuite la plus courante n'est pas un secret dans un journal mais un `return user` qui emporte `passwordHash` : rien n'échoue, les tests passent, et le champ interne ajouté le matin part vers le client le jour même. La règle est de décrire la sortie par un schéma, avec une liste d'inclusions et non d'exclusions, un `Omit` étant en retard d'un champ en permanence.
 - **La Pyramide de Tests, que le README promettait sans que le corpus la contienne.** Elle dit où vivent les tests, ce que chaque couche appelle un test, et pourquoi elle ne fixe aucun taux de couverture : une exigence chiffrée sur `core/` produit des tests écrits pour la métrique, alors que l'exigence utile, un domaine testable sans DOM ni mock, se vérifie directement.
@@ -58,11 +30,21 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ### Modifié
 
+- **L'exemple de modèle de persistance ne contredit plus la Règle du Pragmatisme Typé.** Il montrait `Product` et `ProductRow` en 1:1, c'est-à-dire précisément le cas où le corpus demande de ne pas dupliquer. Il montre désormais un agrégat `Order` reconstruit depuis trois tables, avec son mapper : la séparation se justifie quand l'entité n'a pas la forme d'une table, et le corpus dit maintenant quand s'en abstenir.
+- **Les tests sont colocalisés, et le template ne livre plus de dossiers `tests/` vides.** Il créait `src/tests/unit`, `integration` et `e2e`, trois dossiers vides qui promettaient une organisation par nature de test que les générateurs contredisaient en écrivant à côté du code. Un test séparé de son sujet se met à mentir au premier déplacement de fichier, ou survit en orphelin à une suppression.
+- **Les messages de lint citent un code, plus un titre de section.** Un titre se réécrit et le renvoi casse en silence, ce qui est arrivé quand la numérotation des titres a été retirée du corpus. `MA-002 : une feature ne peut pas en importer une autre` reste juste quelle que soit la façon dont le corpus évolue ensuite, et relie le message, la section, la fixture et l'entrée de ce journal.
+- **« Trois couches sur quatre ne bougent pas » devient une condition, et non plus une promesse.** Elles ne bougent pas *si les écrans reçoivent leurs données au lieu d'aller les chercher*. Ce n'est pas le framework qui rend le portage possible, c'est la règle « zéro modèle dans le JSX » appliquée avant lui : un projet dont les écrans appellent eux-mêmes leurs sources verra le coût se répandre dans `features/`, et l'affirmation sera fausse pour lui. Le corpus donne le test à faire sur son propre code avant de se lancer.
 - **Les schémas d'architecture sont dessinés, plus dessinés en caractères.** Les trois diagrammes du corpus, les quatre couches et la typologie des modèles dans ses deux profils, passent en blocs `mermaid`. GitHub les rend nativement dans les `.md`, le site les rend aux couleurs du thème courant : la source reste un texte que l'on corrige en une ligne, là où une image se serait figée hors du thème, hors du lecteur d'écran et hors du dépôt.
 - **Les titres du corpus ne sont plus numérotés.** Ils portaient une numérotation manuelle qu'il fallait reprendre à chaque insertion, et qui interdisait surtout de masquer une section sans laisser un trou visible dans le sommaire. Les renvois `§N` deviennent des liens d'ancre à l'intérieur d'un document, et le nom de la section ailleurs, y compris dans les messages de lint et les commentaires des templates.
 - **La typologie des modèles s'adapte au profil de lecture.** En Mode Light, où la couche `core/` n'existe pas, les trois catégories qui y vivent laissent place à un schéma à deux formes et à la marche à suivre pour basculer vers Full.
 - **Le corpus marque la section Agnosticisme technique comme propre au Mode Full.** Le §9 le déclarait déjà : en Light, ni contracts ni adapters. Un lecteur en Light ne la voit plus.
 - **Refonte visuelle du site.** Palette issue du Maedow Design System, avec trois valeurs dérivées pour le thème clair, chacune mesurée au premier seuil AA. Quatre fontes et quatre rôles : Space Grotesk aux titres, Google Sans Flex au texte courant, Google Sans Code au code de la documentation, Geist Mono au seul bloc terminal de la page d'accueil.
+
+### Corrigé
+
+- **Le Result Pattern n'est plus écrit à deux endroits.** Le script de bascule vers Full en portait une copie, nécessaire puisqu'il vit dans le projet généré, mais écrite à la main. Les deux versions ont divergé deux fois en une journée, dont une par le seul passage du formateur. La copie est désormais injectée au moment du scaffolding depuis le fichier source.
+- **Les générateurs produisaient du TypeScript invalide sur un nom composé.** `generate:feature user-profile` écrivait `User-profileScreen`, qui n'est pas un identifiant : une majuscule posée sur la seule première lettre laisse le tiret au milieu. Les noms sont désormais découpés sur les tirets, points et underscores, et un nom qui ne donnerait pas d'identifiant exploitable est refusé avant que le moindre fichier ne soit écrit.
+- **`generate:domain` était inutilisable en profil Light.** Le service généré importait `../common/result`, absent d'un projet Light puisque la couche domaine n'y existe pas. La commande fait maintenant naître cette couche et annonce la bascule vers Full, ce que le corpus décrit désormais à la section « Passer de Light à Full ».
 
 ### Décidé
 
