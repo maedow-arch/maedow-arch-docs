@@ -201,6 +201,10 @@ match(checkoutResult, {
    * Utiliser une allowlist d'en-têtes et de propriétés autorisées pour les rapports d'incidents.
 3. **Validation Systématique aux Frontières** :
    * Toute entrée externe (requêtes HTTP, formulaires, webhooks, paramètres d'URL) doit être validée via un parseur de schéma (ex: Zod) avant d'atteindre le cœur de domaine.
+4. **Sérialisation Décrite en Sortie** :
+   * Ce qui part vers le client est décrit par un schéma, jamais laissé au hasard de la forme de l'entité. Voir [Le DTO de Sortie](./models.md) dans `models.md`.
+   * La règle 2 protège les journaux, celle-ci protège les réponses. C'est la seconde qui fuit le plus souvent : un `return user` renvoie l'entité entière, rien n'échoue, et le champ interne ajouté ce matin part vers le client le jour même.
+   * Une liste d'inclusions, jamais une liste d'exclusions. Un `Omit<User, "passwordHash">` laisse passer par défaut et n'exclut que ce dont on s'est souvenu : il est en retard d'un champ en permanence.
 
 ---
 

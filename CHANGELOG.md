@@ -10,6 +10,10 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ### Modifié
 
+- **L'exemple de modèle de persistance ne contredit plus la Règle du Pragmatisme Typé.** Il montrait `Product` et `ProductRow` en 1:1, c'est-à-dire précisément le cas où le corpus demande de ne pas dupliquer. Il montre désormais un agrégat `Order` reconstruit depuis trois tables, avec son mapper : la séparation se justifie quand l'entité n'a pas la forme d'une table, et le corpus dit maintenant quand s'en abstenir.
+
+### Modifié
+
 - **Les tests sont colocalisés, et le template ne livre plus de dossiers `tests/` vides.** Il créait `src/tests/unit`, `integration` et `e2e`, trois dossiers vides qui promettaient une organisation par nature de test que les générateurs contredisaient en écrivant à côté du code. Un test séparé de son sujet se met à mentir au premier déplacement de fichier, ou survit en orphelin à une suppression.
 
 ### Corrigé
@@ -27,6 +31,7 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ### Ajouté
 
+- **Le DTO de sortie, symétrique du DTO d'entrée.** Le corpus décrivait ce qu'un client a le droit d'envoyer, jamais ce qu'il a le droit de recevoir. La fuite la plus courante n'est pas un secret dans un journal mais un `return user` qui emporte `passwordHash` : rien n'échoue, les tests passent, et le champ interne ajouté le matin part vers le client le jour même. La règle est de décrire la sortie par un schéma, avec une liste d'inclusions et non d'exclusions, un `Omit` étant en retard d'un champ en permanence.
 - **La Pyramide de Tests, que le README promettait sans que le corpus la contienne.** Elle dit où vivent les tests, ce que chaque couche appelle un test, et pourquoi elle ne fixe aucun taux de couverture : une exigence chiffrée sur `core/` produit des tests écrits pour la métrique, alors que l'exigence utile, un domaine testable sans DOM ni mock, se vérifie directement.
 - **`generate:domain` amorce désormais un test, colocalisé.** La couche que le standard présente comme la plus testable était la seule dont le générateur n'écrivait aucun test.
 - **La table de nommage a enfin une ligne pour les tests.** Un test porte le nom de ce qu'il teste, et vit à côté de lui.
