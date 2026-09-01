@@ -32,10 +32,18 @@ jobs:
           for paquet in packages/*/; do
             nom=$(basename "$paquet")
 
-            # Ce qui a changé dans ce paquet, hors documentation : un README
-            # corrigé n'oblige personne à republier.
+            # Ce qui a changé dans ce paquet, hors de ce qui ne part pas dans le
+            # tarball : un README corrigé ou une fixture ajustée n'oblige
+            # personne à republier.
+            #
+            # Chaque motif porte sa propre ancre. Regroupés sous une seule, le
+            # `$` final ne s'appliquait qu'au dernier terme, et `/test/` ne
+            # correspondait donc jamais : le garde signalait ses propres
+            # fichiers de test comme du code publiable. Constaté sur la pull
+            # request qui l'introduit, ce qui est la meilleure preuve qu'il
+            # regarde vraiment quelque chose.
             modifies=$(git diff --name-only "origin/$BASE...HEAD" -- "$paquet" \
-              | grep -v -E '(README\.md|LICENSE|/test/|\.test\.mjs)$' || true)
+              | grep -v -E 'README\.md$|LICENSE$|/test/|\.test\.mjs$' || true)
 
             if [ -z "$modifies" ]; then
               continue
