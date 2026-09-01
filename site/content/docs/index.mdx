@@ -5,6 +5,25 @@ description: "Maedow Arch en bref : pourquoi ce standard existe, et par où comm
 
 Maedow Arch définit un standard d'ingénierie logicielle universel, modulaire et découplé, pour les applications web et fullstack modernes (TypeScript, React, Next.js).
 
+## Par où entrer
+
+Deux chemins, selon l'état de votre projet.
+
+<Cards>
+  <Card
+    title="Vous avez déjà un projet"
+    href="/docs/adoption"
+    description="npx maedow-arch check dit ce que l'adoption coûterait, sans rien installer ni modifier."
+  />
+  <Card
+    title="Vous démarrez un projet"
+    href="#démarrage"
+    description="npx create-maedow-arch-app écrit l'arborescence complète en une commande."
+  />
+</Cards>
+
+Le second chemin est celui que documente la suite de cette page. Le premier est le plus fréquent : personne n'adopte une architecture en repartant de zéro.
+
 ## Démarrage
 
 <Steps>
@@ -169,4 +188,15 @@ Sans verser dans l'excès inverse : la **Règle de Lazy Abstraction** interdit d
     href="https://www.npmjs.com/package/eslint-config-maedow-arch"
     description="Les frontières app / features / core / components / lib, appliquées par ESLint."
   />
+  <Card
+    title="maedow-arch"
+    href="https://www.npmjs.com/package/maedow-arch"
+    description="Audite un projet existant, sans rien installer ni modifier. Voir Adoption."
+  />
 </Cards>
+
+## Le registre des règles
+
+Le standard énonce neuf règles normatives. Sept sont vérifiées par la machine, deux sont tenues par l'équipe, et le [registre](/docs/rules) dit laquelle est laquelle.
+
+C'est le document à consulter avant de se demander si une exigence sera attrapée automatiquement. Il donne à chaque règle un code stable, de `MA-001` à `MA-009`, que citent les messages de lint : un titre de section se réécrit, un code ne bouge pas.
