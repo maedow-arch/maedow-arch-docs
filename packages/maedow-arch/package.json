@@ -1,6 +1,6 @@
 {
   "name": "maedow-arch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Audite un projet existant au regard du standard Maedow Arch, sans rien installer ni modifier",
   "type": "module",
   "bin": {

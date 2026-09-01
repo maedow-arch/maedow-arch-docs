@@ -63,6 +63,37 @@ test("chaque violation désigne le bon fichier", () => {
   ]);
 });
 
+test("un fichier hors des couches est dénombré, jamais compté comme violation", () => {
+  /*
+   * La fixture porte `public/analytics.js` et `scripts/build.mjs`. Tous deux
+   * ont un import qui remonte le flux et un `any`.
+   *
+   * Le second est celui qui fuyait. Les règles de frontière étaient déjà
+   * conditionnées à la couche du fichier, mais MA-005, MA-006 et le graphe des
+   * cycles s'appliquaient à tout ce que la liste d'exclusions n'avait pas
+   * pensé à exclure : retirer la garde de `audit.mjs` fait remonter MA-005 de
+   * un à trois et vide `horsCouche`, et ce test échoue alors deux fois.
+   */
+  const resultat = auditer(nonConforme);
+
+  assert.deepEqual(
+    resultat.horsCouche.sort(),
+    ["public/analytics.js", "scripts/build.mjs"],
+    "les deux fichiers doivent être vus, et rangés hors périmètre"
+  );
+
+  const parFichier = Object.values(resultat.violations)
+    .flat()
+    .map((v) => v.fichier);
+
+  for (const hors of resultat.horsCouche) {
+    assert.ok(
+      !parFichier.includes(hors),
+      `${hors} est hors couche et ne peut pas être une violation`
+    );
+  }
+});
+
 test("app/ peut tout importer, et n'est jamais en violation", () => {
   const { violations } = auditer(nonConforme);
   const tous = Object.values(violations).flat();
@@ -168,4 +199,5 @@ test("la sortie JSON porte l'ordre de migration et le détail par code", () => {
   assert.equal(json.ordreDeMigration[0], "TS-STRICT", "le typage vient en premier");
   assert.ok(json.ordreDeMigration.indexOf("MA-001") < json.ordreDeMigration.indexOf("MA-002"));
   assert.ok(json.parCode["MA-002"].fichiers.length > 0);
+  assert.equal(json.fichiersHorsCouches, 2, "le hors-périmètre se lit aussi en JSON");
 });

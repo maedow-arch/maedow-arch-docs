@@ -112,10 +112,48 @@ export default function HomePage() {
                 le linter les vérifie.
               </p>
 
-              {/* La commande qui crée un projet, là où le visiteur convaincu la
-                cherche : sous la promesse, avant la recherche. */}
-              <div data-hero="commande" className="mx-auto mb-8 max-w-xl">
-                <CopyCommand command="npx create-maedow-arch-app mon-projet" tone="terminal" />
+              {/* Les deux chemins d'entrée, sous la promesse et avant la
+                recherche, dans l'ordre de leur fréquence réelle : personne
+                n'adopte une architecture en repartant de zéro. Le README et
+                la documentation proposaient déjà les deux, la page d'accueil
+                ne montrait que la commande de création. */}
+              <div
+                data-hero="commande"
+                className="mx-auto mb-8 grid max-w-3xl gap-5 text-left sm:grid-cols-2"
+              >
+                <div>
+                  <p className="mb-2 text-sm font-semibold text-fd-foreground">
+                    Vous avez déjà un projet
+                  </p>
+                  <CopyCommand command="npx maedow-arch check" tone="terminal" />
+                  <p className="mt-2 text-sm leading-relaxed text-fd-muted-foreground">
+                    L&rsquo;audit lit votre code sans rien installer ni modifier, et rend un rapport
+                    ordonné par ce qui débloque le reste.{" "}
+                    <Link
+                      href="/docs/adoption"
+                      className="font-medium text-fd-primary underline-offset-4 hover:underline"
+                    >
+                      Adopter sur un projet existant
+                    </Link>
+                  </p>
+                </div>
+
+                <div>
+                  <p className="mb-2 text-sm font-semibold text-fd-foreground">
+                    Vous en démarrez un
+                  </p>
+                  <CopyCommand command="npx create-maedow-arch-app mon-projet" tone="terminal" />
+                  <p className="mt-2 text-sm leading-relaxed text-fd-muted-foreground">
+                    La structure des quatre couches, le Result Pattern et les générateurs, en une
+                    commande.{" "}
+                    <Link
+                      href="/docs/architecture"
+                      className="font-medium text-fd-primary underline-offset-4 hover:underline"
+                    >
+                      Voir l&rsquo;arborescence
+                    </Link>
+                  </p>
+                </div>
               </div>
 
               <div data-hero="recherche" className="mx-auto mb-6 max-w-2xl">
