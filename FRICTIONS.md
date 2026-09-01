@@ -261,3 +261,27 @@ Ce garde attrape la première des deux causes, celle qui se répète. La seconde
 **La leçon.** Un projet finit par ne vérifier que ce qu'il sait vérifier, et ses angles morts se logent aux endroits où son outillage n'a pas de prise. Ici la frontière est nette : ce qui vit dans le dépôt est couvert, ce qui en sort ne l'est pas. Le garde ne supprime pas cette frontière, il la déplace d'un cran, en refusant en amont l'état qui aurait fait échouer la publication en aval.
 
 C'est aussi la raison pour laquelle un `CHANGELOG.md` tenu à jour vaut mieux qu'une automatisation partielle : il oblige à formuler ce qui change, et c'est ce moment de formulation qui fait remarquer qu'une version n'a pas bougé.
+
+## F-017 : trois façons pour un audit de parler de ce qu'il n'a pas regardé
+
+**Le contexte.** `npx maedow-arch check` sert à décider s'il vaut la peine d'adopter le standard sur un projet déjà écrit. Un rapport faux ne coûte pas un bug : il coûte la décision.
+
+**Ce qui s'est passé.** Trois défauts du même genre, trouvés à trois semaines d'intervalle, tous en retournant l'outil sur ce dépôt.
+
+Le premier : l'audit signalait `public/mockServiceWorker.js`, un fichier généré, comme une violation. Il partait d'une **liste d'exclusions**, examinait tout sauf ce dont on s'était souvenu d'écarter, et aurait signalé demain `scripts/`, `e2e/` ou le prochain dossier imprévu.
+
+Le deuxième : appliqué à la racine de ce dépôt, il annonçait trois violations `TS-STRICT` sur un `tsconfig.json` **qui n'existe pas**. `tsconfig?.compilerOptions ?? {}` transformait un fichier absent en fichier vide, donc en trois options manquantes. Un projet purement JavaScript recevait l'ordre de corriger un fichier qu'il n'a pas, en tête de son plan de migration.
+
+Le troisième : le rapport affirmait « ce projet n'a pas de features, les règles de frontière n'ont donc rien pu vérifier » **sur tous les projets**, y compris trois lignes sous des violations MA-002 et MA-003 que ces mêmes règles venaient de trouver. `classer` rend la couche `feature` au singulier, le rapport cherchait le dossier `features` au pluriel, et la chaîne ne correspondait jamais.
+
+**Ce qui les relie.** F-001, F-011, F-012 et F-015 décrivent des contrôles qui rendent un verdict favorable sans avoir rien vérifié. F-016 décrit l'absence de tout contrôle. Ceux-ci forment une troisième famille : le contrôle **parle de ce qu'il n'a pas regardé**. Il accuse un fichier hors périmètre, un fichier absent, ou nie avoir vu ce qu'il vient de trouver.
+
+Le premier défaut est celui que le corpus décrit lui-même à propos du DTO de sortie : une liste d'exclusions est en retard d'un champ en permanence, et un `Omit` ne rattrape jamais le champ ajouté ce matin. L'outil faisait exactement ce que sa propre règle défend.
+
+**Ce qu'on en a fait.** L'audit part désormais d'une **liste blanche** : seuls les fichiers appartenant à une couche du standard sont examinés, le reste est dénombré et rapporté à part. Cette liste ne se périme pas, puisque c'est celle que le corpus énonce. La liste de dossiers ignorés subsiste pour ne pas descendre dans `node_modules`, ce qui est une question de coût et non de périmètre.
+
+`TS-STRICT` ne produit plus rien sans `tsconfig.json`, et le rapport distingue deux silences : un projet sans TypeScript, pour qui la règle est hors sujet, et un projet qui a des `.ts` sans configuration, ce qui est un problème en soi. Le troisième défaut se corrige en comparant les couches et non leurs noms de dossiers.
+
+**La leçon.** Un contrôle qui se trompe de périmètre est plus coûteux qu'un contrôle absent, parce qu'il inspire confiance. Les trois défauts ont survécu à la relecture et aux tests : ils ne sont apparus qu'en lançant l'outil sur ce dépôt, c'est-à-dire sur un projet que ses auteurs connaissent assez pour voir que la réponse est fausse.
+
+C'est l'argument le plus concret en faveur du dogfooding : une fixture prouve qu'un outil trouve ce qu'on y a mis, elle ne prouve jamais qu'il ne trouve rien d'autre.

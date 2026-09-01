@@ -38,15 +38,17 @@ export function enTexte(resultat, { seuil }) {
   }
 
   if (total === 0) {
-    const sansCouches = ["features", "core"].filter((c) => !(resultat.couches ?? []).includes(c));
+    const sansCouches = dossiersManquants(resultat);
     if (sansCouches.length > 0) {
       l.push(`  Aucune violation, mais ce projet n'a pas de ${sansCouches.join(" ni de ")}.`);
       l.push("  Les règles de frontière n'ont rien pu vérifier : leur silence ne dit pas");
       l.push("  qu'elles sont respectées, mais qu'il n'y avait rien à examiner.");
+      for (const ligne of surLeTsconfig(resultat)) l.push(ligne);
       l.push("");
       return l.join("\n");
     }
     l.push("  Aucune violation détectée.");
+    for (const ligne of surLeTsconfig(resultat)) l.push(ligne);
     l.push("");
     l.push("  Cet audit dénombre, il ne garantit pas : installez");
     l.push("  eslint-config-maedow-arch pour que la vérification tienne dans le temps.");
@@ -82,7 +84,7 @@ export function enTexte(resultat, { seuil }) {
   l.push("  ──────────────────");
   l.push(`  ${quantifier(total)} au total.`);
 
-  const manquantes = ["features", "core"].filter((c) => !(resultat.couches ?? []).includes(c));
+  const manquantes = dossiersManquants(resultat);
   if (manquantes.length > 0) {
     l.push("");
     l.push(`  Ce projet n'a pas de ${manquantes.join(" ni de ")}. Les règles de frontière`);
@@ -90,6 +92,8 @@ export function enTexte(resultat, { seuil }) {
     l.push("  sont respectées, mais qu'il n'y avait rien à examiner. Le découpage en");
     l.push("  couches est le premier geste, avant tout ce qui précède.");
   }
+
+  for (const ligne of surLeTsconfig(resultat)) l.push(ligne);
 
   if (seuil !== null) {
     l.push(
@@ -128,6 +132,9 @@ export function enJson(resultat) {
       fichiersLus: resultat.fichiers,
       fichiersClasses: resultat.classes,
       tsconfigTrouve: resultat.tsconfig,
+      // Sans l'un et l'autre, un total de zéro pour TS-STRICT se lirait comme
+      // un typage strict, alors qu'il n'y avait rien à examiner.
+      typescriptPresent: resultat.typescript ?? false,
       couchesPresentes: resultat.couches ?? [],
       fichiersHorsCouches: (resultat.horsCouche ?? []).length,
       total: compter(resultat.violations),
@@ -147,4 +154,62 @@ export function compter(violations) {
 
 function quantifier(n) {
   return n === 1 ? "1 violation" : `${n} violations`;
+}
+
+/**
+ * Ce que le rapport dit quand il n'a pas trouvé de `tsconfig.json`.
+ *
+ * Deux situations que le même silence recouvrirait. Un projet purement
+ * JavaScript n'a rien à corriger, et TS-STRICT est hors sujet pour lui. Un
+ * projet qui a des `.ts` sans `tsconfig.json` a, lui, un vrai problème, et le
+ * rapport ne doit pas le laisser passer pour un non-sujet.
+ *
+ * Le pire serait de ne rien dire du tout : TS-STRICT ne remonte plus rien dans
+ * ces deux cas, et un silence non expliqué se lit comme une bonne nouvelle.
+ * C'est la défaillance que ce dépôt a rencontrée le plus souvent.
+ *
+ * @returns les lignes à ajouter, vide si un `tsconfig.json` a été lu.
+ */
+function surLeTsconfig(resultat) {
+  if (resultat.tsconfig) return [];
+
+  if (resultat.typescript) {
+    return [
+      "",
+      "  Aucun tsconfig.json n'a été trouvé, alors que ce projet contient du",
+      "  TypeScript. TS-STRICT n'a donc rien pu vérifier, et c'est un problème",
+      "  en soi : sans fichier de configuration, rien ne garantit sous quelles",
+      "  options ce code est compilé.",
+    ];
+  }
+
+  return [
+    "",
+    "  Aucun tsconfig.json, et aucun fichier TypeScript : TS-STRICT ne",
+    "  s'applique pas à ce projet. Son silence ci-dessus ne dit pas que le",
+    "  typage est strict, mais qu'il n'y avait rien à examiner.",
+  ];
+}
+
+/**
+ * Lesquels des deux dossiers que les frontières surveillent manquent au projet.
+ *
+ * Le nom du dossier n'est pas celui de la couche : `classer` rend `feature` au
+ * singulier et `shared-feature` pour le partagé, là où le lecteur du rapport
+ * connaît `features/`. La comparaison portait sur le nom du dossier, qui
+ * n'apparaît jamais tel quel parmi les couches : l'avertissement se déclenchait
+ * donc sur tous les projets, y compris juste sous des violations MA-002 et
+ * MA-003 que ces mêmes règles venaient de trouver. Le rapport se contredisait
+ * dans sa propre page.
+ *
+ * @returns les noms de dossiers absents, dans l'ordre où on les lit.
+ */
+function dossiersManquants(resultat) {
+  const couches = resultat.couches ?? [];
+  const presence = {
+    features: couches.includes("feature") || couches.includes("shared-feature"),
+    core: couches.includes("core"),
+  };
+
+  return Object.keys(presence).filter((dossier) => !presence[dossier]);
 }

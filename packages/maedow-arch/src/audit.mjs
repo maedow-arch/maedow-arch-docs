@@ -181,15 +181,41 @@ export function auditer(racine) {
   }
 
   /* --- TS-STRICT : ce que le tsconfig promet ------------------------------ */
-  const options = tsconfig?.compilerOptions ?? {};
-  for (const { nom, raison } of OPTIONS_STRICT) {
-    if (options[nom] !== true) {
-      violations["TS-STRICT"].push({
-        fichier: "tsconfig.json",
-        detail: `${nom} absent ou faux, ${raison}`,
-      });
+
+  /*
+   * Sans `tsconfig.json`, TS-STRICT ne vérifie rien, et le dit.
+   *
+   * Un fichier absent devenait un fichier vide, donc trois options manquantes,
+   * donc trois violations en tête du plan de migration, sur un chemin qui
+   * n'existe pas. Un projet purement JavaScript recevait ainsi un ordre de
+   * corriger un fichier qu'il n'a pas, et ce défaut se voyait sur la racine de
+   * ce dépôt même.
+   *
+   * C'est la faute que le corpus reproche partout ailleurs : rendre un verdict
+   * sur ce qu'on n'a pas regardé. Les règles de frontière ont déjà leur phrase
+   * pour ce cas, TS-STRICT a maintenant la sienne.
+   */
+  if (tsconfig !== null) {
+    const options = tsconfig.compilerOptions ?? {};
+    for (const { nom, raison } of OPTIONS_STRICT) {
+      if (options[nom] !== true) {
+        violations["TS-STRICT"].push({
+          fichier: "tsconfig.json",
+          detail: `${nom} absent ou faux, ${raison}`,
+        });
+      }
     }
   }
+
+  /*
+   * Le projet contient-il du TypeScript ?
+   *
+   * La question sépare deux situations que le même silence recouvrirait. Un
+   * projet purement JavaScript n'a rien à corriger : TS-STRICT est hors sujet
+   * pour lui. Un projet qui a des `.ts` sans `tsconfig.json` a, lui, un vrai
+   * problème, et le rapport ne doit pas le laisser passer pour un non-sujet.
+   */
+  const typescript = fichiers.some((f) => f.endsWith(".ts") || f.endsWith(".tsx"));
 
   /*
    * Quelles couches le projet possède réellement.
@@ -216,6 +242,7 @@ export function auditer(racine) {
     couches: [...couches].sort(),
     violations,
     tsconfig: tsconfig !== null,
+    typescript,
   };
 }
 
