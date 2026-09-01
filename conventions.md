@@ -112,7 +112,71 @@ export function match<TData, TError, TReturn>(
 ): TReturn {
   return result.ok ? handlers.ok(result.data) : handlers.err(result.error);
 }
+
+// Enchaîne une opération faillible sur le succès de la précédente
+export async function andThen<TData, TSuivant, TError>(
+  result: Result<TData, TError> | Promise<Result<TData, TError>>,
+  fn: (data: TData) => Result<TSuivant, TError> | Promise<Result<TSuivant, TError>>
+): Promise<Result<TSuivant, TError>> {
+  const resolu = await result;
+  return resolu.ok ? fn(resolu.data) : resolu;
+}
+
+// Agrège une liste de résultats, en s'arrêtant à la première erreur
+export function all<TData, TError>(results: Result<TData, TError>[]): Result<TData[], TError> {
+  const donnees: TData[] = [];
+
+  for (const result of results) {
+    if (!result.ok) return result;
+    donnees.push(result.data);
+  }
+
+  return { ok: true, data: donnees };
+}
 ```
+
+### Enchaîner plusieurs opérations faillibles
+
+C'est le point où le Result Pattern tient ou s'écroule, et c'est celui qu'on documente le moins.
+
+`mapResult` transforme une donnée, mais son résultat n'est pas faillible. Un service qui enchaîne trois appels pouvant chacun échouer retombe donc sur l'imbrication que le pattern devait supprimer :
+
+```typescript
+// ❌ Ce que le Result Pattern était censé faire disparaître
+const commande = await trouverCommande(id);
+if (!commande.ok) return commande;
+
+const autorisee = await autoriserPaiement(commande.data);
+if (!autorisee.ok) return autorisee;
+
+const encaissee = await encaisser(autorisee.data);
+if (!encaissee.ok) return encaissee;
+
+return { ok: true, data: encaissee.data };
+```
+
+`andThen` enchaîne, et court-circuite à la première erreur :
+
+```typescript
+// ✅ Trois étapes faillibles, une seule expression
+export async function payerCommande(id: string): Promise<Result<Paiement>> {
+  return andThen(andThen(trouverCommande(id), autoriserPaiement), encaisser);
+}
+```
+
+Chaque étape reçoit la donnée de la précédente et rend un `Result`. Dès qu'une échoue, les suivantes ne sont pas appelées et l'erreur remonte telle quelle, sans être enveloppée ni traduite.
+
+`all` sert le cas parallèle plutôt que séquentiel, typiquement une validation :
+
+```typescript
+// ✅ Valider une liste, et s'arrêter à la première ligne fautive
+const lignes = panier.map(validerLigne);
+const validees = all(lignes);
+
+if (!validees.ok) return validees; // la première erreur, telle quelle
+```
+
+**Pourquoi `andThen` est asynchrone même quand l'étape ne l'est pas.** Deux variantes, l'une synchrone et l'autre non, obligeraient à choisir à chaque appel selon ce que fait l'étape suivante, c'est-à-dire à connaître son implémentation. Rendre une opération asynchrone cesserait alors d'être un détail interne et deviendrait une rupture de contrat pour tous ses appelants.
 
 **Exemple d'usage recommandé** (à documenter systématiquement dans le README d'un projet Maedow Arch) :
 
