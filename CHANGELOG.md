@@ -8,6 +8,12 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ## [Non publié]
 
+### Corrigé
+
+- **`AGENTS.md` décrivait un état antérieur du projet.** Écrit avant la page d'adoption, il ignorait `npx maedow-arch check` et ne renvoyait qu'à cinq documents sur six. Le fichier destiné aux assistants était le seul à ne pas connaître le dernier outil livré.
+- **`AGENTS.md` n'était référencé nulle part.** Ni le README ni le guide de contribution ne le mentionnaient : on ne le trouvait qu'en explorant la racine. Les deux y renvoient désormais, avec l'adresse du corpus en texte brut.
+
+
 ### Ajouté
 
 - **Une page « Adopter sur un projet existant » dans la documentation.** La commande d'audit existait, la page d'accueil l'annonçait, mais rien n'expliquait comment lire son rapport ni conduire la migration. La page donne l'ordre des corrections et sa raison, ce que `--fix` ne touche pas, et le passage de l'audit à la configuration ESLint une fois la migration faite, en précisant que charger l'entrée par défaut et l'entrée stricte d'un coup sur une base existante est le meilleur moyen de tout désactiver la semaine suivante.
