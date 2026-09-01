@@ -40,7 +40,7 @@ flowchart TD
 | :--- | :--- | :--- | :--- | :--- |
 | **App** | `app/` | Point d'entrée, routing, injection de dépendances. | Les fichiers d'amorçage et de routing du framework hôte. Sous Next.js : `page.tsx`, `layout.tsx`, `route.ts`, middlewares. Voir [Maedow Arch hors Next.js](#maedow-arch-hors-nextjs). | Logique métier détaillée, requêtes directes non encapsulées. |
 | **Features** | `features/<feature>/` | Écrans et modules fonctionnels utilisateur. | Composants `.tsx`, hooks React dédiés, adaptateurs de vue. | Définitions de modèles de données partagés, logique de persistance brute. |
-| **Shared Features** | `features/_shared/` | Composants UI métier utilisés par $\ge$ 2 features. | Composants composites métier partagés (`UserAvatarCard`, `AddressPicker`). | Primitives UI agnostiques (qui vont dans `components/ui/`). |
+| **Shared Features** | `features/_shared/` | Composants UI métier utilisés par au moins deux features. | Composants composites métier partagés (`UserAvatarCard`, `AddressPicker`). | Primitives UI agnostiques (qui vont dans `components/ui/`). |
 | **Core** | `core/<module>/` | Cœur métier, domaine pur, persistance, contrats. | Types/Interfaces purs (`.ts`), machines d'états, validateurs, interfaces de repositories. | **ZÉRO fichier `.tsx`**, aucun import React/DOM. |
 | **UI Primitives** | `components/ui/` | Composants atomiques réutilisables (Design System). | Boutons, Modales, Inputs, Dropdowns, etc. | Types métier, appels API, état applicatif global. |
 | **Lib** | `lib/` | Utilitaires transverses non liés au métier. | Formatage, manipulation de chaînes/dates, helpers CSS (`cn`). | Types spécifiques au métier, règles de gestion. |

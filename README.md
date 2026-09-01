@@ -13,6 +13,18 @@ Bienvenue dans la documentation officielle de **Maedow Arch**. Ce corpus méthod
 
 ## 🚀 Démarrage Rapide
 
+### Vous avez déjà un projet
+
+```bash
+npx maedow-arch check
+```
+
+L'audit lit votre code sans rien installer, sans rien modifier, et sans avoir besoin que le projet compile. Il rend un rapport ordonné **par ce qui débloque le reste**, avec le nombre de violations par règle et les premiers fichiers concernés.
+
+Personne n'adopte une architecture en repartant de zéro : commencez par savoir ce que ça coûte.
+
+### Vous démarrez un projet
+
 ```bash
 npx create-maedow-arch-app mon-projet
 cd mon-projet
@@ -84,6 +96,7 @@ export default [...maedowArchConfig];
 | :--- | :--- |
 | [`create-maedow-arch-app`](https://www.npmjs.com/package/create-maedow-arch-app) | CLI de scaffolding. Génère un projet Maedow Arch complet en une commande. |
 | [`eslint-config-maedow-arch`](https://www.npmjs.com/package/eslint-config-maedow-arch) | Config ESLint prête à l'emploi qui enforce les frontières `app/features/core/components/lib`. |
+| [`maedow-arch`](https://www.npmjs.com/package/maedow-arch) | Audite un projet **existant** au regard du standard, sans rien installer ni modifier. |
 
 ---
 

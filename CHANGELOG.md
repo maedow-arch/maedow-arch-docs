@@ -6,6 +6,22 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [Non publié]
+
+### Ajouté
+
+- **Le corpus entier est lisible à une seule adresse, sur `/llms.txt`.** Un agent qui veut connaître ce standard n'a plus à parcourir six pages de HTML. Le fichier est dérivé de la documentation et jamais recopié : il ne peut pas se périmer sans qu'elle se périme aussi. C'est un canal d'adoption réel pour un standard destiné à être appliqué par des développeurs qui travaillent avec des assistants.
+- **Un `AGENTS.md` à la racine**, qui dit ce qu'il faut savoir avant de modifier le dépôt : que le corpus est la source et les pages du site des fichiers générés, que chaque règle a besoin de sa fixture, et où chercher une réponse. `FRICTIONS.md` y est signalé comme le document le plus utile pour comprendre les décisions qui paraissent arbitraires.
+- **La commande d'audit est annoncée là où on la cherche.** `maedow-arch` était publié sur npm sans apparaître ni dans le tableau d'outillage du README, ni sur le site, ni dans le guide de contribution. Le démarrage rapide commence désormais par le projet qui existe déjà, qui est le cas le plus fréquent.
+
+- **Un garde de version en intégration continue.** Une pull request qui modifie le code d'un paquet sans faire bouger sa version échoue désormais. C'est le défaut qui a fait perdre deux tentatives de publication : `npm publish` refuse une version déjà en ligne, et il le refuse après la construction et après l'authentification. Le garde n'exige rien quand seuls le README, la licence ou les tests changent.
+- **Le site déclare son domaine, son plan et ses règles d'indexation.** `metadataBase` manquait, si bien que les balises Open Graph portaient des adresses relatives et qu'un partage sur un réseau social ne trouvait pas l'image. Le plan du site est dérivé des pages réelles, comme la navigation : une liste écrite à la main se périmerait au premier document ajouté.
+
+### Corrigé
+
+- **Le tableau des rôles ne contient plus de notation mathématique.** La ligne de `features/_shared` employait une notation LaTeX qui ne rend ni sur GitHub ni sur le site et s'affichait telle quelle. Elle dit maintenant « au moins deux features ».
+- **La fixture d'audit n'emploie plus `baseUrl`.** L'option est dépréciée depuis TypeScript 7 et faisait apparaître un avertissement dans l'éditeur de quiconque ouvre ce dépôt. Le support de `baseUrl` reste vérifié par un test, les projets audités en ayant encore.
+
 ## [0.8.0] : 2026-09-01
 
 ### Ajouté

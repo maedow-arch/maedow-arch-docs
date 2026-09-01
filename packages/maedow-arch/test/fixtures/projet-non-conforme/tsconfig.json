@@ -1,10 +1,13 @@
 {
   "compilerOptions": {
     // Un projet réel a des commentaires, et un alias dont le motif ressemble
-    // à un début de commentaire de bloc.
+    // à un début de commentaire de bloc. Pas de "baseUrl" ici : l'option est
+    // dépréciée depuis TypeScript 7, et une fixture n'a pas à faire apparaître
+    // un avertissement dans l'éditeur de celui qui lit ce dépôt. Le support de
+    // "baseUrl" reste testé sans fichier, dans check.test.mjs, parce que les
+    // projets audités en ont encore.
     "target": "ES2022",
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
