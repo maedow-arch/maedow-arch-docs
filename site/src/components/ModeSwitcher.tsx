@@ -4,7 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { Check, ChevronsUpDown, Feather, Layers } from "lucide-react";
 import { DEFAULT_MODE, readMode, writeMode, type Mode } from "@/lib/mode";
 
-const PROFILS: { mode: Mode; icon: typeof Layers; title: string; description: string }[] = [
+type Profil = { mode: Mode; icon: typeof Layers; title: string; description: string };
+
+/*
+ * Un tuple non vide, et non un tableau.
+ *
+ * Le premier profil sert de repli quand le mode courant ne correspond à aucune
+ * entrée, ce qui n'arrive pas puisque les deux modes sont ici. Sous
+ * `noUncheckedIndexedAccess`, un tableau rend pourtant `PROFILS[0]` possiblement
+ * indéfini, et le repli devenait à son tour un cas à traiter. Le type dit
+ * maintenant ce que la donnée garantit déjà, ce qui vaut mieux qu'une assertion
+ * pour l'affirmer après coup.
+ */
+const PROFILS: [Profil, ...Profil[]] = [
   {
     mode: "full",
     icon: Layers,
