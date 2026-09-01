@@ -17,6 +17,7 @@ import tseslint from "typescript-eslint";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import maedowArchConfig from "../index.js";
+import maedowArchStrict from "../strict.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixtures = join(here, "fixtures");
@@ -49,20 +50,21 @@ const EXPECTED_VIOLATIONS = [
 ];
 
 /** La config du package, plus le parser TypeScript que l'utilisateur apporte. */
-function configFor(cwd) {
+function configFor(cwd, { strict = false } = {}) {
   return [
     { files: ["**/*.{ts,tsx}"], languageOptions: { parser: tseslint.parser } },
     ...maedowArchConfig,
+    ...(strict ? maedowArchStrict : []),
     { settings: { "import/resolver": { typescript: { project: join(cwd, "tsconfig.json") } } } },
   ];
 }
 
-async function lint(fixtureName) {
+async function lint(fixtureName, options) {
   const cwd = join(fixtures, fixtureName);
   const eslint = new ESLint({
     cwd,
     overrideConfigFile: true,
-    overrideConfig: configFor(cwd),
+    overrideConfig: configFor(cwd, options),
   });
   const results = await eslint.lintFiles(["src"]);
   return results.flatMap((result) =>
@@ -134,6 +136,67 @@ const unexpected = invalidProblems.filter(
 );
 for (const problem of unexpected) {
   fail(`remontée non déclarée dans ${problem.file} : ${problem.message}`);
+}
+
+/* ------------------------------------------------------------------ *
+ * L'entrée stricte, chargée en plus de l'entrée par défaut
+ * ------------------------------------------------------------------ */
+
+/** Violations attendues dans `strict-invalid/`, une règle par fichier. */
+const EXPECTED_STRICT = [
+  { file: "core/billing/types.ts", regle: "@typescript-eslint/no-explicit-any", code: "MA-005" },
+  { file: "core/billing/cast.ts", regle: "no-restricted-syntax", code: "MA-006" },
+  { file: "core/billing/aller.ts", regle: "import/no-cycle", code: "MA-007" },
+];
+
+console.log("");
+console.log("▸ Fixture strict-valid/ : ce que l'entrée stricte accepte");
+const strictValidProblems = await lint("strict-valid", { strict: true });
+if (strictValidProblems.length === 0) {
+  console.log("  ✓ aucune erreur, comme attendu");
+} else {
+  for (const problem of strictValidProblems) {
+    fail(`faux positif dans ${problem.file} : ${problem.message}`);
+  }
+}
+
+console.log("");
+console.log(`▸ Fixture strict-invalid/ : ${EXPECTED_STRICT.length} règles de typage violées`);
+const strictInvalidProblems = await lint("strict-invalid", { strict: true });
+
+for (const expected of EXPECTED_STRICT) {
+  const found = strictInvalidProblems.find(
+    (problem) => problem.file === expected.file && problem.ruleId === expected.regle
+  );
+  if (found) {
+    console.log(`  ✓ ${expected.file} : ${expected.code}, ${expected.regle}`);
+  } else {
+    fail(
+      `${expected.code} NON détectée dans ${expected.file}. ` +
+        `Remontées pour ce fichier : ${
+          strictInvalidProblems
+            .filter((p) => p.file === expected.file)
+            .map((p) => `${p.ruleId} ${p.message}`)
+            .join(" | ") || "aucune"
+        }`
+    );
+  }
+}
+
+/*
+ * L'entrée par défaut ne doit pas bouger. Sans cette assertion, une règle
+ * stricte pourrait glisser dans le défaut sans que rien ne le signale, et
+ * casser le lint de tout projet installé à la mise à jour suivante.
+ */
+console.log("");
+console.log("▸ L'entrée par défaut, sur les mêmes fichiers, reste silencieuse");
+const defautSurStrict = await lint("strict-invalid");
+if (defautSurStrict.length === 0) {
+  console.log("  ✓ aucune remontée : les règles strictes ne sont pas dans le défaut");
+} else {
+  for (const problem of defautSurStrict) {
+    fail(`l'entrée par défaut remonte ${problem.ruleId} dans ${problem.file} : elle a changé`);
+  }
 }
 
 console.log(

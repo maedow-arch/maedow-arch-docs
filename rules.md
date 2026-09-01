@@ -8,7 +8,9 @@ Il existe pour une raison simple : un standard qui laisse croire que tout est ap
 
 **Vérifiée** signifie qu'une violation fait échouer le lint, donc la CI, avant d'atteindre la revue. La règle possède une fixture invalide qui échoue et une fixture valide qui passe : sans cette paire, une règle peut cesser de fonctionner sans que rien ne le signale, ce que ce dépôt a déjà vécu et documente sous [F-001](./FRICTIONS.md).
 
-**Tenue par l'équipe** signifie que la règle relève de la revue et de la discipline. Ce n'est pas un aveu d'échec : certaines exigences ne se réduisent pas à un motif syntaxique sans produire plus de faux positifs que de vraies détections. La règle reste normative, et sa violation reste une violation.
+**Tenue par l'équipe** signifie que la règle relève de la revue et de la discipline. Ce n'est pas un aveu d'échec, et ce n'est pas une étape en attendant mieux : certaines exigences ne se réduisent pas à un motif syntaxique sans produire plus de faux positifs que de vraies détections. La règle reste normative, et sa violation reste une violation.
+
+Les deux règles qui restent dans cette catégorie, MA-008 et MA-009, **y sont par décision et non par manque de travail**. Chacune dit en quoi l'outiller coûterait plus qu'elle ne rapporte. Le rapport de sept règles vérifiées sur neuf n'est donc pas une dette à combler : c'est la part du standard qui se prête à la vérification automatique, et l'autre part est reconnue comme telle plutôt que passée sous silence.
 
 ## À quoi sert un code stable
 
@@ -26,9 +28,9 @@ Les codes ne sont jamais réattribués. Une règle retirée laisse son code vaca
 | **MA-002** | Une feature n'importe jamais une autre feature | vérifiée | `boundaries/dependencies` |
 | **MA-003** | `features/_shared/` ne connaît aucune feature | vérifiée | `boundaries/dependencies` |
 | **MA-004** | Zéro fichier `.tsx` et zéro JSX dans `core/` | vérifiée | `no-restricted-syntax`, `no-restricted-imports` |
-| **MA-005** | `any` interdit, `unknown` et gardes de type à la place | tenue par l'équipe | revue |
-| **MA-006** | Double assertion `as unknown as` interdite | tenue par l'équipe | revue |
-| **MA-007** | Aucun cycle d'import entre modules | tenue par l'équipe | revue |
+| **MA-005** | `any` interdit, `unknown` et gardes de type à la place | vérifiée | `@typescript-eslint/no-explicit-any` · entrée `strict` |
+| **MA-006** | Double assertion `as unknown as` interdite | vérifiée | `no-restricted-syntax` · entrée `strict` |
+| **MA-007** | Aucun cycle d'import entre modules | vérifiée | `import/no-cycle` · entrée `strict` |
 | **MA-008** | Les modules à secrets sont marqués `server-only` | tenue par l'équipe | revue |
 | **MA-009** | Les adaptateurs, dépôts et contrats suivent leur nommage | tenue par l'équipe | revue |
 
@@ -70,21 +72,29 @@ Fixtures : `core/audit/Widget.tsx` pour le JSX sans import, `core/audit/useTheme
 
 ## MA-005 · `any` interdit
 
-**Tenue par l'équipe.** `unknown` avec des gardes de type, ou une validation à l'entrée des frontières.
+**Vérifiée**, dans l'entrée `strict`. `unknown` avec des gardes de type, ou une validation à l'entrée des frontières.
 
 Énoncé dans [conventions.md](./conventions.md), section « TypeScript strict ».
+
+Fixtures : `strict-invalid/src/core/billing/types.ts` et sa contrepartie valide, qui montre la garde de type attendue à la place.
 
 ## MA-006 · Double assertion interdite
 
-**Tenue par l'équipe.** `as unknown as TargetType` force un type au lieu de le valider. La validation appartient au moment du parsing.
+**Vérifiée**, dans l'entrée `strict`. `as unknown as TargetType` force un type au lieu de le valider. La validation appartient au moment du parsing.
+
+Aucune règle publiée ne vise cette forme, d'où un sélecteur qui cible l'assertion vers `unknown` dont le parent est une autre assertion. Un `as unknown` isolé reste permis : c'est l'enchaînement qui pose problème, pas le passage par `unknown`.
 
 Énoncé dans [conventions.md](./conventions.md), section « TypeScript strict ».
 
+Fixtures : `strict-invalid/src/core/billing/cast.ts` et sa contrepartie valide.
+
 ## MA-007 · Aucun cycle d'import entre modules
 
-**Tenue par l'équipe.** Deux modules qui s'importent mutuellement ne peuvent plus être lus, testés ni déplacés séparément. Le cycle ne viole aucune frontière de couche, ce qui le rend invisible aux règles MA-001 à MA-003 : il se forme à l'intérieur d'une même couche.
+**Vérifiée**, dans l'entrée `strict`. Deux modules qui s'importent mutuellement ne peuvent plus être lus, testés ni déplacés séparément. Le cycle ne viole aucune frontière de couche, ce qui le rend invisible aux règles MA-001 à MA-003 : il se forme à l'intérieur d'une même couche.
 
-Cette règle est introduite par le registre. Le corpus ne l'énonçait pas, alors qu'elle conditionne la testabilité que le standard revendique.
+Cette règle a été introduite par le registre. Le corpus ne l'énonçait pas, alors qu'elle conditionne la testabilité que le standard revendique.
+
+Fixtures : `strict-invalid/src/core/billing/aller.ts` et `retour.ts`, qui forment un cycle sans franchir la moindre frontière.
 
 ## MA-008 · Les modules à secrets sont marqués `server-only`
 
@@ -92,7 +102,7 @@ Cette règle est introduite par le registre. Le corpus ne l'énonçait pas, alor
 
 Énoncé dans [conventions.md](./conventions.md), section « Sécurité et données sensibles ».
 
-Cette règle restera tenue par l'équipe tant qu'un besoin réel ne justifiera pas de l'outiller : reconnaître mécaniquement ce qui constitue un secret demanderait une liste de motifs qui produirait surtout des faux positifs.
+**Elle reste tenue par l'équipe par décision.** Reconnaître mécaniquement ce qui constitue un secret demanderait une liste de motifs de noms, qui signalerait des modules inoffensifs et manquerait ceux qui comptent. Une règle qui se trompe souvent finit désactivée, et l'exigence disparaît alors complètement. La revue, elle, sait lire ce que fait un module.
 
 ## MA-009 · Le nommage des adaptateurs, dépôts et contrats
 
@@ -100,4 +110,4 @@ Cette règle restera tenue par l'équipe tant qu'un besoin réel ne justifiera p
 
 Énoncé dans [conventions.md](./conventions.md), table de nommage.
 
-Comme MA-008, elle reste tenue par l'équipe : une règle de nom ne sait pas distinguer un adaptateur mal nommé d'un fichier qui n'en est pas un.
+**Elle reste tenue par l'équipe par décision.** Une règle de nom ne sait pas distinguer un adaptateur mal nommé d'un fichier qui n'en est pas un. Elle imposerait donc de nommer selon ce que la règle sait reconnaître, plutôt que selon ce que le fichier fait, ce qui est exactement l'inverse du but.
