@@ -2,6 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 
 import { auditer } from "../src/audit.mjs";
 import { classer, importAutorise, codePour } from "../src/couches.mjs";
@@ -87,6 +89,22 @@ test("le tsconfig se lit malgré les commentaires et un alias en @ étoile", () 
 
   assert.notEqual(config, null, "un tsconfig illisible ferait croire à un projet sans typage");
   assert.deepEqual(lireAlias(nonConforme), [{ prefixe: "@/", vers: "src/" }]);
+});
+
+test("un baseUrl est encore lu, même si TypeScript le déprécie", () => {
+  // La fixture n'en porte plus : l'option est dépréciée depuis TypeScript 7 et
+  // faisait apparaître un avertissement dans l'éditeur. Les projets audités en
+  // ont pourtant encore, et un alias mal résolu vide le rapport de ses
+  // violations, ce qui se lit comme une bonne nouvelle. Le support est donc
+  // vérifié ici, sur un dossier temporaire.
+  const dossier = mkdtempSync(join(tmpdir(), "maedow-baseurl-"));
+  writeFileSync(
+    join(dossier, "tsconfig.json"),
+    JSON.stringify({ compilerOptions: { baseUrl: "./app", paths: { "~/*": ["./modules/*"] } } })
+  );
+
+  assert.deepEqual(lireAlias(dossier), [{ prefixe: "~/", vers: "app/modules/" }]);
+  rmSync(dossier, { recursive: true, force: true });
 });
 
 test("sans les alias, l'audit ne verrait presque aucune violation", () => {
