@@ -17,7 +17,15 @@ export function enTexte(resultat, { seuil }) {
 
   l.push("");
   l.push(`  Maedow Arch · audit de ${resultat.racine}`);
-  l.push(`  ${resultat.fichiers} fichiers lus, ${resultat.classes} dans une couche reconnue`);
+  l.push(`  ${resultat.fichiers} fichiers lus, ${resultat.classes} dans une couche du standard`);
+
+  const hors = (resultat.horsCouche ?? []).length;
+  if (hors > 0) {
+    // Un renseignement, pas un reproche : l'audit ne dit rien de ces fichiers
+    // parce qu'ils ne relèvent pas du standard, et non parce qu'ils seraient
+    // conformes.
+    l.push(`  ${hors} hors des couches, non examinés (scripts, configuration, actifs)`);
+  }
   l.push("");
 
   if (resultat.classes === 0) {
@@ -121,6 +129,7 @@ export function enJson(resultat) {
       fichiersClasses: resultat.classes,
       tsconfigTrouve: resultat.tsconfig,
       couchesPresentes: resultat.couches ?? [],
+      fichiersHorsCouches: (resultat.horsCouche ?? []).length,
       total: compter(resultat.violations),
       ordreDeMigration: ORDRE.filter((e) => (resultat.violations[e.code] ?? []).length > 0).map(
         (e) => e.code

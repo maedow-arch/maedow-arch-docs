@@ -109,15 +109,37 @@ export function auditer(racine) {
 
   const violations = Object.fromEntries(CODES.map((code) => [code, []]));
   const graphe = new Map();
+  const horsCouche = [];
   let classes = 0;
 
   for (const fichier of fichiers) {
-    const contenu = lireFichier(racine, fichier);
     const source = classer(fichier);
-    if (source !== null) classes += 1;
+
+    /*
+     * Hors couche, l'audit n'a rien à dire.
+     *
+     * Le standard définit lui-même sa liste blanche : un fichier qui
+     * n'appartient ni à `app/`, ni à `features/`, ni à `core/`, ni à
+     * `components/`, ni à `lib/` n'est pas du code Maedow Arch. Cette liste ne
+     * se périme pas, puisque c'est celle que le corpus énonce.
+     *
+     * Une liste d'exclusions faisait l'inverse : elle laissait passer par
+     * défaut, et n'écartait que ce dont on s'était souvenu. Elle a signalé un
+     * `mockServiceWorker.js` généré dans `public/`, et aurait signalé demain
+     * `scripts/`, `e2e/`, `.storybook/` ou le prochain dossier que personne
+     * n'a prévu. C'est précisément ce que `models.md` interdit à propos du DTO
+     * de sortie : cet outil faisait ce que sa propre règle défend.
+     */
+    if (source === null) {
+      horsCouche.push(fichier);
+      continue;
+    }
+
+    classes += 1;
+    const contenu = lireFichier(racine, fichier);
 
     /* --- MA-004 : ni JSX ni dépendance d'interface dans core/ ------------- */
-    if (source?.couche === "core" && detecterJsx(contenu)) {
+    if (source.couche === "core" && detecterJsx(contenu)) {
       violations["MA-004"].push({ fichier, detail: "contient du JSX" });
     }
 
@@ -136,10 +158,13 @@ export function auditer(racine) {
     for (const specificateur of extraireImports(contenu)) {
       const cible = resoudre(specificateur, fichier, racine, alias);
       if (cible === null || cible.startsWith("..")) continue;
-      cibles.push(cible);
 
       const destination = classer(cible);
-      if (source === null || destination === null) continue;
+      // Le graphe des cycles ne relie que du code du standard : un cycle
+      // passant par un script de build n'est pas une violation de MA-007.
+      if (destination === null) continue;
+      cibles.push(cible);
+
       if (importAutorise(source, destination)) continue;
 
       violations[codePour(source, destination)].push({
@@ -184,6 +209,10 @@ export function auditer(racine) {
     racine,
     fichiers: fichiers.length,
     classes,
+    // Dénombré, jamais compté comme violation : pour un projet en migration,
+    // savoir combien de fichiers vivent hors des couches est un renseignement,
+    // et c'est très différent d'un défaut à corriger.
+    horsCouche,
     couches: [...couches].sort(),
     violations,
     tsconfig: tsconfig !== null,

@@ -6,6 +6,7 @@ Bienvenue dans la documentation officielle de **Maedow Arch**. Ce corpus méthod
 
 [![create-maedow-arch-app](https://img.shields.io/npm/v/create-maedow-arch-app?label=create-maedow-arch-app&color=8b5cf6)](https://www.npmjs.com/package/create-maedow-arch-app)
 [![eslint-config-maedow-arch](https://img.shields.io/npm/v/eslint-config-maedow-arch?label=eslint-config-maedow-arch&color=8b5cf6)](https://www.npmjs.com/package/eslint-config-maedow-arch)
+[![maedow-arch](https://img.shields.io/npm/v/maedow-arch?label=maedow-arch&color=8b5cf6)](https://www.npmjs.com/package/maedow-arch)
 [![licence MIT](https://img.shields.io/badge/licence-MIT-8b5cf6)](./LICENSE)
 [![CI](https://github.com/maedow-arch/maedow-arch-docs/actions/workflows/ci.yml/badge.svg)](https://github.com/maedow-arch/maedow-arch-docs/actions/workflows/ci.yml)
 
@@ -90,6 +91,27 @@ export default [...maedowArchConfig];
 
 ---
 
+### 4. [Registre des règles (`rules.md`)](./rules.md)
+* **Les neuf règles normatives**, `MA-001` à `MA-009`, avec un **code stable** que les messages de lint citent à la place d'un titre de section.
+* **Ce qui est vérifié par la machine et ce qui est tenu par l'équipe** : sept règles contre deux, et pour chacune des deux restantes, la raison de ne pas l'outiller.
+* **La clause de conformité** : les quatre conditions pour se dire conforme, et ce qui constitue une rupture du standard.
+
+---
+
+### 5. [Adopter sur un projet existant (`adoption.mdx`)](./site/content/docs/adoption.mdx)
+* **Lire le rapport de `npx maedow-arch check`**, ordonné par ce qui débloque le reste plutôt que par gravité.
+* **L'ordre de migration et sa raison**, étape par étape, chacune disant ce que la correction rend possible.
+* **`--seuil`, `--json`, `--fix`** : mesurer une progression sans rougir un pipeline au premier jour.
+* **Le passage de l'audit au linter**, et pourquoi l'entrée par défaut vient avant l'entrée stricte.
+
+---
+
+### 6. [Journal des frictions (`FRICTIONS.md`)](./FRICTIONS.md)
+* **Ce qui a résisté en conditions réelles** : la règle trop stricte, le cas limite imprévu, le contrôle qui rendait un verdict favorable sans rien vérifier.
+* C'est le document le plus utile des six pour comprendre le dépôt : plusieurs choix qui paraissent arbitraires y trouvent leur raison.
+
+---
+
 ## 🛠️ Outillage Officiel
 
 | Package | Description |
@@ -105,10 +127,13 @@ export default [...maedowArchConfig];
 ```
 maedow-arch-docs/
 ├── architecture.md · models.md · conventions.md   # le corpus, source de vérité
+├── rules.md                                       # le registre, un code stable par règle
+├── FRICTIONS.md                                   # ce qui a résisté en conditions réelles
 ├── site/                                          # le site de documentation (Next.js + Fumadocs)
 └── packages/
     ├── create-maedow-arch-app/                    # la CLI de scaffolding
-    └── eslint-config-maedow-arch/                 # les règles de frontières
+    ├── eslint-config-maedow-arch/                 # les règles de frontières
+    └── maedow-arch/                               # l'audit d'un projet existant
 ```
 
 Les pages du site sont **dérivées** des `.md` de cette racine par `site/scripts/sync-docs.mjs`. Ne modifiez jamais `site/content/docs/*.mdx` à la main.
