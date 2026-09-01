@@ -120,6 +120,12 @@ npm run site:dev          # lance le site en local
 
 ---
 
+## 🤖 Lire ce standard avec un assistant
+
+La documentation entière est servie en texte brut sur [`/llms.txt`](https://maedow-arch-docs.vercel.app/llms.txt) : un seul fichier, le corpus complet, sans HTML à parcourir.
+
+Pour travailler **sur ce dépôt**, [`AGENTS.md`](./AGENTS.md) rassemble ce qu'il faut savoir avant d'y toucher : que le corpus de la racine est la source de vérité et les pages du site des fichiers générés, qu'une règle n'entre pas dans une configuration sans sa fixture, et où chercher une réponse.
+
 ## 📝 Licence & Contribution
 
 Maedow Arch est un standard ouvert, sous licence MIT.

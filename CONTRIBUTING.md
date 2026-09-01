@@ -4,6 +4,8 @@ Merci de l'intérêt que vous portez à ce standard. Ce document décrit le seul
 chemin par lequel une modification entre dans le dépôt, et ce que la
 vérification automatique attend de vous.
 
+Si vous travaillez avec un assistant, [`AGENTS.md`](./AGENTS.md) rassemble ce qu'il doit savoir avant de modifier ce dépôt, et la documentation entière est servie en texte brut sur [`/llms.txt`](https://maedow-arch-docs.vercel.app/llms.txt).
+
 ## Le flux en un coup d'œil
 
 ```

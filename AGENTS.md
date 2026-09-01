@@ -13,7 +13,7 @@ Un standard d'architecture logicielle, son outillage, et le site qui le publie.
 | `FRICTIONS.md` | ce qui a résisté en conditions réelles |
 | `packages/create-maedow-arch-app/` | la CLI de génération |
 | `packages/eslint-config-maedow-arch/` | les règles ESLint |
-| `packages/maedow-arch/` | la commande d'audit d'un projet existant |
+| `packages/maedow-arch/` | `npx maedow-arch check`, l'audit d'un projet existant |
 | `site/` | le site de documentation, Next.js et Fumadocs |
 
 ## Les cinq règles à connaître
@@ -27,6 +27,16 @@ Un standard d'architecture logicielle, son outillage, et le site qui le publie.
 **Toute modification du corpus prend une ligne au `CHANGELOG.md`.** Une ligne qui dit ce qui change pour celui qui applique le standard, pas ce qui change dans le fichier.
 
 **Chaque exemple de code du corpus doit compiler**, sous `strict` avec `exactOptionalPropertyTypes` et `noUncheckedIndexedAccess`. Un exemple qui ne compile pas est pire que pas d'exemple.
+
+## Auditer un projet, y compris celui-ci
+
+```bash
+npx maedow-arch check
+```
+
+L'audit applique le registre à un projet existant, sans rien installer ni modifier, et sans avoir besoin que le projet compile. Il rend un rapport ordonné par ce qui débloque le reste.
+
+Il **dénombre, il ne garantit pas** : il lit les chemins d'import sans compiler, ce qui lui permet de tourner sur une cible non installée, au prix de quelques cas limites. Ce qui garantit, c'est `eslint-config-maedow-arch`, et c'est lui qui tourne en intégration continue sur ce dépôt.
 
 ## Le flux
 
@@ -58,9 +68,12 @@ Un paquet dont le code change **doit** changer de version, sans quoi la CI refus
 | Où va ce type, cette donnée ? | [`models.md`](./models.md) |
 | Comment écrit-on ici ? | [`conventions.md`](./conventions.md) |
 | Cette règle est-elle vérifiée ou tenue à la main ? | [`rules.md`](./rules.md) |
+| Comment adopter le standard sur un projet déjà écrit ? | [`site/content/docs/adoption.mdx`](./site/content/docs/adoption.mdx) |
 | Pourquoi cette décision bizarre ? | [`FRICTIONS.md`](./FRICTIONS.md) |
 
-`FRICTIONS.md` est le document le plus utile des cinq pour comprendre le dépôt : il consigne ce qui a échoué, pourquoi, et ce qu'on en a tiré. Plusieurs choix qui paraissent arbitraires y trouvent leur raison.
+`FRICTIONS.md` est le document le plus utile des six pour comprendre le dépôt : il consigne ce qui a échoué, pourquoi, et ce qu'on en a tiré. Plusieurs choix qui paraissent arbitraires y trouvent leur raison.
+
+La page d'adoption est l'exception à la règle du corpus : elle est écrite directement dans `site/content/docs/`, comme `index.mdx`, parce qu'elle documente l'outillage et non le standard. Les quatre autres pages du site, elles, sont générées.
 
 ## Pour lire la documentation en ligne
 
