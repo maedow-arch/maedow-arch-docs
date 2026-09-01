@@ -15,6 +15,21 @@ La commande **ne modifie rien, n'installe rien**, et n'a besoin ni des `node_mod
 
 Elle lit votre code et rend un rapport par règle du [registre](/docs/rules).
 
+## Ce que l'audit examine, et ce qu'il laisse de côté
+
+L'en-tête du rapport le dit avant tout le reste :
+
+```
+  37 fichiers lus, 32 dans une couche du standard
+  5 hors des couches, non examinés (scripts, configuration, actifs)
+```
+
+**Seuls les fichiers appartenant à une couche du standard sont examinés.** Un fichier qui ne vit ni dans `app/`, ni dans `features/`, ni dans `core/`, ni dans `components/`, ni dans `lib/` n'est pas du code Maedow Arch : vos scripts de build, vos tests de bout en bout, vos fichiers de configuration et ce que vos outils déposent dans `public/` ne reçoivent aucun reproche.
+
+C'est une liste blanche, et le choix est délibéré. Une liste d'exclusions laisserait passer par défaut et ne pourrait être complète qu'après coup : elle signalerait le prochain dossier que personne n'avait prévu. La liste blanche, elle, ne se périme pas, puisque c'est celle que le corpus énonce.
+
+Le second chiffre est un **renseignement, pas un reproche**. Sur un projet en migration, savoir combien de fichiers vivent hors des couches vous dit où en est le découpage, et cela n'a rien à voir avec une dette à corriger.
+
 ## Lire le rapport
 
 Il est ordonné **par ce qui débloque le reste**, jamais par gravité, et chaque section dit ce que la correction rend possible.
@@ -55,6 +70,25 @@ Il vous le dira explicitement :
 
 C'est le cas le plus fréquent sur un projet qui range tout dans `app/` et `components/`. Le [découpage en couches](/docs/architecture) est alors le premier geste, avant tout le reste.
 
+
+### Si le rapport ne signale rien sur le typage
+
+`TS-STRICT` ne juge que ce qu'il a lu. Sans `tsconfig.json`, il ne compte rien, et distingue deux situations qui n'ont pas le même sens :
+
+```
+  Aucun tsconfig.json, et aucun fichier TypeScript : TS-STRICT ne
+  s'applique pas à ce projet. Son silence ci-dessus ne dit pas que le
+  typage est strict, mais qu'il n'y avait rien à examiner.
+```
+
+```
+  Aucun tsconfig.json n'a été trouvé, alors que ce projet contient du
+  TypeScript. TS-STRICT n'a donc rien pu vérifier, et c'est un problème
+  en soi : sans fichier de configuration, rien ne garantit sous quelles
+  options ce code est compilé.
+```
+
+Le second cas se corrige avant tout le reste : tant qu'aucun fichier ne dit sous quelles options ce code est compilé, aucune des corrections suivantes ne repose sur du solide.
 ## Mesurer une progression, pas rougir un pipeline
 
 ```bash
