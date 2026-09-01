@@ -2,13 +2,13 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 
 import { auditer } from "../src/audit.mjs";
 import { classer, importAutorise, codePour } from "../src/couches.mjs";
 import { lireAlias, lireTsconfig } from "../src/projet.mjs";
-import { compter, enJson } from "../src/rapport.mjs";
+import { compter, enJson, enTexte } from "../src/rapport.mjs";
 
 /**
  * Le test négatif de l'audit.
@@ -200,4 +200,68 @@ test("la sortie JSON porte l'ordre de migration et le détail par code", () => {
   assert.ok(json.ordreDeMigration.indexOf("MA-001") < json.ordreDeMigration.indexOf("MA-002"));
   assert.ok(json.parCode["MA-002"].fichiers.length > 0);
   assert.equal(json.fichiersHorsCouches, 2, "le hors-périmètre se lit aussi en JSON");
+});
+
+/* ------------------------------------------------------------------ *
+ * Ce que le rapport dit de ce qu'il n'a pas trouvé
+ * ------------------------------------------------------------------ */
+
+/** Un projet jetable, décrit par la liste de ses fichiers. */
+function projetTemporaire(fichiers) {
+  const dossier = mkdtempSync(join(tmpdir(), "maedow-rapport-"));
+  for (const [chemin, contenu] of Object.entries(fichiers)) {
+    const complet = join(dossier, chemin);
+    mkdirSync(dirname(complet), { recursive: true });
+    writeFileSync(complet, contenu);
+  }
+  return dossier;
+}
+
+test("sans tsconfig.json, TS-STRICT ne compte rien et le rapport le dit", () => {
+  /*
+   * Un fichier absent devenait un fichier vide, donc trois options
+   * manquantes, donc trois violations en tête du plan de migration, sur un
+   * chemin qui n'existe pas. Le défaut se voyait sur la racine de ce dépôt,
+   * qui n'a ni tsconfig.json ni TypeScript.
+   */
+  const dossier = projetTemporaire({ "src/lib/util.js": "export const a = 1;" });
+  const resultat = auditer(dossier);
+
+  assert.equal(resultat.violations["TS-STRICT"].length, 0, "aucun fichier à juger");
+  assert.equal(resultat.tsconfig, false);
+  assert.equal(resultat.typescript, false);
+
+  const texte = enTexte(resultat, { seuil: null });
+  assert.match(texte, /aucun fichier TypeScript/);
+  rmSync(dossier, { recursive: true, force: true });
+});
+
+test("du TypeScript sans tsconfig.json est signalé comme un problème en soi", () => {
+  // L'autre moitié du cas : ici le silence de TS-STRICT n'est pas un
+  // non-sujet, et le rapport ne doit pas le laisser passer pour tel.
+  const dossier = projetTemporaire({
+    "src/core/taux.ts": "export const taux = 0.2;",
+  });
+  const resultat = auditer(dossier);
+
+  assert.equal(resultat.violations["TS-STRICT"].length, 0);
+  assert.equal(resultat.typescript, true);
+
+  const texte = enTexte(resultat, { seuil: null });
+  assert.match(texte, /alors que ce projet contient du/);
+  assert.equal(JSON.parse(enJson(resultat)).typescriptPresent, true);
+  rmSync(dossier, { recursive: true, force: true });
+});
+
+test("un projet qui a des features ne s'entend pas dire qu'il n'en a pas", () => {
+  /*
+   * `classer` rend la couche `feature` au singulier, le rapport cherchait le
+   * dossier `features` au pluriel, et la chaîne ne correspondait jamais.
+   * L'avertissement s'affichait donc sur tous les projets, y compris juste
+   * sous les violations MA-002 et MA-003 que ces règles venaient de trouver.
+   */
+  const texte = enTexte(auditer(nonConforme), { seuil: null });
+
+  assert.ok(!texte.includes("n'a pas de features"), texte.slice(-400));
+  assert.match(texte, /MA-002/, "et pourtant les frontières ont bien trouvé quelque chose");
 });

@@ -6,6 +6,12 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [Non publié]
+
+### Corrigé
+
+- **L'audit parlait de ce qu'il n'avait pas regardé, de trois façons.** Il annonçait trois violations `TS-STRICT` sur un `tsconfig.json` absent, un fichier manquant devenant un fichier vide donc trois options manquantes : un projet purement JavaScript recevait l'ordre de corriger un fichier qu'il n'a pas, en tête de son plan de migration. Le rapport affirmait par ailleurs « ce projet n'a pas de features » sur **tous** les projets, y compris trois lignes sous les violations MA-002 et MA-003 que ces mêmes règles venaient de trouver, la couche étant nommée `feature` au singulier là où la comparaison cherchait le dossier `features`. `TS-STRICT` ne produit plus rien sans `tsconfig.json`, et le rapport distingue deux silences : un projet sans TypeScript, pour qui la règle est hors sujet, et un projet qui a des `.ts` sans configuration, ce qui est un problème en soi. Les trois défauts n'ont été trouvés qu'en lançant l'outil sur ce dépôt : une fixture prouve qu'un outil trouve ce qu'on y a mis, jamais qu'il ne trouve rien d'autre. `maedow-arch` passe en 0.1.2.
+- **Le journal des frictions n'avait pas d'entrée sur l'audit.** [F-017](./FRICTIONS.md) rassemble les trois défauts ci-dessus et celui de la liste d'exclusions, et les rattache à leur famille : après les contrôles qui rendent un verdict favorable sans rien vérifier, et l'absence de tout contrôle, ceux qui parlent de ce qu'ils n'ont pas regardé.
 ## [0.9.0] : 2026-09-01
 
 ### Ajouté
