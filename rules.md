@@ -6,7 +6,7 @@ Il existe pour une raison simple : un standard qui laisse croire que tout est ap
 
 ## Comment lire ce registre
 
-**Vérifiée** signifie qu'une violation fait échouer le lint, donc la CI, avant d'atteindre la revue. La règle possède une fixture invalide qui échoue et une fixture valide qui passe : sans cette paire, une règle peut cesser de fonctionner sans que rien ne le signale, ce que ce dépôt a déjà vécu et documente sous [F-001](./FRICTIONS.md).
+**Vérifiée** signifie qu'une violation fait échouer le lint, donc la CI, avant d'atteindre la revue. La règle possède une fixture invalide qui échoue et une fixture valide qui passe : sans cette paire, une règle peut être chargée, valide, et ne rien regarder du tout, ce que ce dépôt a rencontré quatre fois et documente de [F-001](./FRICTIONS.md) à F-015.
 
 **Tenue par l'équipe** signifie que la règle relève de la revue et de la discipline. Ce n'est pas un aveu d'échec, et ce n'est pas une étape en attendant mieux : certaines exigences ne se réduisent pas à un motif syntaxique sans produire plus de faux positifs que de vraies détections. La règle reste normative, et sa violation reste une violation.
 
