@@ -232,6 +232,28 @@ figure.shiki pre code {
 }
 
 /*
+ * Une colonne qui défile sans le montrer.
+ *
+ * Le sommaire tient dans une colonne étroite, et sa barre de défilement y
+ * occupait la largeur d'un mot juste à droite du texte, là où l'œil revient à
+ * chaque ligne. Le repère de position n'est pas perdu pour autant : le trait
+ * vertical du sommaire marque déjà l'entrée courante, et c'est lui que le
+ * lecteur suit.
+ *
+ * Réservé aux conteneurs qui portent leur propre repère. Ailleurs, masquer la
+ * barre reviendrait à cacher qu'il reste du contenu à lire.
+ */
+.maedow-defilement-discret {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.maedow-defilement-discret::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/*
  * Le bandeau des technologies.
  *
  * La piste porte six copies de la liste et glisse d'exactement sa moitié : à
