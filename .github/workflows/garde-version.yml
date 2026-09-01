@@ -1,0 +1,70 @@
+name: Garde de version
+
+# Un paquet dont le code change sans que sa version bouge se publie mal, ou ne
+# se publie pas du tout. Le second cas est celui qu'on a vécu : `npm publish`
+# refuse une version déjà en ligne, et le refus arrive après le build, après
+# l'authentification, et après avoir cru la publication faite.
+#
+# Ce garde ne tourne que sur les pull requests : c'est le seul moment où
+# comparer à la branche de destination a un sens.
+on:
+  pull_request:
+
+jobs:
+  version:
+    name: Version des paquets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Le garde compare deux états : il lui faut l'historique, pas
+          # seulement le dernier commit.
+          fetch-depth: 0
+
+      - name: Un paquet modifié doit changer de version
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+          git fetch --quiet origin "$BASE"
+          manquants=""
+
+          for paquet in packages/*/; do
+            nom=$(basename "$paquet")
+
+            # Ce qui a changé dans ce paquet, hors de ce qui ne part pas dans le
+            # tarball : un README corrigé ou une fixture ajustée n'oblige
+            # personne à republier.
+            #
+            # Chaque motif porte sa propre ancre. Regroupés sous une seule, le
+            # `$` final ne s'appliquait qu'au dernier terme, et `/test/` ne
+            # correspondait donc jamais : le garde signalait ses propres
+            # fichiers de test comme du code publiable. Constaté sur la pull
+            # request qui l'introduit, ce qui est la meilleure preuve qu'il
+            # regarde vraiment quelque chose.
+            modifies=$(git diff --name-only "origin/$BASE...HEAD" -- "$paquet" \
+              | grep -v -E 'README\.md$|LICENSE$|/test/|\.test\.mjs$' || true)
+
+            if [ -z "$modifies" ]; then
+              continue
+            fi
+
+            avant=$(git show "origin/$BASE:${paquet}package.json" 2>/dev/null \
+              | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{console.log(JSON.parse(s).version)}catch{console.log('')}})")
+            apres=$(node -p "require('./${paquet}package.json').version")
+
+            if [ "$avant" = "$apres" ]; then
+              echo "::error file=${paquet}package.json::$nom change sans que sa version bouge (toujours $apres). Un publish sur une version déjà en ligne est refusé après coup."
+              manquants="$manquants $nom"
+            else
+              echo "  $nom : $avant vers $apres"
+            fi
+          done
+
+          if [ -n "$manquants" ]; then
+            echo ""
+            echo "Paquets à faire évoluer :$manquants"
+            exit 1
+          fi
+
+          echo "Aucun paquet modifié sans changement de version."

@@ -243,3 +243,21 @@ Et c'est le premier apport concret de Prettier, avant même la question du style
 **La leçon.** Le journal comptait déjà F-001, F-011 et F-012, trois formes du même mode de défaillance : un contrôle qui rend un verdict favorable sans avoir rien vérifié. Celle-ci en ajoute une quatrième, et la plus difficile à voir, parce que rien n'y est cassé. La configuration est valide, la règle est bien chargée, le plugin est bien résolu, et le fichier est bien lu. Seule une hypothèse implicite est fausse : que l'outil analyse de la même façon le fichier qu'on lui donne et ceux qu'il va chercher.
 
 D'où la règle du dépôt, à laquelle il n'y a pas d'exception : une règle n'entre pas dans une configuration sans une fixture qui échoue quand on la retire. Non pour documenter la règle, mais parce que c'est le seul moyen de savoir qu'elle regarde quelque chose. Écrite sans sa fixture, celle-ci serait entrée dans un paquet publié, et son premier utilisateur aurait cru ses cycles surveillés.
+
+---
+
+## F-016 : le seul geste du projet qui n'a aucun filet
+
+**Le contexte.** Tout ce qui entre dans ce dépôt est vérifié. Vingt-sept contrôles, des fixtures qui échouent quand on retire une règle, un garde qui refuse une pull request venant d'ailleurs que de `develop`. La publication sur npm, elle, n'a rien.
+
+**Ce qui s'est passé.** Deux tentatives perdues dans la même journée. La première parce que la version du paquet n'avait pas bougé : `npm publish` refuse une version déjà en ligne, et il le refuse **après** la construction, **après** l'authentification, et après qu'on ait cru la publication faite. La seconde parce que la commande a été lancée depuis une branche de travail, ce que rien ne signale non plus. S'y ajoute la double authentification, qui redemande le navigateur à chaque essai et transforme une erreur d'une seconde en trois minutes.
+
+**Ce qui rend ce défaut différent des précédents.** F-001, F-011, F-012 et F-015 décrivent des contrôles qui rendent un verdict favorable sans avoir rien vérifié. Celui-ci est l'inverse : il n'y a pas de contrôle du tout. Le geste sort du dépôt, donc de tout ce que la CI peut atteindre, et personne ne s'en aperçoit tant qu'il n'échoue pas.
+
+**Ce qu'on en a fait.** Un garde de version en CI compare chaque dossier de `packages/` à la branche de destination, et fait échouer la pull request si le code d'un paquet change sans que sa version bouge. Il n'exige rien quand seuls le README, la licence ou les tests changent : republier pour une faute d'orthographe n'a pas de sens.
+
+Ce garde attrape la première des deux causes, celle qui se répète. La seconde, publier depuis la mauvaise branche, reste entre les mains de celui qui publie : la CI ne voit pas ce qui se passe sur un poste.
+
+**La leçon.** Un projet finit par ne vérifier que ce qu'il sait vérifier, et ses angles morts se logent aux endroits où son outillage n'a pas de prise. Ici la frontière est nette : ce qui vit dans le dépôt est couvert, ce qui en sort ne l'est pas. Le garde ne supprime pas cette frontière, il la déplace d'un cran, en refusant en amont l'état qui aurait fait échouer la publication en aval.
+
+C'est aussi la raison pour laquelle un `CHANGELOG.md` tenu à jour vaut mieux qu'une automatisation partielle : il oblige à formuler ce qui change, et c'est ce moment de formulation qui fait remarquer qu'une version n'a pas bougé.

@@ -3,6 +3,7 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import { Space_Grotesk, Google_Sans_Flex, Google_Sans_Code, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/links";
 import { TRANSLATIONS } from "@/lib/translations";
 import { MODE_BOOTSTRAP_SCRIPT } from "@/lib/mode";
 
@@ -57,12 +58,35 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  /*
+   * Sans `metadataBase`, Next construit des URL relatives dans les balises
+   * Open Graph. Un partage sur un réseau social ne trouve alors pas l'image, et
+   * l'aperçu se réduit au titre : le site paraît inachevé là où il est le plus
+   * vu.
+   */
+  metadataBase: new URL(SITE_URL),
   title: {
     template: "%s | Maedow Arch",
     default: "Maedow Arch, standard modulaire et découplé",
   },
   description:
     "Standard d’architecture logicielle universel, modulaire et agnostique pour applications web et fullstack modernes.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: SITE_URL,
+    siteName: "Maedow Arch",
+    title: "Maedow Arch, standard modulaire et découplé",
+    description:
+      "Le domaine métier reste séparé de l’interface et l’infrastructure interchangeable. Les frontières ne dépendent pas de la mémoire de l’équipe : le linter les vérifie.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Maedow Arch, standard modulaire et découplé",
+    description:
+      "Un standard d’architecture dont les frontières sont vérifiées par la machine, pas tenues par la discipline.",
+  },
 };
 
 export default function Layout({ children }: { children: ReactNode }) {
