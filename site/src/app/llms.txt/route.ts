@@ -22,6 +22,7 @@ import { SITE_URL } from "@/lib/links";
 export const dynamic = "force-static";
 
 const DOCUMENTS = [
+  { fichier: "adoption.mdx", titre: "Adopter le standard sur un projet existant" },
   { fichier: "architecture.mdx", titre: "Architecture, les quatre couches et le flux" },
   { fichier: "models.mdx", titre: "Modélisation, zéro modèle dans le JSX" },
   { fichier: "conventions.mdx", titre: "Conventions, typage strict et Result Pattern" },

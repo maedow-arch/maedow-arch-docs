@@ -1,0 +1,114 @@
+---
+title: Adopter sur un projet existant
+description: "Auditer un projet déjà écrit avec npx maedow-arch check, lire son rapport, et conduire la migration dans l'ordre qui débloque le reste."
+---
+
+Le reste de cette documentation s'adresse aux projets qui n'existent pas encore. Celle-ci s'adresse aux autres, qui sont la majorité : personne n'adopte une architecture en repartant de zéro.
+
+## Savoir ce que ça coûte, avant de décider
+
+```bash
+npx maedow-arch check
+```
+
+La commande **ne modifie rien, n'installe rien**, et n'a besoin ni des `node_modules` ni d'un projet qui compile. C'est délibéré : un audit qu'il faudrait préparer ne serait jamais lancé par l'équipe qui hésite encore, c'est-à-dire par la seule à qui il s'adresse.
+
+Elle lit votre code et rend un rapport par règle du [registre](/docs/rules).
+
+## Lire le rapport
+
+Il est ordonné **par ce qui débloque le reste**, jamais par gravité, et chaque section dit ce que la correction rend possible.
+
+```
+  1. Activer le typage strict  ·  TS-STRICT  ·  2 violations
+     Sans strict, les couches basses ne peuvent pas garantir ce qu'elles
+     annoncent, et les corrections suivantes reposeraient sur des types
+     qui mentent.
+
+       tsconfig.json
+         noUncheckedIndexedAccess absent ou faux
+```
+
+Un projet qui découvre deux cents violations doit voir un chemin, pas un verdict. Le total n'apparaît qu'à la fin, une fois que vous savez par où commencer.
+
+### L'ordre de migration, et sa raison
+
+| Rang | Ce qu'on corrige | Pourquoi d'abord |
+| :--- | :--- | :--- |
+| 1 | le typage strict | les corrections suivantes reposeraient sinon sur des types qui mentent |
+| 2 | MA-004, l'interface hors de `core/` | un domaine sans JSX devient testable sans DOM |
+| 3 | MA-001, le sens du flux | tant qu'il remonte, séparer les features n'a pas d'effet durable |
+| 4 | MA-002, les features entre elles | chacune devient supprimable et déplaçable seule |
+| 5 | MA-003, le partagé transverse | `features/_shared` cesse d'être un fourre-tout |
+| 6 | MA-007, les cycles | deux modules en cycle ne se testent ni ne se déplacent séparément |
+| 7 et 8 | MA-005 et MA-006, le typage | chaque `any` retiré rend réelle une garantie déjà promise |
+
+### Si le rapport ne signale aucune frontière
+
+Il vous le dira explicitement :
+
+```
+  Ce projet n'a pas de features ni de core. Les règles de frontière
+  n'ont donc rien pu vérifier : leur silence ci-dessus ne dit pas
+  qu'elles sont respectées, mais qu'il n'y avait rien à examiner.
+```
+
+C'est le cas le plus fréquent sur un projet qui range tout dans `app/` et `components/`. Le [découpage en couches](/docs/architecture) est alors le premier geste, avant tout le reste.
+
+## Mesurer une progression, pas rougir un pipeline
+
+```bash
+npx maedow-arch check --seuil 50
+```
+
+Sans seuil, la commande réussit toujours. Avec un seuil, elle échoue au-delà. Une équipe en migration a besoin de **voir sa dette baisser**, pas d'un pipeline rouge au premier jour : posez le seuil au-dessus de votre compte actuel, puis descendez-le à mesure que vous corrigez.
+
+```bash
+npx maedow-arch check --json > audit.json
+```
+
+La sortie machine porte le total, l'ordre de migration et le détail par code, de quoi tracer une courbe dans votre intégration continue.
+
+## Ce que `--fix` corrige, et ce qu'il ne touche pas
+
+```bash
+npx maedow-arch check --fix
+```
+
+Il ajoute les options manquantes du `tsconfig.json`, en préservant vos commentaires. **Rien d'autre.**
+
+Les déplacements de fichiers sont proposés, jamais appliqués : un outil qui déplace du code sans qu'on le lui demande ne se fait pardonner qu'une fois. Et les violations de frontière ne se corrigent pas mécaniquement, chacune demandant de décider où va le code, ce qu'un outil ne sait pas faire à votre place.
+
+## Ce que l'audit ne fait pas
+
+**Il dénombre, il ne garantit pas.** Il lit les chemins d'import sans compiler le projet, ce qui lui permet de tourner sur une cible non installée qui ne compile pas encore. Le prix est quelques cas limites, et il est assumé.
+
+Une fois la migration faite, c'est [`eslint-config-maedow-arch`](https://www.npmjs.com/package/eslint-config-maedow-arch) qui tient les frontières, à chaque commit :
+
+```bash
+npm install --save-dev eslint-config-maedow-arch eslint-plugin-boundaries eslint-import-resolver-typescript
+```
+
+```js
+// eslint.config.mjs
+import maedowArch from "eslint-config-maedow-arch";
+export default [...maedowArch];
+```
+
+L'entrée par défaut porte les règles de **frontière**. Quand elles passent, l'entrée `strict` ajoute la discipline de typage :
+
+```js
+import maedowArch from "eslint-config-maedow-arch";
+import maedowArchStrict from "eslint-config-maedow-arch/strict";
+export default [...maedowArch, ...maedowArchStrict];
+```
+
+L'ordre compte : adopter les deux d'un coup sur une base existante remonte tout en même temps, et c'est le meilleur moyen de tout désactiver le vendredi suivant.
+
+## Se dire conforme
+
+Le registre définit [les quatre conditions](/docs/rules) qu'un projet doit satisfaire, et ce qui constitue une rupture du standard. `check` en mesure deux : il ne décerne pas la conformité, il dit ce qui vous en sépare.
+
+## Ce qui aide vraiment ce standard
+
+Les frictions rencontrées pendant une migration réelle. Une règle trop stricte, un cas limite qu'elle n'avait pas prévu, un rapport qui compte mal : ces retours passent par les [issues du dépôt](https://github.com/maedow-arch/maedow-arch-docs/issues) et alimentent `FRICTIONS.md`, le journal de ce qui a résisté en conditions réelles.
