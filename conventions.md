@@ -59,6 +59,150 @@ export type OrganizationId = string & { readonly __brand: unique symbol };
 
 ---
 
+### Vivre avec `exactOptionalPropertyTypes`
+
+C'est l'option de `strict` qui saute en premier dans un vrai projet, et sa désactivation entraîne rarement qu'elle seule : on la retire un vendredi soir, et le reste du strict suit dans les semaines qui viennent.
+
+Elle distingue deux choses que TypeScript confondait : **une propriété absente** et **une propriété présente valant `undefined`**. `{ auteur?: string }` accepte l'objet sans la clé, et refuse `{ auteur: undefined }`.
+
+C'est ce que vous voulez. Les deux ne se comportent pas pareil devant `Object.keys`, devant un `JSON.stringify`, devant un `PATCH` partiel ou devant une base de données, où l'un ne touche pas la colonne et l'autre l'efface.
+
+#### Reconnaître l'erreur
+
+Deux codes, selon l'endroit :
+
+| Code | Situation |
+| :--- | :--- |
+| `TS2375` | vous **affectez** : retour de fonction, variable typée, props JSX |
+| `TS2379` | vous **passez en argument** à une fonction |
+
+Le message est le même dans les deux cas, et sa dernière phrase est un piège :
+
+```
+error TS2375: Type '{ recherche: string | undefined; page: number; }'
+is not assignable to type 'Filtre' with 'exactOptionalPropertyTypes: true'.
+Consider adding 'undefined' to the types of the target's properties.
+```
+
+Le conseil de TypeScript, ajouter `undefined` au type cible, n'est le bon que dans un cas sur deux : celui où la cible vous appartient.
+
+#### Le type vous appartient : dites-le explicitement
+
+```typescript
+// ❌ error TS2375
+type Filtre = { recherche?: string; page: number };
+
+export function construire(recherche: string | undefined): Filtre {
+  return { recherche, page: 1 };
+}
+```
+
+```typescript
+// ✅ La clé peut être absente, ou présente et indéfinie. Les deux sont voulus.
+type Filtre = { recherche?: string | undefined; page: number };
+
+export function construire(recherche: string | undefined): Filtre {
+  return { recherche, page: 1 };
+}
+```
+
+`?: string | undefined` n'est pas un pléonasme sous cette option, c'est la façon d'exprimer que les deux formes conviennent. Écrivez-la quand c'est vrai, et laissez `?: string` quand la clé ne doit vraiment pas exister.
+
+#### Le type ne vous appartient pas : n'écrivez pas la clé
+
+C'est le cas des SDK tiers, dont les types ont été écrits sans cette option.
+
+```typescript
+// ❌ error TS2379
+declare function envoyer(options: { url: string; token?: string }): Promise<void>;
+
+export async function appeler(token: string | undefined) {
+  await envoyer({ url: "https://exemple.test", token });
+}
+```
+
+```typescript
+// ✅ La clé n'apparaît que si elle a une valeur
+export async function appeler(token: string | undefined) {
+  await envoyer({ url: "https://exemple.test", ...(token !== undefined && { token }) });
+}
+```
+
+Le `&&` rend `false` quand la condition est fausse, et répandre `false` ne produit aucune clé.
+
+#### Effacer une propriété, c'est la retirer
+
+```typescript
+// ❌ error TS2375 : `{ auteur: undefined }` n'est pas `{}`
+export function anonymiser(brouillon: Brouillon): Brouillon {
+  return { ...brouillon, auteur: undefined };
+}
+```
+
+```typescript
+// ✅ La clé disparaît vraiment
+export function anonymiser(brouillon: Brouillon): Brouillon {
+  const { auteur: _retire, ...reste } = brouillon;
+  return reste;
+}
+```
+
+Cette erreur est la plus utile des quatre : elle signale un endroit où votre code croyait effacer une donnée alors qu'il écrivait `undefined` dedans. La différence est réelle dès qu'un `PATCH` ou un ORM lit cet objet.
+
+#### En React, les deux cas se présentent
+
+Si le composant est à vous, appliquez le premier remède : `couleur?: string | undefined`.
+
+S'il vient d'une bibliothèque, l'attribut absent remplace l'attribut indéfini :
+
+```tsx
+// ✅ Deux appels plutôt qu'un attribut à undefined
+export function Etiquette({ couleurChoisie }: { couleurChoisie: string | undefined }) {
+  return couleurChoisie === undefined ? (
+    <Badge libelle="Actif" />
+  ) : (
+    <Badge libelle="Actif" couleur={couleurChoisie} />
+  );
+}
+```
+
+#### La limite : quand renoncer localement
+
+Les remèdes ci-dessus supposent un ou deux champs facultatifs. Devant un client d'API qui en compte six, le remède du spread conditionnel donne ceci :
+
+```typescript
+// Correct, et illisible
+return requete({
+  url: e.url,
+  ...(e.methode !== undefined && { methode: e.methode }),
+  ...(e.entete !== undefined && { entete: e.entete }),
+  ...(e.corps !== undefined && { corps: e.corps }),
+  ...(e.delai !== undefined && { delai: e.delai }),
+  ...(e.reprises !== undefined && { reprises: e.reprises }),
+});
+```
+
+Le bon geste est alors de renoncer **localement**, une fois, et de le dire :
+
+```typescript
+function sansIndefinis<T extends object>(objet: T): T {
+  return Object.fromEntries(
+    Object.entries(objet).filter(([, valeur]) => valeur !== undefined)
+  ) as T;
+}
+
+export function appelLisible(e: Entree) {
+  // Renoncement assumé : les six champs facultatifs de ce client devraient
+  // être conditionnés un par un. L'assertion couvre cette ligne et rien
+  // d'autre, et la fonction ci-dessus garantit ce qu'elle affirme.
+  return requete(sansIndefinis(e) as Parameters<typeof requete>[0]);
+}
+```
+
+**Une assertion confinée à trois lignes, commentée, adossée à une fonction qui fait réellement ce qu'elle prétend, vaut mieux qu'une option désactivée dans le `tsconfig.json`.** La première se relit et se retire le jour où le SDK corrige ses types ; la seconde emporte tout le fichier, puis tout le projet.
+
+C'est la seule forme de renoncement que ce standard accepte : locale, visible, et argumentée à l'endroit où elle s'applique.
+
 ## Gestion des Erreurs : Données Typées vs Exceptions (Result Pattern)
 
 Dans Maedow Arch, **les erreurs prévisibles et fonctionnelles sont modélisées comme des données**, pas comme des exceptions système.
