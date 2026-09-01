@@ -1,0 +1,1 @@
+export const ProfilCarte = () => null;
