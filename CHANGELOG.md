@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [Non publié]
+
+### Corrigé
+
+- **La page « Adopter sur un projet existant » décrivait un rapport que l'outil ne produit plus.** Le comportement de `check` a changé trois fois sans qu'elle bouge : elle ne disait rien de la ligne « hors des couches », ni du fait que seuls les fichiers d'une couche du standard sont examinés, ni des deux silences possibles de `TS-STRICT` en l'absence de `tsconfig.json`. Une équipe qui suit ce mode d'emploi ne reconnaissait pas sa propre sortie. Comme cette page alimente `/llms.txt`, le corpus servi aux assistants portait le même retard. Elle explique désormais le périmètre avant d'expliquer le rapport, ce qui est l'ordre dans lequel on lit un audit : savoir ce qui a été regardé, puis ce qui y a été trouvé.
 ## [0.9.1] : 2026-09-01
 
 ### Corrigé
