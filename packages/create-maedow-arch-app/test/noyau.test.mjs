@@ -6,7 +6,6 @@ import { dirname, join } from "node:path";
 
 import { ErreurUsage, buildPackageJson, deepMerge, layersFor, parseArgs } from "../bin/noyau.mjs";
 import { versPascal } from "../templates/base/scripts/nom.mjs";
-import { CONTENU_RESULT } from "../templates/base/scripts/bascule-full.mjs";
 
 /**
  * Ce que la matrice d'intégration ne voit pas.
@@ -147,14 +146,31 @@ test("buildPackageJson trie les dépendances comme npm le ferait", () => {
  * La bascule du profil Light vers Full
  * ------------------------------------------------------------------ */
 
-test("le Result Pattern de la bascule est celui du template Full", () => {
-  const duTemplate = readFileSync(
+test("le script de bascule ne porte aucune copie du Result", () => {
+  const script = readFileSync(join(templatesDir, "base", "scripts", "bascule-full.mjs"), "utf-8");
+
+  assert.match(
+    script,
+    /const RESULT = __RESULT_TS__;/,
+    "le contenu doit être injecté au scaffolding, pas écrit dans le script"
+  );
+  assert.ok(
+    !script.includes("export type Result<"),
+    "une copie écrite à la main finirait par diverger de sa source, en silence"
+  );
+});
+
+test("la source injectée existe, et porte les helpers documentés", () => {
+  const source = readFileSync(
     join(templatesDir, "mode-full", "src", "core", "common", "result.ts"),
     "utf-8"
   );
-  assert.equal(
-    CONTENU_RESULT,
-    duTemplate,
-    "un projet basculé et un projet créé en Full ne peuvent pas avoir deux Result différents"
-  );
+
+  for (const helper of ["unwrapOr", "mapResult", "match", "andThen", "all"]) {
+    assert.ok(
+      source.includes(`export function ${helper}`) ||
+        source.includes(`export async function ${helper}`),
+      `${helper} manque au Result livré`
+    );
+  }
 });

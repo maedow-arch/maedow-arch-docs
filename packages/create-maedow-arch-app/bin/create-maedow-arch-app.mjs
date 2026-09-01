@@ -167,15 +167,32 @@ function isTextFile(path) {
 }
 
 /** Remplace le nom du projet partout, plutôt que dans une liste à tenir à jour. */
-function substituteProjectName(dir, projectName) {
+/**
+ * Remplace les jetons du template par leur valeur, dans tout l'arbre généré.
+ *
+ * `__RESULT_TS__` mérite son explication : le script de bascule vit dans le
+ * projet généré et ne peut donc pas lire un fichier du paquet qui l'a produit.
+ * Il lui faut une copie du Result Pattern. Elle a d'abord été écrite à la main,
+ * et les deux versions ont divergé deux fois en une seule journée, dont une par
+ * le seul passage du formateur. La valeur est passée par `JSON.stringify`, ce
+ * qui produit une chaîne JavaScript correctement échappée quel que soit le
+ * contenu du fichier source.
+ */
+function substituteTokens(dir, tokens) {
+  const noms = Object.keys(tokens);
+
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
-      substituteProjectName(full, projectName);
+      substituteTokens(full, tokens);
     } else if (isTextFile(full)) {
       const original = readFileSync(full, "utf-8");
-      if (original.includes("__PROJECT_NAME__")) {
-        writeFileSync(full, original.replaceAll("__PROJECT_NAME__", projectName));
+      if (noms.some((nom) => original.includes(nom))) {
+        let substitue = original;
+        for (const [nom, valeur] of Object.entries(tokens)) {
+          substitue = substitue.replaceAll(nom, valeur);
+        }
+        writeFileSync(full, substitue);
       }
     }
   }
@@ -344,7 +361,14 @@ if (existsSync(gitignoreSource)) {
   renameSync(gitignoreSource, join(targetDir, ".gitignore"));
 }
 
-substituteProjectName(targetDir, projectName);
+substituteTokens(targetDir, {
+  __PROJECT_NAME__: projectName,
+  // Le contenu vient du template, jamais du projet généré : en profil Light,
+  // le projet n'a pas encore de couche domaine à lire.
+  __RESULT_TS__: JSON.stringify(
+    readFileSync(join(templatesDir, "mode-full", "src", "core", "common", "result.ts"), "utf-8")
+  ),
+});
 pruneGitkeeps(targetDir);
 
 /* ------------------------------------------------------------------ *

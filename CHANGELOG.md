@@ -10,6 +10,14 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ### Modifié
 
+- **Les tests sont colocalisés, et le template ne livre plus de dossiers `tests/` vides.** Il créait `src/tests/unit`, `integration` et `e2e`, trois dossiers vides qui promettaient une organisation par nature de test que les générateurs contredisaient en écrivant à côté du code. Un test séparé de son sujet se met à mentir au premier déplacement de fichier, ou survit en orphelin à une suppression.
+
+### Corrigé
+
+- **Le Result Pattern n'est plus écrit à deux endroits.** Le script de bascule vers Full en portait une copie, nécessaire puisqu'il vit dans le projet généré, mais écrite à la main. Les deux versions ont divergé deux fois en une journée, dont une par le seul passage du formateur. La copie est désormais injectée au moment du scaffolding depuis le fichier source.
+
+### Modifié
+
 - **Les messages de lint citent un code, plus un titre de section.** Un titre se réécrit et le renvoi casse en silence, ce qui est arrivé quand la numérotation des titres a été retirée du corpus. `MA-002 : une feature ne peut pas en importer une autre` reste juste quelle que soit la façon dont le corpus évolue ensuite, et relie le message, la section, la fixture et l'entrée de ce journal.
 
 ### Corrigé
@@ -19,6 +27,9 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 ### Ajouté
 
+- **La Pyramide de Tests, que le README promettait sans que le corpus la contienne.** Elle dit où vivent les tests, ce que chaque couche appelle un test, et pourquoi elle ne fixe aucun taux de couverture : une exigence chiffrée sur `core/` produit des tests écrits pour la métrique, alors que l'exigence utile, un domaine testable sans DOM ni mock, se vérifie directement.
+- **`generate:domain` amorce désormais un test, colocalisé.** La couche que le standard présente comme la plus testable était la seule dont le générateur n'écrivait aucun test.
+- **La table de nommage a enfin une ligne pour les tests.** Un test porte le nom de ce qu'il teste, et vit à côté de lui.
 - **Le Result Pattern se compose enfin.** `andThen` enchaîne une opération faillible sur le succès de la précédente, `all` agrège une liste de résultats en s'arrêtant à la première erreur. Sans eux, un service qui enchaînait trois appels pouvant échouer retombait sur l'imbrication de `if (!result.ok)` que le pattern était censé supprimer : `mapResult` transforme une donnée, mais son résultat n'est pas faillible. Les deux helpers sont livrés dans le template avec leurs tests, et le corpus montre l'enchaînement de trois services, l'absence d'exemple étant ce qui pousse les équipes à réinventer mal.
 - **Une entrée stricte, `eslint-config-maedow-arch/strict`.** Elle porte MA-005 `any` interdit, MA-006 la double assertion, et MA-007 les cycles d'import. L'entrée par défaut ne change pas d'une ligne : un projet installé lint exactement comme avant, et l'adoption des règles de typage devient un choix explicite plutôt qu'une rupture subie à la mise à jour. Le partage entre les deux entrées est structurel, les frontières d'un côté, la discipline de typage de l'autre, et non fondé sur ce que casserait le parc installé à un instant donné. `eslint-config-maedow-arch` passe en 0.3.0.
 - **Sept règles sur neuf sont désormais vérifiées par la machine**, contre trois avant ce lot. Les deux qui restent, MA-008 et MA-009, le sont par décision : le registre explique pour chacune en quoi l'outiller coûterait plus qu'elle ne rapporte.
