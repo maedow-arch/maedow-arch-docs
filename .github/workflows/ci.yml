@@ -35,6 +35,30 @@ jobs:
       - run: npm test
         working-directory: packages/create-maedow-arch-app
 
+  # L'audit doit continuer à voir ce qu'il prétend voir. Une fixture
+  # volontairement non conforme, et un compte attendu par code : sans ce test,
+  # la commande pourrait cesser de rien détecter et rendre un rapport vide, qui
+  # se lit comme une bonne nouvelle.
+  audit:
+    name: Commande d'audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+        working-directory: packages/maedow-arch
+      # Le seuil vérifie le code de sortie, qui est ce dont dépend une CI de
+      # projet en migration.
+      - name: La fixture non conforme dépasse le seuil
+        run: |
+          if node packages/maedow-arch/bin/maedow-arch.mjs check             packages/maedow-arch/test/fixtures/projet-non-conforme --seuil 5; then
+            echo "::error::L'audit a réussi sur une fixture qui compte 11 violations."
+            exit 1
+          fi
+          echo "Seuil correctement dépassé."
+
   format:
     name: Formatage
     runs-on: ubuntu-latest

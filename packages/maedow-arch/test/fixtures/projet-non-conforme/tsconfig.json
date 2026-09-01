@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    // Un projet réel a des commentaires, et un alias dont le motif ressemble
+    // à un début de commentaire de bloc.
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}

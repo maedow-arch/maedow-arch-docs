@@ -187,7 +187,7 @@ export function ModeToc({ items }: { items: TOCItemType[] }) {
         <svg
           width={trace.largeur}
           height={trace.hauteur}
-          className="pointer-events-none absolute start-0 top-0"
+          className="pointer-events-none absolute inset-s-0 top-0"
           aria-hidden
         >
           <path

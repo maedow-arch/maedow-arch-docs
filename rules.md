@@ -111,3 +111,30 @@ Fixtures : `strict-invalid/src/core/billing/aller.ts` et `retour.ts`, qui formen
 Énoncé dans [conventions.md](./conventions.md), table de nommage.
 
 **Elle reste tenue par l'équipe par décision.** Une règle de nom ne sait pas distinguer un adaptateur mal nommé d'un fichier qui n'en est pas un. Elle imposerait donc de nommer selon ce que la règle sait reconnaître, plutôt que selon ce que le fichier fait, ce qui est exactement l'inverse du but.
+
+---
+
+## Se dire conforme à Maedow Arch
+
+Un projet est **conforme à Maedow Arch 1.0** lorsque les quatre conditions suivantes sont réunies.
+
+1. **Les sept règles vérifiables passent.** `eslint-config-maedow-arch` est installé et son lint est vert, entrée `strict` comprise. C'est la seule condition qu'une machine constate.
+2. **Les deux règles humaines sont tenues.** MA-008 et MA-009 relèvent de la revue, et se dire conforme, c'est affirmer qu'elle a lieu.
+3. **Le typage est strict.** `strict`, `noUncheckedIndexedAccess` et `exactOptionalPropertyTypes` sont activés, et aucun n'est désactivé fichier par fichier.
+4. **Les renoncements sont locaux et écrits.** Une assertion commentée à l'endroit où elle s'applique reste conforme ; une option retirée du `tsconfig.json` ne l'est pas.
+
+`npx maedow-arch check` mesure la première et la troisième. Il ne décerne pas la conformité : il dit ce qui vous en sépare.
+
+### Ce qui constitue une rupture du standard
+
+Une rupture est un changement qui **rend non conforme un projet qui l'était**. C'est une notion distincte du versionnage des paquets : `eslint-config-maedow-arch` peut publier une version majeure sans que le standard bouge, et l'inverse est vrai aussi.
+
+Trois changements constituent une rupture :
+
+- **Une règle passe de tenue par l'équipe à vérifiée**, et fait donc échouer un lint qui passait.
+- **Une règle change de sens**, et interdit ce qu'elle autorisait.
+- **Une règle nouvelle rejoint l'entrée par défaut.**
+
+Ne constituent pas une rupture : l'ajout d'une règle à l'entrée `strict`, qui se charge explicitement ; la reformulation d'un message ; l'ajout d'une section au corpus ; le retrait d'une règle, qui ne peut que faire passer un lint qui échouait.
+
+Toute rupture est annoncée dans le `CHANGELOG.md` sous cette forme, avec le chemin de migration. Un standard qui change sans le dire ne vaut pas mieux qu'une convention d'équipe.

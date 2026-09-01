@@ -1,0 +1,40 @@
+{
+  "name": "maedow-arch",
+  "version": "0.1.0",
+  "description": "Audite un projet existant au regard du standard Maedow Arch, sans rien installer ni modifier",
+  "type": "module",
+  "bin": {
+    "maedow-arch": "bin/maedow-arch.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "maedow-arch",
+    "architecture",
+    "audit",
+    "migration",
+    "boundaries",
+    "typescript"
+  ],
+  "license": "MIT",
+  "author": "Jean-Marc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maedow-arch/maedow-arch-docs.git",
+    "directory": "packages/maedow-arch"
+  },
+  "homepage": "https://github.com/maedow-arch/maedow-arch-docs#readme",
+  "bugs": {
+    "url": "https://github.com/maedow-arch/maedow-arch-docs/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test \"test/**/*.test.mjs\""
+  }
+}
