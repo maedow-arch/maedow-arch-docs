@@ -25,6 +25,7 @@
 | **Schéma de Validation** | camelCase | `.ts` | `order.schema.ts`, `validation.ts` |
 | **Contrat d'Interface (Port)** | camelCase | `.ts` | `payment.contract.ts` |
 | **Adaptateur d'Infrastructure** | camelCase (`*.adapter.ts` ou `*.repository.ts`) | `.ts` | `stripePayment.adapter.ts`, `postgresOrder.repository.ts` |
+| **Test** | le nom de ce qu'il teste (`*.test.ts` ou `*.test.tsx`) | `.ts` / `.tsx` | `result.test.ts`, `CheckoutScreen.test.tsx` |
 
 ---
 
@@ -222,3 +223,43 @@ Ce script initialise automatiquement :
 * `features/<nom>/types.ts`
 * `features/<nom>/hooks/use<Nom>.ts`
 * `features/<nom>/<Nom>.test.tsx`
+
+---
+
+## Pyramide de Tests et Testabilité
+
+### Où vivent les tests
+
+**À côté de ce qu'ils testent, toujours.** `core/billing/billing.test.ts` accompagne `core/billing/service.ts`, et `features/checkout/Checkout.test.tsx` accompagne son écran.
+
+Ce n'est pas un goût de rangement. Un test séparé de son sujet se met à mentir dès le premier déplacement de fichier : il continue de passer alors qu'il teste une version antérieure du comportement, ou il est oublié lors d'une suppression et devient un test orphelin qui vérifie du code mort. Colocalisé, il se déplace, se relit et se supprime avec ce qu'il couvre.
+
+C'est aussi ce que produisent les deux générateurs : `generate:domain` et `generate:feature` amorcent chacun leur test au bon endroit.
+
+Un projet Maedow Arch ne livre donc **aucun dossier `tests/`**. Une arborescence par nature de test, `unit/`, `integration/`, `e2e/`, oblige à ranger avant d'écrire, et la question « ceci est-il unitaire ou d'intégration ? » n'a aucune réponse utile pour un service de domaine qui appelle deux fonctions pures.
+
+### Ce que chaque couche appelle un test
+
+La pyramide de Maedow Arch ne se lit pas en pourcentages, elle se lit en **coût d'exécution**. Chaque couche se teste par le moyen le moins cher qui prouve quelque chose.
+
+| Couche | Ce qu'on teste | Ce dont on n'a pas besoin |
+| :--- | :--- | :--- |
+| `core/` | les règles métier, les transitions d'état, les contrats | ni DOM, ni mock, ni rendu |
+| `lib/` | les fonctions d'aide, sur leurs cas limites | rien non plus |
+| `components/` | le rendu d'une primitive à partir de ses props | un moteur de rendu, sans données métier |
+| `features/` | le parcours d'un écran, avec son domaine réel | un moteur de rendu, et rien de simulé côté domaine |
+| `app/` | l'assemblage, de bout en bout, sur les chemins critiques seulement | un navigateur, donc le test le plus cher |
+
+La base large de la pyramide n'est pas une consigne de quantité, c'est une conséquence : **si le domaine est pur, ses tests sont si rapides et si simples à écrire qu'ils deviennent naturellement les plus nombreux.** Une pyramide qui ne se remplit pas par le bas signale que la logique a fui vers le haut, dans les écrans ou dans les routes, ce que la règle « zéro modèle dans le JSX » cherche précisément à empêcher.
+
+### Ce que la pyramide ne dit pas
+
+**Elle ne fixe aucun taux de couverture.** Une exigence de couverture chiffrée sur `core/` produit des tests écrits pour la métrique : on teste les accesseurs et on saute la règle de gestion, parce que la première ligne compte autant que la seconde dans le calcul.
+
+L'exigence utile est vérifiable autrement, et elle l'est déjà : **`core/` doit se tester sans DOM, sans mock et sans rendu.** Un test du domaine qui a besoin de simuler quelque chose signale que le domaine dépend de quelque chose dont il ne devrait pas dépendre, et c'est une violation de frontière avant d'être un problème de test.
+
+### En Mode Light
+
+La couche domaine n'existe pas, la base de la pyramide non plus. Les tests portent alors sur `lib/` et sur les écrans. C'est cohérent, et c'est même l'argument du profil : un site vitrine n'a pas de règles de gestion à protéger.
+
+Le jour où il en acquiert, `generate:domain` fait naître `core/` avec son premier test, et la pyramide se remplit par le bas.

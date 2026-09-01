@@ -50,10 +50,30 @@ if (bascule) {
   console.log("");
 }
 
+// Le test naît avec le domaine, colocalisé comme celui des features. C'est la
+// couche que le standard présente comme la plus testable, elle n'a aucune
+// raison d'être la seule dont le générateur n'amorce pas de test.
+writeFileSync(
+  join(dir, `${name}.test.ts`),
+  `import { describe, it, expect } from "vitest";
+import { create${pascal} } from "./service";
+
+// Ce test s'exécute sans DOM, sans mock et sans arbre React : c'est la
+// propriété que la couche core/ doit conserver.
+describe("create${pascal}", () => {
+  it("refuse tant que la logique métier n'est pas écrite", async () => {
+    const resultat = await create${pascal}({} as never);
+    expect(resultat.ok).toBe(false);
+  });
+});
+`
+);
+
 console.log(`✅ Domaine "${name}" généré dans ${dir}/`);
 console.log(`   - types.ts`);
 console.log(`   - validation.ts`);
 console.log(`   - service.ts (accès direct, voir la Règle de Lazy Abstraction)`);
+console.log(`   - ${name}.test.ts`);
 console.log(
   `   Rappel : n'ajoute contract.ts + repository.ts que si un 2ème fournisseur devient réel.`
 );
