@@ -285,7 +285,9 @@ Chaque profil se décline en deux contenus : `--template demo` livre un compteur
 
 Le standard revendique l'agnosticisme technique. Il doit donc valoir au-delà du framework qui a servi à le formuler.
 
-**Trois couches sur quatre ne bougent pas.** `features/`, `core/`, `components/` et `lib/` ne connaissent ni routeur, ni convention de fichiers, ni rendu serveur. Elles sont déjà portables telles quelles.
+**Trois couches sur quatre ne bougent pas, à une condition.** `features/`, `core/`, `components/` et `lib/` ne connaissent ni routeur, ni convention de fichiers, ni rendu serveur. Elles sont portables telles quelles **si les écrans reçoivent leurs données au lieu d'aller les chercher**.
+
+Cette condition n'est pas une réserve de style : c'est elle qui fait tout tenir. Un projet dont les écrans appellent eux-mêmes leurs sources verra le coût du portage se répandre dans `features/`, et l'affirmation ci-dessus sera fausse pour lui. Le [chargement de données côté serveur](#le-chargement-de-données-côté-serveur) donne le test à faire sur votre propre code avant de vous lancer.
 
 **Seule la couche `app/` s'adapte.** Sa définition reste inchangée : point d'entrée, routing, injection de dépendances. Ce sont ses fichiers qui diffèrent, parce que chaque framework déclare ses routes à sa façon.
 
@@ -296,6 +298,105 @@ Le standard revendique l'agnosticisme technique. Il doit donc valoir au-delà du
 | Déclaration des routes | l'arborescence de `app/` | `app/routes.tsx` |
 
 L'interdiction, elle, ne change jamais : aucune logique métier détaillée dans cette couche, quel que soit le framework.
+
+### Le chargement de données côté serveur
+
+C'est le point où le portage se joue vraiment, et la question difficile de cette section. Les Server Components et les Server Actions n'ont pas d'équivalent hors Next.js.
+
+**La condition qui fait tenir l'affirmation.** Les trois couches ne bougent pas *à condition que vos écrans reçoivent leurs données au lieu d'aller les chercher*. Ce n'est pas le framework qui rend le portage possible, c'est la règle « zéro modèle dans le JSX » appliquée avant lui.
+
+Le test à faire sur votre propre code, avant de vous lancer :
+
+> Ouvrez trois écrans de `features/`. Reçoivent-ils leurs données en props, ou appellent-ils eux-mêmes une source ?
+
+Si les écrans reçoivent, ce qui suit vous coûtera une couche. **S'ils vont chercher, le portage vous coûtera les quatre**, parce que chaque écran devra être repris, et l'affirmation ci-dessus ne vaut pas pour votre projet.
+
+#### Deux chemins, deux destins
+
+La donnée lue par une route API et la donnée lue dans un Server Component ne se portent pas du tout pareil.
+
+**La route API se porte presque telle quelle.** Le corps de la fonction est identique, seuls son emplacement et sa signature d'export changent :
+
+```typescript
+// Next : app/api/catalogue/route.ts
+export async function GET() {
+  const resultat = verifierCatalogue(SOURCE);
+  if (!resultat.ok) return Response.json({ erreur: resultat.error }, { status: 404 });
+  return Response.json(resultat.data);
+}
+```
+
+Le même corps se pose dans un gestionnaire Express, Hono ou Fastify. Rien à repenser.
+
+**Le Server Component, lui, n'a pas d'équivalent.** Il faut le remplacer, et le remplacement change de nature :
+
+| | Server Component | Effet client, hors Next |
+| :--- | :--- | :--- |
+| Moment de la lecture | pendant le rendu | après le montage |
+| États à exprimer | aucun | trois : chargement, erreur, données |
+| Route intermédiaire | inutile | obligatoire |
+| Annulation | rien à gérer | à gérer au démontage |
+| Premier rendu | avec les données | sans les données |
+| Coût mesuré | 27 lignes | 41 lignes |
+
+Les vingt-sept et quarante et une lignes ne sont pas une estimation : ce sont les deux versions du même écran, écrites et compilées pour rédiger cette section.
+
+```tsx
+// Next : app/catalogue.tsx · la lecture se fait pendant le rendu
+export default async function Page() {
+  const resultat = verifierCatalogue(SOURCE);
+  if (!resultat.ok) return <p>Catalogue indisponible</p>;
+
+  return <CatalogueScreen articles={resultat.data.map(versVue)} />;
+}
+```
+
+```tsx
+// Vite : app/CataloguePage.tsx · la lecture devient un effet, avec ses états
+export function CataloguePage() {
+  const [articles, setArticles] = useState<ArticleView[] | null>(null);
+  const [erreur, setErreur] = useState<string | null>(null);
+
+  useEffect(() => {
+    let annule = false;
+    fetch("/api/catalogue")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("indisponible"))))
+      .then((donnees: Article[]) => {
+        if (!annule) setArticles(donnees.map(versVue));
+      })
+      .catch(() => {
+        if (!annule) setErreur("Catalogue indisponible");
+      });
+    return () => {
+      annule = true;
+    };
+  }, []);
+
+  if (erreur !== null) return <p>{erreur}</p>;
+  if (articles === null) return <p>Chargement…</p>;
+
+  return <CatalogueScreen articles={articles} />;
+}
+```
+
+**`CatalogueScreen` est le même fichier dans les deux projets, à l'octet près.** C'est tout l'objet du standard : l'écran ne sait pas d'où viennent ses données, donc il ne bouge pas quand leur provenance change.
+
+#### Ce que le compromis coûte vraiment
+
+Puisque la route API se porte facilement, la tentation est de tout y faire passer. **Ce serait acheter la portabilité au prix d'un aller-retour réseau permanent.**
+
+Un Server Component lit la donnée là où elle se trouve, pendant le rendu, sans que le navigateur n'ait rien à demander. Le remplacer par un `fetch` vers votre propre serveur ajoute un aller-retour, un temps d'affichage vide, et un état d'erreur à traiter, pour chaque écran converti. Sur une application de contenu, cela se voit.
+
+Le choix se pose donc à l'endroit habituel, et le standard ne le tranche pas à votre place :
+
+- **Vous restez sur Next et l'assumez** : gardez les Server Components, le portage éventuel coûtera cette conversion.
+- **La portabilité prime** : traitez les Server Components comme une optimisation locale, et gardez les routes API comme chemin par défaut. Vous payez le réseau tout de suite plutôt que la conversion plus tard.
+
+Dans les deux cas, la règle reste la même : **le chargement appartient à `app/`, jamais à l'écran.** C'est elle qui garantit que le choix ci-dessus se rejoue à un seul endroit, et non dans chaque feature.
+
+#### Ce qui a été vérifié
+
+Les deux projets de cette section ont été générés par la CLI, complétés du même domaine et du même écran, puis compilés et lintés. Après portage, `core/`, `features/` et `lib/` sont **identiques fichier pour fichier**, et tout ce qui diffère est dans `app/`.
 
 ### Ce que cela implique pour les frontières
 
