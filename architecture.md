@@ -237,9 +237,11 @@ Un hook réellement transverse appartient à `lib/`. Un hook qui sert un seul é
 
 `npx maedow-arch check` signale les fichiers rangés sous `src/` hors de toute couche, ce qui rattrape le cas s'il se produit quand même.
 
-## Ce que `hooks/` reçoit, et pourquoi il n'est pas facultatif
+## Règle de Logique Extraite : ce que `hooks/` reçoit
 
 L'arborescence ci-dessus place un dossier `hooks/` dans chaque feature. Il reçoit **la logique de vue de l'écran** : son état, ses appels, ses dérivations. Le composant qui l'utilise se réduit alors au rendu.
+
+> **Règle de Logique Extraite** : dès qu'un écran porte plus de trois états ou déclenche un appel réseau, sa logique de vue appartient à un hook de la feature, et le composant se réduit au rendu.
 
 Ce n'est pas une préférence de style. C'est ce qui fait entrer la testabilité dans `features/`.
 
@@ -331,7 +333,7 @@ C'est la seule façon de faire remonter la Pyramide de Tests au-dessus de `core/
 
 Aucun code `MA` ne porte cette section, et aucun linter ne la vérifie. Compter les `useState` d'un fichier produirait un seuil facile à contourner et des faux positifs sur les écrans qui ont de bonnes raisons d'être longs.
 
-Elle est du même ordre que MA-008 et MA-009, que [le registre](./rules.md) classe parmi les règles tenues par l'équipe, sans y figurer elle-même : le registre ne recense que les règles normatives portant un code, et celle-ci est une doctrine de conception. Le standard préfère le dire plutôt que de laisser croire qu'un outil la vérifie.
+Elle appartient aux **Règles de conception**, que [le registre](./rules.md) recense à part des neuf codes `MA` : celles-ci demandent un jugement là où un code se constate. Le seuil est indicatif, et un écran à quatre états ne viole rien, il mérite un regard. Le standard préfère le dire plutôt que de laisser croire qu'un outil la vérifie.
 
 ---
 
