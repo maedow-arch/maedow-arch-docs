@@ -395,10 +395,12 @@ La pyramide de Maedow Arch ne se lit pas en pourcentages, elle se lit en **coût
 | `core/` | les règles métier, les transitions d'état, les contrats | ni DOM, ni mock, ni rendu |
 | `lib/` | les fonctions d'aide, sur leurs cas limites | rien non plus |
 | `components/` | le rendu d'une primitive à partir de ses props | un moteur de rendu, sans données métier |
-| `features/` | le parcours d'un écran, avec son domaine réel | un moteur de rendu, et rien de simulé côté domaine |
+| `features/` | la logique de vue dans son hook, puis le parcours de l'écran | pour le hook, aucun écran ; pour le parcours, un moteur de rendu et rien de simulé côté domaine |
 | `app/` | l'assemblage, de bout en bout, sur les chemins critiques seulement | un navigateur, donc le test le plus cher |
 
 La base large de la pyramide n'est pas une consigne de quantité, c'est une conséquence : **si le domaine est pur, ses tests sont si rapides et si simples à écrire qu'ils deviennent naturellement les plus nombreux.** Une pyramide qui ne se remplit pas par le bas signale que la logique a fui vers le haut, dans les écrans ou dans les routes, ce que la règle « zéro modèle dans le JSX » cherche précisément à empêcher.
+
+Reste à savoir où la remettre quand elle a déjà fui. Un écran qui porte plus de trois états, ou qui déclenche un appel réseau, ne se teste pas sans monter un arbre React : sa logique appartient à un hook de la feature, où elle redevient du TypeScript ordinaire. [`architecture.md`](./architecture.md) dit ce que `hooks/` reçoit, et donne la forme. C'est ce qui fait monter la pyramide au-dessus de `core/`, là où elle s'arrêtait.
 
 ### Ce que la pyramide ne dit pas
 

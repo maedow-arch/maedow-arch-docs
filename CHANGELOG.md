@@ -21,6 +21,11 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 - **La bascule de Light vers Full livrait le Result Pattern sans son test.** Un projet généré directement en Full avait les deux fichiers, un projet arrivé en Full par `generate:domain` n'avait que le premier, et rien ne signalait la différence. Le test est désormais injecté par le même chemin que le helper, jamais recopié à la main.
 - **Deux tests ferment la classe de ces écarts plutôt que leurs cas.** Le premier vérifie que tout point d'entrée de framework importe la feuille de style, le second que les deux chemins vers Full livrent les mêmes fichiers. Les défauts précédents divergeaient sur une case d'une matrice dont les autres étaient correctes : les vérifier isolément ne pouvait pas les voir, les comparer entre eux, si. `create-maedow-arch-app` passe en 0.9.0.
 
+## [Non publié]
+
+### Ajouté
+
+- **Le corpus dit enfin ce que `hooks/` reçoit, et pourquoi.** L'arborescence d'une feature le montrait depuis toujours avec un commentaire de trois mots : rien ne disait ce qu'on y met, quand l'employer, ni ce qu'on y gagne. Le projet ABBA a passé dix-neuf lots sans en créer un seul, pendant que ses écrans montaient à 443 lignes portant douze `useState` et leurs appels réseau, **et rien ne l'a signalé** : lint vert, audit vert, neuf règles tenues à chaque lot. Un écran pareil est parfaitement conforme aux règles vérifiables du standard, il n'est simplement pas testable sans monter un arbre React. La section donne ce que le dossier reçoit, un seuil d'extraction pour que chaque équipe n'invente pas le sien, la forme complète avec une union discriminée et l'annulation de l'effet, et dit franchement qu'aucun linter ne la vérifie. La Pyramide de Tests y renvoie à l'endroit où elle constatait déjà que la logique fuit vers le haut sans dire où la remettre.
 ## [0.9.1] : 2026-09-01
 
 ### Corrigé
