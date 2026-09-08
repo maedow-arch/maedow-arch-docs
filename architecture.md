@@ -186,7 +186,7 @@ src/
 │   │   ├── types.ts            # Entités et modèles
 │   │   ├── validation.ts       # Schémas Zod
 │   │   ├── service.ts          # Cas d'usage
-│   │   ├── contract.ts         # Interfaces de repositories/services
+│   │   ├── contract.ts         # Seulement à la 2e implémentation, voir Lazy Abstraction
 │   │   └── repository.ts       # Adapter de persistance
 │   ├── auth/                   # Abstraction d'authentification
 │   └── server/                 # Infra serveur (DB Pool, Env)
@@ -214,6 +214,28 @@ src/
 ```
 
 ---
+
+### Installer une base de composants sans sortir des couches
+
+`components/ui/` est l'endroit prévu pour une base de composants, shadcn ou une autre. Un point de configuration mérite pourtant d'être corrigé avant la première installation.
+
+L'assistant de shadcn écrit un `components.json` qui déclare, par défaut :
+
+```json
+{ "aliases": { "components": "@/components", "hooks": "@/hooks" } }
+```
+
+**`@/hooks` n'est aucune des cinq couches.** Tout composant qui embarque un hook, et il y en a, le dépose alors dans `src/hooks/`, où il échappe à deux garde-fous à la fois : l'audit ne l'examine pas, et `eslint-plugin-boundaries` ne lui applique aucune politique, faute de correspondre à un type déclaré. Un hook posé là peut importer n'importe quoi, y compris remonter le flux, sans que rien ne le signale.
+
+Faites pointer l'alias vers un répertoire couvert avant d'installer quoi que ce soit :
+
+```json
+{ "aliases": { "components": "@/components/ui", "hooks": "@/lib" } }
+```
+
+Un hook réellement transverse appartient à `lib/`. Un hook qui sert un seul écran appartient au `hooks/` de sa feature, et c'est là qu'il faut le déplacer quand la base de composants en dépose un.
+
+`npx maedow-arch check` signale les fichiers rangés sous `src/` hors de toute couche, ce qui rattrape le cas s'il se produit quand même.
 
 ## Ce que `hooks/` reçoit, et pourquoi il n'est pas facultatif
 
@@ -361,6 +383,8 @@ npm run generate:domain order-item
 Sur un projet Light, cette commande crée `core/common/result.ts` avant d'écrire le domaine, puis annonce le changement de profil. Il n'y a rien d'autre à faire, et surtout rien à déplacer.
 
 C'est pour cette raison que `core/` reste vide en Light plutôt que d'être livré avec un Result Pattern inutilisé : une couche présente mais vide invite à y écrire du domaine par anticipation, ce que la Règle de Lazy Abstraction interdit. La couche naît de son premier habitant.
+
+**Cette phrase vise le profil Light, et elle ne dit pas que `result.ts` serait une abstraction anticipée.** En mode Full, le générateur le livre avec la couche, et c'est cohérent : la Règle de Lazy Abstraction porte sur les contrats et les adaptateurs, c'est-à-dire sur l'indirection qu'on ajoute pour une deuxième implémentation qui n'existe pas encore. Le Result Pattern n'est pas une indirection, c'est le type de retour que toute la couche emploie dès sa première fonction. Ce qui naît de son premier habitant, c'est la couche `core/`, pas le vocabulaire qu'elle parle.
 
 Le mouvement inverse n'est pas outillé, et c'est délibéré : retirer une couche domaine peuplée demande de décider où va chacune de ses règles, et cette décision n'appartient pas à un générateur.
 
