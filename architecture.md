@@ -186,7 +186,7 @@ src/
 │   │   ├── types.ts            # Entités et modèles
 │   │   ├── validation.ts       # Schémas Zod
 │   │   ├── service.ts          # Cas d'usage
-│   │   ├── contract.ts         # Interfaces de repositories/services
+│   │   ├── contract.ts         # Seulement à la 2e implémentation, voir Lazy Abstraction
 │   │   └── repository.ts       # Adapter de persistance
 │   ├── auth/                   # Abstraction d'authentification
 │   └── server/                 # Infra serveur (DB Pool, Env)
@@ -212,6 +212,126 @@ src/
     ├── integration/            # Tests adaptateurs & DB
     └── e2e/                    # Tests bout en bout (Playwright)
 ```
+
+---
+
+### Installer une base de composants sans sortir des couches
+
+`components/ui/` est l'endroit prévu pour une base de composants, shadcn ou une autre. Un point de configuration mérite pourtant d'être corrigé avant la première installation.
+
+L'assistant de shadcn écrit un `components.json` qui déclare, par défaut :
+
+```json
+{ "aliases": { "components": "@/components", "hooks": "@/hooks" } }
+```
+
+**`@/hooks` n'est aucune des cinq couches.** Tout composant qui embarque un hook, et il y en a, le dépose alors dans `src/hooks/`, où il échappe à deux garde-fous à la fois : l'audit ne l'examine pas, et `eslint-plugin-boundaries` ne lui applique aucune politique, faute de correspondre à un type déclaré. Un hook posé là peut importer n'importe quoi, y compris remonter le flux, sans que rien ne le signale.
+
+Faites pointer l'alias vers un répertoire couvert avant d'installer quoi que ce soit :
+
+```json
+{ "aliases": { "components": "@/components/ui", "hooks": "@/lib" } }
+```
+
+Un hook réellement transverse appartient à `lib/`. Un hook qui sert un seul écran appartient au `hooks/` de sa feature, et c'est là qu'il faut le déplacer quand la base de composants en dépose un.
+
+`npx maedow-arch check` signale les fichiers rangés sous `src/` hors de toute couche, ce qui rattrape le cas s'il se produit quand même.
+
+## Ce que `hooks/` reçoit, et pourquoi il n'est pas facultatif
+
+L'arborescence ci-dessus place un dossier `hooks/` dans chaque feature. Il reçoit **la logique de vue de l'écran** : son état, ses appels, ses dérivations. Le composant qui l'utilise se réduit alors au rendu.
+
+Ce n'est pas une préférence de style. C'est ce qui fait entrer la testabilité dans `features/`.
+
+### Le problème que cela résout
+
+Le standard met la testabilité au premier rang de ses arguments, et la Pyramide de Tests promet des tests de domaine rapides parce que `core/` ne dépend d'aucun DOM. C'est vrai, et c'est insuffisant : **rien n'est dit de ce qui se passe dans les écrans**, où la logique s'accumule sans qu'aucune règle ne s'y oppose.
+
+Un écran de quatre cents lignes portant douze `useState` et ses appels réseau respecte les neuf règles du registre. Le flux ne remonte pas, aucune feature n'en importe une autre, `core/` reste pur : le lint est vert, l'audit est vert. Il n'est simplement pas testable sans monter un arbre React, alors qu'une logique extraite dans un hook `.ts` l'est.
+
+Autrement dit, sans cette section, la testabilité s'arrête à la frontière de `features/` et le corpus ne dit pas comment l'y faire entrer.
+
+### Quand extraire
+
+Extrayez dans un hook dès que l'écran remplit **l'une** de ces deux conditions :
+
+- il porte **plus de trois états**, ou
+- il déclenche **un appel réseau**.
+
+Le seuil est indicatif et il est là pour éviter que chaque équipe invente le sien. En dessous, un `useState` dans le composant ne coûte rien et l'extraire ajouterait un fichier sans rien rendre plus clair : la Règle de Lazy Abstraction s'applique ici comme ailleurs.
+
+### La forme
+
+```ts
+// features/panier/hooks/usePanier.ts
+import { useEffect, useState } from "react";
+import type { LigneVM } from "../types";
+import { chargerPanier } from "@/core/panier/service";
+
+type EtatPanier =
+  | { statut: "chargement" }
+  | { statut: "erreur"; message: string }
+  | { statut: "pret"; lignes: readonly LigneVM[]; total: number };
+
+export function usePanier(clientId: string): EtatPanier {
+  const [etat, setEtat] = useState<EtatPanier>({ statut: "chargement" });
+
+  useEffect(() => {
+    let vivant = true;
+
+    void chargerPanier(clientId).then((resultat) => {
+      if (!vivant) return;
+      setEtat(
+        resultat.ok
+          ? { statut: "pret", lignes: resultat.value.lignes, total: resultat.value.total }
+          : { statut: "erreur", message: resultat.error.message }
+      );
+    });
+
+    return () => {
+      vivant = false;
+    };
+  }, [clientId]);
+
+  return etat;
+}
+```
+
+L'écran n'a plus qu'à distinguer les trois cas :
+
+```tsx
+// features/panier/Screen.tsx
+import { usePanier } from "./hooks/usePanier";
+
+export function PanierScreen({ clientId }: { clientId: string }) {
+  const etat = usePanier(clientId);
+
+  if (etat.statut === "chargement") return <p>Chargement…</p>;
+  if (etat.statut === "erreur") return <p role="alert">{etat.message}</p>;
+
+  return (
+    <ul>
+      {etat.lignes.map((ligne) => (
+        <li key={ligne.id}>{ligne.libelle}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Trois choses valent d'être remarquées. L'état est **une union discriminée** plutôt que trois booléens indépendants, ce qui rend impossible l'état « en chargement et en erreur ». Le hook rend un état, jamais des setters : l'écran ne peut pas contourner la logique. Et l'effet annule proprement sa mise à jour si le composant disparaît avant la réponse, ce qui est exactement le genre de détail qu'on écrit une fois dans un hook plutôt que douze fois dans des écrans.
+
+### Ce que cela change pour les tests
+
+`usePanier` se teste avec un moteur de rendu de hooks, sans écran. Ce que le composant garde, le choix entre trois branches, se vérifie d'un coup d'œil.
+
+C'est la seule façon de faire remonter la Pyramide de Tests au-dessus de `core/`. Un projet qui applique cette section voit son nombre de tests croître sans que son domaine change, et ce n'est pas de la couverture pour la métrique : c'est de la logique qui était intestable et qui ne l'est plus.
+
+### Une règle tenue par l'équipe
+
+Aucun code `MA` ne porte cette section, et aucun linter ne la vérifie. Compter les `useState` d'un fichier produirait un seuil facile à contourner et des faux positifs sur les écrans qui ont de bonnes raisons d'être longs.
+
+Elle est du même ordre que MA-008 et MA-009, que [le registre](./rules.md) classe parmi les règles tenues par l'équipe, sans y figurer elle-même : le registre ne recense que les règles normatives portant un code, et celle-ci est une doctrine de conception. Le standard préfère le dire plutôt que de laisser croire qu'un outil la vérifie.
 
 ---
 
@@ -263,6 +383,8 @@ npm run generate:domain order-item
 Sur un projet Light, cette commande crée `core/common/result.ts` avant d'écrire le domaine, puis annonce le changement de profil. Il n'y a rien d'autre à faire, et surtout rien à déplacer.
 
 C'est pour cette raison que `core/` reste vide en Light plutôt que d'être livré avec un Result Pattern inutilisé : une couche présente mais vide invite à y écrire du domaine par anticipation, ce que la Règle de Lazy Abstraction interdit. La couche naît de son premier habitant.
+
+**Cette phrase vise le profil Light, et elle ne dit pas que `result.ts` serait une abstraction anticipée.** En mode Full, le générateur le livre avec la couche, et c'est cohérent : la Règle de Lazy Abstraction porte sur les contrats et les adaptateurs, c'est-à-dire sur l'indirection qu'on ajoute pour une deuxième implémentation qui n'existe pas encore. Le Result Pattern n'est pas une indirection, c'est le type de retour que toute la couche emploie dès sa première fonction. Ce qui naît de son premier habitant, c'est la couche `core/`, pas le vocabulaire qu'elle parle.
 
 Le mouvement inverse n'est pas outillé, et c'est délibéré : retirer une couche domaine peuplée demande de décider où va chacune de ses règles, et cette décision n'appartient pas à un générateur.
 
