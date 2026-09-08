@@ -345,3 +345,19 @@ Sans lui, le lot serait passé au vert. Les trois autres cas de MA-001 continuai
 **La leçon.** Un test écrit pour une friction en attrape une autre, deux lots plus tard, sur un chemin que personne n'avait relié au premier. C'est l'argument le plus concret pour écrire le test au moment où l'on comprend le défaut, plutôt que de se contenter du correctif : le correctif règle un cas, le test surveille une classe.
 
 Et une note sur la dette héritée : ce lot ne monte aucune version d'ESLint, il lève seulement le plafond. `eslint-plugin-import` avait cessé de suivre son écosystème, et le standard qui déléguait une garantie à ce plugin héritait de son immobilité. Le corpus dit désormais quel plugin porte quelle règle, pour que ce risque se suive au lieu de se découvrir un jour d'ERESOLVE.
+
+## F-021 : le standard hérite du calendrier de ses plugins, une seconde fois
+
+**Le contexte.** [F-020](#f-020--deux-plugins-deux-réglages-de-résolveur-et-une-règle-qui-séteint) venait de lever un plafond : `eslint-plugin-import` bloquait les projets sur ESLint 9. En montant les majeures dépassées du scaffold, la même forme est réapparue ailleurs.
+
+**Ce qui s'est passé.** TypeScript 7 est publié, et le scaffold épinglait encore la 5. La montée paraissait libre. Elle ne l'est pas : `typescript-eslint` déclare `typescript: >=4.8.4 <6.1.0`. Passer en 7 casse le lint de tout projet généré, c'est-à-dire les sept règles vérifiées par la machine.
+
+Le contrôle a été fait avant d'écrire la version, et non après un échec de la matrice. C'est la seule différence avec la fois précédente, où `vitest@4` avait fait tomber seize jobs.
+
+**Ce qu'on en a fait.** Quatre majeures sur cinq sont montées : ESLint 10, Next 16, `@types/node` 26 et `vitest` 5. TypeScript reste en 5, et le corpus dit pourquoi plutôt que de laisser croire à un oubli.
+
+**Ce que cela dit du standard.** Un standard qui délègue ses garanties à des plugins hérite de leur calendrier, et ce n'est pas un accident : c'est le prix de la vérification par la machine, que Maedow Arch revendique. Deux plafonds en deux lots, portés par deux paquets différents, sur deux dimensions différentes de la même chaîne.
+
+La conséquence pratique est qu'une montée de majeure ne se décide pas en lisant le registre npm. Elle se décide en lisant les `peerDependencies` de ce qui vérifie les règles, et ce contrôle vaut d'être fait à chaque fois.
+
+**Au passage, le piège que le projet ABBA avait documenté.** Leur entrée N-002 décrivait un premier build Next 16 qui réécrit `tsconfig.json` en cours d'exécution puis échoue, le second passant. Le remède est de livrer d'avance les valeurs que Next impose : `jsx` en `react-jsx`, et l'entrée `.next/dev/types` dans `include`. Vérifié par empreinte sur un projet neuf, le fichier n'est plus touché et aucun message de reconfiguration n'apparaît.
