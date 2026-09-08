@@ -114,6 +114,33 @@ Fixtures : `strict-invalid/src/core/billing/aller.ts` et `retour.ts`, qui formen
 
 ---
 
+## Les Règles de conception, distinctes des neuf codes
+
+Le corpus porte une seconde famille d'exigences, qui n'a pas de code et n'en aura pas. Elle n'était recensée nulle part : les cinq règles ci-dessous vivaient dispersées dans trois documents, sans que rien ne dise ce qui les sépare du registre.
+
+| Règle | Ce qu'elle demande | Où elle est énoncée |
+| :--- | :--- | :--- |
+| **Règle d'Or Maedow Arch** | Une erreur attendue est une donnée typée, pas une exception | [`conventions.md`](./conventions.md) |
+| **Zéro Modèle dans le JSX** | Les types métier ne traversent pas la couche de rendu | [`models.md`](./models.md) |
+| **Règle du Pragmatisme Typé** | Ne pas dupliquer un modèle qui n'a pas divergé | [`models.md`](./models.md) |
+| **Règle de Lazy Abstraction** | Pas de contrat ni d'adaptateur avant la deuxième implémentation réelle | [`architecture.md`](./architecture.md) |
+| **Règle de Dégradation de `features/_shared/`** | Un composant partagé par une seule feature en redescend | [`architecture.md`](./architecture.md) |
+| **Règle de Logique Extraite** | Plus de trois états ou un appel réseau : la logique de vue passe dans un hook | [`architecture.md`](./architecture.md) |
+
+### Ce qui les sépare d'un code `MA`
+
+**Un code se constate, une Règle de conception s'apprécie.** Un fichier `.tsx` est dans `core/` ou il n'y est pas : MA-004 se tranche sans discussion, et c'est ce qui permet à une machine ou à une revue de rendre un verdict. « La logique de vue est-elle extraite ? » n'a pas de réponse binaire, et le seuil de trois états est **indicatif** : un écran à quatre états ne viole rien, il mérite un regard.
+
+C'est aussi pourquoi elles ne figurent pas dans la clause de conformité. Se dire conforme, c'est affirmer que MA-008 et MA-009 sont tenues, deux questions auxquelles une revue répond par oui ou par non. Une clause qui reposerait sur une appréciation cesserait d'être une clause.
+
+**Elles ne sont pas pour autant facultatives.** Une Règle de conception ignorée ne fait échouer aucun contrôle, et c'est précisément son danger : un projet réel a passé dix-neuf lots sans appliquer la Règle de Logique Extraite, avec des écrans montés à 443 lignes, pendant que le lint, l'audit et les neuf règles restaient au vert. Ce que le standard vérifie mécaniquement ne dit rien de ce qu'il demande par ailleurs.
+
+### Pourquoi ne pas leur donner un code quand même
+
+Un registre dont les entrées mêlent le constatable et l'appréciable perd ce qui fait sa valeur : le rapport de sept règles vérifiées sur neuf, et la raison donnée pour chacune des deux autres. Diluer ce compte avec des exigences qu'aucun outil ne pourra jamais trancher rendrait le registre moins crédible, pas plus complet.
+
+Le flou entre les deux catégories est ce que ce document existe pour supprimer. Les nommer et les recenser ici, sans les numéroter, est la façon de les rendre citables en revue sans effacer cette frontière.
+
 ## Se dire conforme à Maedow Arch
 
 Un projet est **conforme à Maedow Arch 1.0** lorsque les quatre conditions suivantes sont réunies.
