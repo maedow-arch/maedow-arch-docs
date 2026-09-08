@@ -42,7 +42,7 @@ npm run generate:feature checkout
 Pour enforcer les frontières architecturales via ESLint :
 
 ```bash
-npm install --save-dev eslint-config-maedow-arch eslint-plugin-boundaries eslint-import-resolver-typescript
+npm install --save-dev eslint-config-maedow-arch eslint-plugin-boundaries eslint-plugin-import-x eslint-import-resolver-typescript
 ```
 
 ```js

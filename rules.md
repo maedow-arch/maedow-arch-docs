@@ -30,7 +30,7 @@ Les codes ne sont jamais réattribués. Une règle retirée laisse son code vaca
 | **MA-004** | Zéro fichier `.tsx` et zéro JSX dans `core/` | vérifiée | `no-restricted-syntax`, `no-restricted-imports` |
 | **MA-005** | `any` interdit, `unknown` et gardes de type à la place | vérifiée | `@typescript-eslint/no-explicit-any` · entrée `strict` |
 | **MA-006** | Double assertion `as unknown as` interdite | vérifiée | `no-restricted-syntax` · entrée `strict` |
-| **MA-007** | Aucun cycle d'import entre modules | vérifiée | `import/no-cycle` · entrée `strict` |
+| **MA-007** | Aucun cycle d'import entre modules | vérifiée | `import-x/no-cycle` · entrée `strict` |
 | **MA-008** | Les modules à secrets sont marqués `server-only` | tenue par l'équipe | revue |
 | **MA-009** | Les adaptateurs, dépôts et contrats suivent leur nommage | tenue par l'équipe | revue |
 

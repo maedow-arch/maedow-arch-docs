@@ -55,7 +55,21 @@ function configFor(cwd, { strict = false } = {}) {
     { files: ["**/*.{ts,tsx}"], languageOptions: { parser: tseslint.parser } },
     ...maedowArchConfig,
     ...(strict ? maedowArchStrict : []),
-    { settings: { "import/resolver": { typescript: { project: join(cwd, "tsconfig.json") } } } },
+    /*
+     * Les deux réglages, et ce n'est pas une redondance.
+     *
+     * `eslint-plugin-boundaries` résout ses chemins via `import/resolver`, et
+     * `eslint-plugin-import-x` via `import-x/resolver`. N'en déclarer qu'un
+     * suffit à éteindre l'autre en silence : en ne gardant que le second,
+     * MA-001 cessait d'être détectée sur l'import par alias, sans qu'aucune
+     * erreur ne le signale. Le test de composition l'a attrapé.
+     */
+    {
+      settings: {
+        "import/resolver": { typescript: { project: join(cwd, "tsconfig.json") } },
+        "import-x/resolver": { typescript: { project: join(cwd, "tsconfig.json") } },
+      },
+    },
   ];
 }
 
@@ -181,7 +195,7 @@ for (const expected of EXPECTED_VIOLATIONS) {
 const EXPECTED_STRICT = [
   { file: "core/billing/types.ts", regle: "@typescript-eslint/no-explicit-any", code: "MA-005" },
   { file: "core/billing/cast.ts", regle: "no-restricted-syntax", code: "MA-006" },
-  { file: "core/billing/aller.ts", regle: "import/no-cycle", code: "MA-007" },
+  { file: "core/billing/aller.ts", regle: "import-x/no-cycle", code: "MA-007" },
 ];
 
 console.log("");

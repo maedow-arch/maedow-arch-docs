@@ -323,3 +323,41 @@ F-017 décrivait un audit qui parle de ce qu'il n'a pas regardé. Celui-ci en es
 **La leçon.** Un commentaire qui affirme une propriété ne la crée pas. Celui-ci disait « on écarte les génériques TypeScript » et il a survécu à la relecture précisément parce qu'il rassurait. La fixture qui l'aurait démenti n'existait pas : les fixtures couvraient ce que la règle doit trouver, jamais ce qu'elle ne doit pas trouver.
 
 C'est aussi pourquoi le même lot ajoute un renseignement plutôt qu'une règle. `shadcn init` dépose ses hooks dans `src/hooks/`, qui n'est aucune des cinq couches : ces fichiers échappent à l'audit et aux frontières à la fois, et rien ne l'annonçait. Le rapport le dit désormais, sans le compter comme une violation, parce qu'aucune règle du registre ne le prévoit et qu'un outil n'invente pas de règle.
+
+## F-020 : deux plugins, deux réglages de résolveur, et une règle qui s'éteint
+
+**Le contexte.** L'entrée stricte porte MA-007 par `eslint-plugin-import`, plafonné à ESLint 9 et sans aucune préversion pour la 10 sur 132 versions publiées. Tout projet appliquant `strict` était donc bloqué sur une version qu'ESLint lui-même classe en maintenance. Le remplacement par `eslint-plugin-import-x`, son fork maintenu, tenait en un nom de paquet et un préfixe de règle.
+
+**Ce qui s'est passé.** Presque. En renommant `import/resolver` en `import-x/resolver` dans le banc de test, MA-001 a cessé d'être détectée sur l'import par alias. Aucune erreur, aucun avertissement : `eslint-plugin-boundaries` lit son résolveur sous `import/resolver`, `eslint-plugin-import-x` sous `import-x/resolver`, et les deux préfixes ne se replient pas l'un sur l'autre.
+
+Le renommage paraissait mécanique, il ne l'était pas : deux plugins distincts partageaient un réglage dont le nom appartenait historiquement au premier.
+
+**Ce qui l'a attrapé.** Le test de composition ajouté trois lots plus tôt, en réponse à [F-018](#f-018--une-règle-qui-séteint-quand-on-compose-les-entrées). Il éprouve la fixture invalide sous l'entrée par défaut **et** sous la composition prescrite, et c'est la seconde qui a signalé la disparition :
+
+```text
+✗ MA-001 disparaît dans core/pricing/viaAlias.ts quand l'entrée stricte est chargée.
+```
+
+Sans lui, le lot serait passé au vert. Les trois autres cas de MA-001 continuaient de remonter, seul l'import par alias tombait, et c'est précisément la fixture ajoutée un jour parce que rien ne garantissait que les contournements de chemin relatif soient interceptés.
+
+**Ce qu'on en a fait.** Le banc déclare les deux réglages, avec le commentaire qui dit pourquoi. La configuration publiée les déclarait déjà chacun de son côté, l'entrée par défaut pour `boundaries` et l'entrée stricte pour `import-x` : aucun projet installé n'était exposé, mais rien ne l'avait vérifié.
+
+**La leçon.** Un test écrit pour une friction en attrape une autre, deux lots plus tard, sur un chemin que personne n'avait relié au premier. C'est l'argument le plus concret pour écrire le test au moment où l'on comprend le défaut, plutôt que de se contenter du correctif : le correctif règle un cas, le test surveille une classe.
+
+Et une note sur la dette héritée : ce lot ne monte aucune version d'ESLint, il lève seulement le plafond. `eslint-plugin-import` avait cessé de suivre son écosystème, et le standard qui déléguait une garantie à ce plugin héritait de son immobilité. Le corpus dit désormais quel plugin porte quelle règle, pour que ce risque se suive au lieu de se découvrir un jour d'ERESOLVE.
+
+## F-021 : le standard hérite du calendrier de ses plugins, une seconde fois
+
+**Le contexte.** [F-020](#f-020--deux-plugins-deux-réglages-de-résolveur-et-une-règle-qui-séteint) venait de lever un plafond : `eslint-plugin-import` bloquait les projets sur ESLint 9. En montant les majeures dépassées du scaffold, la même forme est réapparue ailleurs.
+
+**Ce qui s'est passé.** TypeScript 7 est publié, et le scaffold épinglait encore la 5. La montée paraissait libre. Elle ne l'est pas : `typescript-eslint` déclare `typescript: >=4.8.4 <6.1.0`. Passer en 7 casse le lint de tout projet généré, c'est-à-dire les sept règles vérifiées par la machine.
+
+Le contrôle a été fait avant d'écrire la version, et non après un échec de la matrice. C'est la seule différence avec la fois précédente, où `vitest@4` avait fait tomber seize jobs.
+
+**Ce qu'on en a fait.** Quatre majeures sur cinq sont montées : ESLint 10, Next 16, `@types/node` 26 et `vitest` 5. TypeScript reste en 5, et le corpus dit pourquoi plutôt que de laisser croire à un oubli.
+
+**Ce que cela dit du standard.** Un standard qui délègue ses garanties à des plugins hérite de leur calendrier, et ce n'est pas un accident : c'est le prix de la vérification par la machine, que Maedow Arch revendique. Deux plafonds en deux lots, portés par deux paquets différents, sur deux dimensions différentes de la même chaîne.
+
+La conséquence pratique est qu'une montée de majeure ne se décide pas en lisant le registre npm. Elle se décide en lisant les `peerDependencies` de ce qui vérifie les règles, et ce contrôle vaut d'être fait à chaque fois.
+
+**Au passage, le piège que le projet ABBA avait documenté.** Leur entrée N-002 décrivait un premier build Next 16 qui réécrit `tsconfig.json` en cours d'exécution puis échoue, le second passant. Le remède est de livrer d'avance les valeurs que Next impose : `jsx` en `react-jsx`, et l'entrée `.next/dev/types` dans `include`. Vérifié par empreinte sur un projet neuf, le fichier n'est plus touché et aucun message de reconfiguration n'apparaît.

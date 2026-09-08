@@ -1,5 +1,5 @@
 import tseslint from "typescript-eslint";
-import importPlugin from "eslint-plugin-import";
+import importPlugin from "eslint-plugin-import-x";
 
 /**
  * Entrée stricte de Maedow Arch : les règles de discipline de typage.
@@ -40,7 +40,7 @@ import importPlugin from "eslint-plugin-import";
  *
  * ## Ce qu'il faut avoir installé
  *
- * `typescript-eslint` et `eslint-plugin-import` sont des dépendances de pair :
+ * `typescript-eslint` et `eslint-plugin-import-x` sont des dépendances de pair :
  * elles doivent être résolues depuis votre projet, jamais depuis le
  * node_modules de cette configuration. C'est la friction F-011, où un plugin
  * introuvable faisait échouer huit combinaisons de la matrice sur douze.
@@ -78,10 +78,10 @@ export default [
 
   {
     files: ["**/*.{js,jsx,ts,tsx,mjs,cjs}"],
-    plugins: { import: importPlugin },
+    plugins: { "import-x": importPlugin },
     settings: {
       /*
-       * `import/parsers` n'est pas facultatif ici, et son absence ne se voit
+       * `import-x/parsers` n'est pas facultatif ici, et son absence ne se voit
        * pas : pour suivre une chaîne d'imports, la règle ouvre elle-même les
        * fichiers importés et doit savoir les analyser. Sans cette ligne elle
        * n'y comprend rien, ne trouve aucun cycle, et rend un lint vert.
@@ -91,10 +91,10 @@ export default [
        * qu'aucune erreur ne le signale. C'est le défaut que ce dépôt documente
        * sous F-001, une configuration qui passe au vert sans rien vérifier.
        */
-      "import/parsers": {
+      "import-x/parsers": {
         "@typescript-eslint/parser": [".ts", ".tsx", ".mts", ".cts"],
       },
-      "import/resolver": {
+      "import-x/resolver": {
         typescript: { alwaysTryTypes: true },
         node: { extensions: [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"] },
       },
@@ -103,7 +103,7 @@ export default [
       // MA-007. `maxDepth: Infinity` est indispensable : un cycle passant par
       // trois modules est aussi bloquant qu'un cycle direct, et c'est même le
       // plus fréquent puisqu'il se voit moins.
-      "import/no-cycle": ["error", { maxDepth: Infinity }],
+      "import-x/no-cycle": ["error", { maxDepth: Infinity }],
     },
   },
 
