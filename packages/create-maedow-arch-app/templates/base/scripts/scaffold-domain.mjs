@@ -46,6 +46,7 @@ if (bascule) {
   console.log("🔀 Ce projet passe du profil Light au profil Full.");
   console.log("   La couche domaine vient d'être créée avec son Result Pattern :");
   console.log("   - src/core/common/result.ts");
+  console.log("   - src/core/common/result.test.ts");
   console.log("   Le corpus décrit ce passage à la section Mode Light ou Full.");
   console.log("");
 }

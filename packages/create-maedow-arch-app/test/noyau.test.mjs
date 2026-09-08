@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -172,5 +172,65 @@ test("la source injectée existe, et porte les helpers documentés", () => {
         source.includes(`export async function ${helper}`),
       `${helper} manque au Result livré`
     );
+  }
+});
+
+/* ------------------------------------------------------------------ *
+ * Les écarts de matrice, la classe entière plutôt qu'un cas
+ * ------------------------------------------------------------------ */
+
+/*
+ * Deux défauts remontés par le projet ABBA, R-005 et R-010, avaient la même
+ * forme : plusieurs chemins mènent à un projet, et ils divergent sur un
+ * fichier que personne ne pense à vérifier. Trois cases sur quatre étaient
+ * correctes, et la quatrième livrait Tailwind sans jamais l'appliquer.
+ *
+ * Vérifier chaque chemin isolément ne les aurait pas attrapés. Les comparer
+ * entre eux, si : c'est ce que font les deux tests ci-dessous.
+ */
+
+test("tout point d'entrée de framework importe la feuille de style", () => {
+  const entrees = [
+    ["framework-next", join("src", "app", "layout.tsx")],
+    ["framework-vite", join("src", "app", "main.tsx")],
+    ["demo-app-next", join("src", "app", "layout.tsx")],
+  ];
+
+  for (const [couche, fichier] of entrees) {
+    const chemin = join(templatesDir, couche, fichier);
+    if (!existsSync(chemin)) continue;
+    const source = readFileSync(chemin, "utf-8");
+    assert.ok(
+      source.includes("globals.css"),
+      `${couche} n'importe pas globals.css : Tailwind serait installé, configuré, ` +
+        `et sans effet, sans que lint, typecheck, build ni audit ne le signalent`
+    );
+  }
+});
+
+test("les deux chemins vers Full livrent les mêmes fichiers de domaine", () => {
+  const commun = join(templatesDir, "mode-full", "src", "core", "common");
+  const attendus = ["result.ts", "result.test.ts"];
+
+  for (const fichier of attendus) {
+    assert.ok(existsSync(join(commun, fichier)), `${fichier} manque au template mode-full`);
+  }
+
+  // La bascule vit dans le projet généré et ne peut pas lire le paquet qui l'a
+  // produit : elle reçoit chaque fichier par un jeton substitué au scaffolding.
+  // Un fichier sans jeton est un fichier que ce chemin ne livrera jamais.
+  const script = readFileSync(join(templatesDir, "base", "scripts", "bascule-full.mjs"), "utf-8");
+  const jetons = {
+    "result.ts": "__RESULT_TS__",
+    "result.test.ts": "__RESULT_TEST_TS__",
+  };
+
+  for (const fichier of attendus) {
+    assert.ok(
+      script.includes(jetons[fichier]),
+      `la bascule ne livre pas ${fichier} : un projet arrivé en Full par ce chemin ` +
+        `n'aurait pas ce qu'un projet généré directement en Full obtient`
+    );
+    assert.ok(script.includes(fichier), `la bascule n'écrit pas ${fichier} sur le disque`);
   }
 });

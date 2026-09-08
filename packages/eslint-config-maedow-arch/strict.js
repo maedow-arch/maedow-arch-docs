@@ -106,4 +106,49 @@ export default [
       "import/no-cycle": ["error", { maxDepth: Infinity }],
     },
   },
+
+  /*
+   * Le rattrapage de MA-004 sous core, et il n'est pas facultatif.
+   *
+   * En configuration plate, deux objets qui ciblent le même fichier et
+   * déclarent la même règle ne fusionnent pas leurs options : la dernière
+   * déclaration remplace la précédente en entier. Le bloc de typage ci-dessus
+   * vise tous les fichiers TypeScript et redéclare `no-restricted-syntax` ;
+   * pour un fichier `.tsx` de core, il arrivait donc après l'entrée par défaut
+   * et effaçait ses sélecteurs JSX.
+   *
+   * Autrement dit, la composition que le corpus prescrit, l'entrée par défaut
+   * puis l'entrée stricte, éteignait la moitié de MA-004. `no-restricted-imports`
+   * restait actif, mais l'entrée par défaut explique elle-même pourquoi il ne
+   * suffit pas : le runtime JSX automatique n'exige aucun import de React.
+   *
+   * Ce bloc arrive en dernier et redéclare les trois sélecteurs ensemble, la
+   * seule composition qui préserve les deux intentions. Remonté par le projet
+   * ABBA, entrée R-001 de son relevé de terrain, et reproduit ici avant
+   * correction : sans ce bloc, la fixture `invalid` du Widget de core passait
+   * au vert sous la composition prescrite.
+   */
+  {
+    files: ["**/core/**/*.{js,jsx,ts,tsx,mjs,cjs}"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "JSXElement",
+          message:
+            "MA-004 : core/ est le domaine pur, il ne contient pas de JSX. Un écran appartient à features/, une primitive à components/. Voir rules.md.",
+        },
+        {
+          selector: "JSXFragment",
+          message:
+            "MA-004 : core/ est le domaine pur, il ne contient pas de JSX. Un écran appartient à features/, une primitive à components/. Voir rules.md.",
+        },
+        {
+          selector: 'TSAsExpression > TSAsExpression[typeAnnotation.type="TSUnknownKeyword"]',
+          message:
+            "MA-006 : la double assertion force un type au lieu de le valider. Validez à la frontière, avec une garde de type ou un schéma. Voir rules.md.",
+        },
+      ],
+    },
+  },
 ];

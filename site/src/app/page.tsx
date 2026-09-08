@@ -117,9 +117,18 @@ export default function HomePage() {
                 n'adopte une architecture en repartant de zéro. Le README et
                 la documentation proposaient déjà les deux, la page d'accueil
                 ne montrait que la commande de création. */}
+              {/* `grid-cols-1` n'est pas décoratif. Sans lui, la colonne
+                implicite se dimensionne sur le contenu le plus large, et la
+                commande de création, qui ne se coupe pas, l'étirait à 438
+                pixels dans une fenêtre de 390. La colonne débordait alors du
+                cadre, où `overflow-hidden` la rognait en silence : sur un
+                téléphone, les deux blocs perdaient leur bouton copier et les
+                phrases leur fin. La piste déclarée vaut `minmax(0, 1fr)`, donc
+                elle ne dépasse jamais la place disponible, et la commande
+                retrouve le défilement horizontal prévu pour elle. */}
               <div
                 data-hero="commande"
-                className="mx-auto mb-8 grid max-w-3xl gap-5 text-left sm:grid-cols-2"
+                className="mx-auto mb-8 grid max-w-3xl grid-cols-1 gap-5 text-left sm:grid-cols-2"
               >
                 <div>
                   <p className="mb-2 text-sm font-semibold text-fd-foreground">
