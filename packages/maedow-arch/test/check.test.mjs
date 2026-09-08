@@ -65,7 +65,7 @@ test("chaque violation désigne le bon fichier", () => {
 
 test("un fichier hors des couches est dénombré, jamais compté comme violation", () => {
   /*
-   * La fixture porte `public/analytics.js` et `scripts/build.mjs`. Tous deux
+   * La fixture porte `public/analytics.js`, `scripts/build.mjs` et un hook
    * ont un import qui remonte le flux et un `any`.
    *
    * Le second est celui qui fuyait. Les règles de frontière étaient déjà
@@ -78,7 +78,7 @@ test("un fichier hors des couches est dénombré, jamais compté comme violation
 
   assert.deepEqual(
     resultat.horsCouche.sort(),
-    ["public/analytics.js", "scripts/build.mjs"],
+    ["public/analytics.js", "scripts/build.mjs", "src/hooks/use-mobile.ts"],
     "les deux fichiers doivent être vus, et rangés hors périmètre"
   );
 
@@ -199,7 +199,8 @@ test("la sortie JSON porte l'ordre de migration et le détail par code", () => {
   assert.equal(json.ordreDeMigration[0], "TS-STRICT", "le typage vient en premier");
   assert.ok(json.ordreDeMigration.indexOf("MA-001") < json.ordreDeMigration.indexOf("MA-002"));
   assert.ok(json.parCode["MA-002"].fichiers.length > 0);
-  assert.equal(json.fichiersHorsCouches, 2, "le hors-périmètre se lit aussi en JSON");
+  assert.equal(json.fichiersHorsCouches, 3, "le hors-périmètre se lit aussi en JSON");
+  assert.deepEqual(json.fichiersHorsCouchesDansSrc, ["src/hooks/use-mobile.ts"]);
 });
 
 /* ------------------------------------------------------------------ *
@@ -264,4 +265,55 @@ test("un projet qui a des features ne s'entend pas dire qu'il n'en a pas", () =>
 
   assert.ok(!texte.includes("n'a pas de features"), texte.slice(-400));
   assert.match(texte, /MA-002/, "et pourtant les frontières ont bien trouvé quelque chose");
+});
+
+test("un générique TypeScript n'est pas du JSX", () => {
+  /*
+   * La détection ne regarde plus que les `.tsx` et `.jsx`. Le registre porte
+   * la justification à MA-004 : un `.ts` ne peut pas contenir de JSX, le parser
+   * le refuserait avant nous. Aucune détection n'est perdue.
+   *
+   * Ce qui est gagné, c'est une classe entière de faux positifs. La fixture
+   * `core/facturation/contrat.ts` porte les trois formes qui trompaient
+   * l'expression régulière, et la couche visée est justement celle où elles
+   * vivent. Retirer la restriction fait remonter MA-004 de un à deux.
+   */
+  const { violations } = auditer(nonConforme);
+  const fichiers = violations["MA-004"].map((v) => v.fichier);
+
+  assert.deepEqual(fichiers, ["src/core/facturation/Vue.tsx"]);
+  assert.ok(
+    !fichiers.includes("src/core/facturation/contrat.ts"),
+    "un dépôt qui rend Promise<T> n'est pas un composant : c'est la signature " +
+      "que le corpus donne lui-même en exemple"
+  );
+});
+
+test("du code rangé sous src/ hors des couches est signalé, sans être compté", () => {
+  /*
+   * `shadcn init` déclare `"hooks": "@/hooks"`, et tout composant embarquant
+   * un hook le dépose dans `src/hooks/`. Ce dossier n'est aucune des cinq
+   * couches : le fichier échappe à l'audit et aux frontières à la fois, donc
+   * rien n'empêche son import de remonter le flux.
+   *
+   * Le rapport le dit désormais. Ce n'est pas une violation, aucune règle du
+   * registre ne le prévoit, et l'audit n'en invente pas : c'est un
+   * renseignement, et il revient au lecteur de décider si le rangement est
+   * voulu. Remonté par ABBA, R-012, où le standard n'a été rétabli que par
+   * accident, à la faveur d'une panne sans rapport.
+   */
+  const resultat = auditer(nonConforme);
+
+  assert.deepEqual(resultat.horsCoucheDansSrc, ["src/hooks/use-mobile.ts"]);
+
+  const parFichier = Object.values(resultat.violations)
+    .flat()
+    .map((v) => v.fichier);
+  assert.ok(
+    !parFichier.includes("src/hooks/use-mobile.ts"),
+    "signalé, jamais compté : aucune règle du registre ne porte sur ce cas"
+  );
+
+  const texte = enTexte(resultat, { seuil: null });
+  assert.match(texte, /n'appartiennent à aucune couche/);
 });

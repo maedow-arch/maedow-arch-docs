@@ -305,3 +305,21 @@ Le détail qui pique : `strict.js` porte en tête un commentaire qui cite F-001.
 **La leçon.** Un paquet qui publie plusieurs entrées compose une surface qu'aucune de ses entrées ne décrit. Tester les entrées ne suffit pas : il faut tester la configuration que la documentation prescrit, parce que c'est la seule qui existe chez les utilisateurs.
 
 Et une leçon sur le reste du lot : trois autres défauts remontés au même moment, R-003, R-005 et R-010, partagent un trait avec celui-ci. Ils sont **silencieux**. Aucun ne produit d'erreur, tous laissent lint, typecheck, build et audit au vert. Un projet généré recevait Tailwind sans que la feuille soit importée, un socle sans MA-005 à MA-007, un helper sans son test. Ce qu'un standard vérifie mécaniquement ne dit rien de ce qu'il livre.
+
+## F-019 : onze violations annoncées, onze fausses, et la confiance perdue
+
+**Le contexte.** `maedow-arch check` cherchait du JSX dans `core/` par expression régulière, sur le texte du fichier, quelle que soit son extension. Un commentaire au-dessus affirmait écarter les génériques TypeScript.
+
+**Ce qui s'est passé.** Il ne les écartait pas. `Promise<UserEntity>`, `Array<string>`, `Result<T>` : tout générique à un seul argument était signalé « contient du JSX ». Une balise écrite dans un littéral de chaîne aussi. Or la couche visée est exactement celle où vivent les génériques, les dépôts et les validateurs, et `Promise<UserEntity | null>` est la signature que le corpus donne lui-même en exemple. **L'audit officiel signalait l'exemple officiel.**
+
+Le projet ABBA a mesuré l'accumulation sur dix-neuf lots : quatre violations MA-004 annoncées, puis huit, puis onze. **Les onze fausses**, `find src/core -name "*.tsx"` rendant zéro fichier. Onze lignes rouges en tête d'un rapport dont l'ordre de migration dit « commencer par sortir l'interface de core ».
+
+**Ce qui rend ce défaut différent des précédents.** Il ne fait pas perdre du temps, il fait perdre la confiance. L'équipe a dû inscrire une décision de projet pour dire que le critère de vérité est `npx eslint` et non le compteur de l'audit. Un standard ne devrait pas avoir besoin qu'un projet écrive cela.
+
+F-017 décrivait un audit qui parle de ce qu'il n'a pas regardé. Celui-ci en est la suite logique : **il regarde, et il se trompe**, ce qui est pire, parce qu'un faux positif répété apprend à ignorer l'outil.
+
+**Ce qu'on en a fait.** La détection ne s'applique plus qu'aux `.tsx` et `.jsx`. Le registre portait déjà la justification, à MA-004 : « un `.ts` ne peut pas en contenir, le parser le refuserait avant nous ». Aucune détection n'est perdue, et la classe entière de faux positifs disparaît sans qu'on ait à distinguer une balise d'un paramètre de type, ce qu'aucune expression régulière ne sait faire sur du texte.
+
+**La leçon.** Un commentaire qui affirme une propriété ne la crée pas. Celui-ci disait « on écarte les génériques TypeScript » et il a survécu à la relecture précisément parce qu'il rassurait. La fixture qui l'aurait démenti n'existait pas : les fixtures couvraient ce que la règle doit trouver, jamais ce qu'elle ne doit pas trouver.
+
+C'est aussi pourquoi le même lot ajoute un renseignement plutôt qu'une règle. `shadcn init` dépose ses hooks dans `src/hooks/`, qui n'est aucune des cinq couches : ces fichiers échappent à l'audit et aux frontières à la fois, et rien ne l'annonçait. Le rapport le dit désormais, sans le compter comme une violation, parce qu'aucune règle du registre ne le prévoit et qu'un outil n'invente pas de règle.

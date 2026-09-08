@@ -49,6 +49,7 @@ export function enTexte(resultat, { seuil }) {
     }
     l.push("  Aucune violation détectée.");
     for (const ligne of surLeTsconfig(resultat)) l.push(ligne);
+    for (const ligne of surLeHorsCouche(resultat)) l.push(ligne);
     l.push("");
     l.push("  Cet audit dénombre, il ne garantit pas : installez");
     l.push("  eslint-config-maedow-arch pour que la vérification tienne dans le temps.");
@@ -94,6 +95,7 @@ export function enTexte(resultat, { seuil }) {
   }
 
   for (const ligne of surLeTsconfig(resultat)) l.push(ligne);
+  for (const ligne of surLeHorsCouche(resultat)) l.push(ligne);
 
   if (seuil !== null) {
     l.push(
@@ -137,6 +139,9 @@ export function enJson(resultat) {
       typescriptPresent: resultat.typescript ?? false,
       couchesPresentes: resultat.couches ?? [],
       fichiersHorsCouches: (resultat.horsCouche ?? []).length,
+      // Le sous-ensemble qui mérite un regard : du code source hors de toute
+      // couche, donc hors de toute politique de frontière.
+      fichiersHorsCouchesDansSrc: resultat.horsCoucheDansSrc ?? [],
       total: compter(resultat.violations),
       ordreDeMigration: ORDRE.filter((e) => (resultat.violations[e.code] ?? []).length > 0).map(
         (e) => e.code
@@ -212,4 +217,35 @@ function dossiersManquants(resultat) {
   };
 
   return Object.keys(presence).filter((dossier) => !presence[dossier]);
+}
+
+/**
+ * Le code rangé dans `src/` mais dans aucune couche.
+ *
+ * Ni une violation ni un simple hors-sujet : ces fichiers échappent à l'audit
+ * et aux frontières ESLint à la fois, faute de correspondre à un type déclaré.
+ * Un hook posé là peut importer n'importe quoi, y compris remonter le flux, et
+ * rien ne le signale.
+ *
+ * Le rapport le dit sans en faire un reproche chiffré : c'est au lecteur de
+ * décider si ce rangement est voulu.
+ *
+ * @returns les lignes à ajouter, vide si tout le code source est dans une couche.
+ */
+function surLeHorsCouche(resultat) {
+  const dansSrc = resultat.horsCoucheDansSrc ?? [];
+  if (dansSrc.length === 0) return [];
+
+  const apercu = dansSrc.slice(0, 3);
+  const lignes = ["", `  ${dansSrc.length} fichier(s) sous src/ n'appartiennent à aucune couche :`];
+  for (const fichier of apercu) lignes.push(`       ${fichier}`);
+  if (dansSrc.length > apercu.length) {
+    lignes.push(`       … et ${dansSrc.length - apercu.length} autre(s)`);
+  }
+  lignes.push(
+    "  Ils échappent à l'audit et aux frontières à la fois : aucune politique",
+    "  ne s'applique à eux, donc rien n'empêche un import de remonter le flux.",
+    "  Une base de composants qui écrit dans src/hooks/ produit exactement cela."
+  );
+  return lignes;
 }

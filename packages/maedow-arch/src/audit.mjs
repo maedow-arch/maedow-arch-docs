@@ -96,9 +96,30 @@ const OPTIONS_STRICT = [
   { nom: "exactOptionalPropertyTypes", raison: "une clé absente n'est pas une clé indéfinie" },
 ];
 
-function detecterJsx(contenu) {
-  // Une balise ouvrante suivie d'un nom, ou un fragment. On écarte les
-  // génériques TypeScript, qui commencent par une majuscule suivie de `>`.
+/**
+ * Le fichier contient-il du JSX ?
+ *
+ * La question ne se pose que pour un `.tsx` ou un `.jsx`, et c'est le registre
+ * qui le dit à propos de MA-004 : un `.ts` ne peut pas contenir de JSX, le
+ * parser le refuserait avant nous. Restreindre l'extension n'affaiblit donc
+ * aucune détection.
+ *
+ * Cela ferme en revanche une classe entière de faux positifs. L'expression
+ * régulière ne distingue pas une balise d'un paramètre de type, et aucune ne le
+ * peut sur du texte : `Promise<UserEntity>` et `Array<string>` étaient signalés
+ * comme du JSX, tout comme une balise écrite dans un littéral de chaîne. Or
+ * `Promise<UserEntity | null>` est la signature que le corpus donne lui-même en
+ * exemple, et la couche visée est précisément celle où vivent les génériques.
+ *
+ * Le projet ABBA a mesuré l'accumulation sur son domaine, entrée R-002 de son
+ * relevé : quatre violations MA-004 annoncées, puis huit, puis onze, et les
+ * onze fausses. Un rapport qui se trompe onze fois de suite cesse d'être lu.
+ * C'est le coût réel de ce défaut, et il se paie en confiance, pas en temps.
+ */
+function detecterJsx(fichier, contenu) {
+  if (!/\.(tsx|jsx)$/.test(fichier)) return false;
+
+  // Une balise ouvrante suivie d'un nom, ou un fragment.
   return /<[A-Za-z][\w.]*(\s[^<>]*)?\/?>/.test(contenu) || /<>\s*$/m.test(contenu);
 }
 
@@ -139,7 +160,7 @@ export function auditer(racine) {
     const contenu = lireFichier(racine, fichier);
 
     /* --- MA-004 : ni JSX ni dépendance d'interface dans core/ ------------- */
-    if (source.couche === "core" && detecterJsx(contenu)) {
+    if (source.couche === "core" && detecterJsx(fichier, contenu)) {
       violations["MA-004"].push({ fichier, detail: "contient du JSX" });
     }
 
@@ -239,6 +260,22 @@ export function auditer(racine) {
     // savoir combien de fichiers vivent hors des couches est un renseignement,
     // et c'est très différent d'un défaut à corriger.
     horsCouche,
+    /*
+     * Ceux qui sont rangés dans `src/` sans appartenir à aucune couche.
+     *
+     * Ce n'est pas une violation, aucune règle du registre ne le dit, et
+     * l'audit n'invente rien. C'est un renseignement : un fichier posé dans le
+     * dossier source et dans aucune couche échappe à la fois à l'audit et aux
+     * frontières ESLint, qui ne lui appliquent aucune politique. Il peut donc
+     * importer n'importe quoi, y compris remonter le flux.
+     *
+     * Le cas courant n'est pas théorique : `shadcn init` déclare
+     * `"hooks": "@/hooks"` dans `components.json`, et tout composant
+     * embarquant un hook le dépose dans `src/hooks/`. Remonté par le projet
+     * ABBA, entrée R-012, où le standard n'a été rétabli que par accident, à
+     * la faveur d'une panne sans rapport.
+     */
+    horsCoucheDansSrc: horsCouche.filter((f) => f.startsWith("src/")),
     couches: [...couches].sort(),
     violations,
     tsconfig: tsconfig !== null,
