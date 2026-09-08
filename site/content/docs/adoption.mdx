@@ -103,6 +103,20 @@ npx maedow-arch check --json > audit.json
 
 La sortie machine porte le total, l'ordre de migration et le détail par code, de quoi tracer une courbe dans votre intégration continue.
 
+### Découvrir avec `npx`, suivre avec une dépendance
+
+Les deux commandes ci-dessus ne s'emploient pas dans le même contexte, et l'outil ne s'installe pas de la même façon selon le cas.
+
+Pour **découvrir** ce que l'adoption coûterait, `npx` est le bon geste : rien à installer, rien à décider, et c'est précisément l'intérêt sur un projet qu'on hésite encore à migrer.
+
+Pour **suivre** une migration lot après lot, épinglez-le :
+
+```bash
+npm install --save-dev maedow-arch
+```
+
+`npx` peut réutiliser une version mise en cache. Deux postes rendent alors deux rapports différents sur le même code, sans que rien n'explique l'écart, et c'est exactement ce qu'il ne faut pas quand le compte sert à mesurer une progression. Une dépendance épinglée fige la version pour toute l'équipe et pour l'intégration continue.
+
 ## Ce que `--fix` corrige, et ce qu'il ne touche pas
 
 ```bash
