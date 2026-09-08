@@ -323,3 +323,25 @@ F-017 décrivait un audit qui parle de ce qu'il n'a pas regardé. Celui-ci en es
 **La leçon.** Un commentaire qui affirme une propriété ne la crée pas. Celui-ci disait « on écarte les génériques TypeScript » et il a survécu à la relecture précisément parce qu'il rassurait. La fixture qui l'aurait démenti n'existait pas : les fixtures couvraient ce que la règle doit trouver, jamais ce qu'elle ne doit pas trouver.
 
 C'est aussi pourquoi le même lot ajoute un renseignement plutôt qu'une règle. `shadcn init` dépose ses hooks dans `src/hooks/`, qui n'est aucune des cinq couches : ces fichiers échappent à l'audit et aux frontières à la fois, et rien ne l'annonçait. Le rapport le dit désormais, sans le compter comme une violation, parce qu'aucune règle du registre ne le prévoit et qu'un outil n'invente pas de règle.
+
+## F-020 : deux plugins, deux réglages de résolveur, et une règle qui s'éteint
+
+**Le contexte.** L'entrée stricte porte MA-007 par `eslint-plugin-import`, plafonné à ESLint 9 et sans aucune préversion pour la 10 sur 132 versions publiées. Tout projet appliquant `strict` était donc bloqué sur une version qu'ESLint lui-même classe en maintenance. Le remplacement par `eslint-plugin-import-x`, son fork maintenu, tenait en un nom de paquet et un préfixe de règle.
+
+**Ce qui s'est passé.** Presque. En renommant `import/resolver` en `import-x/resolver` dans le banc de test, MA-001 a cessé d'être détectée sur l'import par alias. Aucune erreur, aucun avertissement : `eslint-plugin-boundaries` lit son résolveur sous `import/resolver`, `eslint-plugin-import-x` sous `import-x/resolver`, et les deux préfixes ne se replient pas l'un sur l'autre.
+
+Le renommage paraissait mécanique, il ne l'était pas : deux plugins distincts partageaient un réglage dont le nom appartenait historiquement au premier.
+
+**Ce qui l'a attrapé.** Le test de composition ajouté trois lots plus tôt, en réponse à [F-018](#f-018--une-règle-qui-séteint-quand-on-compose-les-entrées). Il éprouve la fixture invalide sous l'entrée par défaut **et** sous la composition prescrite, et c'est la seconde qui a signalé la disparition :
+
+```text
+✗ MA-001 disparaît dans core/pricing/viaAlias.ts quand l'entrée stricte est chargée.
+```
+
+Sans lui, le lot serait passé au vert. Les trois autres cas de MA-001 continuaient de remonter, seul l'import par alias tombait, et c'est précisément la fixture ajoutée un jour parce que rien ne garantissait que les contournements de chemin relatif soient interceptés.
+
+**Ce qu'on en a fait.** Le banc déclare les deux réglages, avec le commentaire qui dit pourquoi. La configuration publiée les déclarait déjà chacun de son côté, l'entrée par défaut pour `boundaries` et l'entrée stricte pour `import-x` : aucun projet installé n'était exposé, mais rien ne l'avait vérifié.
+
+**La leçon.** Un test écrit pour une friction en attrape une autre, deux lots plus tard, sur un chemin que personne n'avait relié au premier. C'est l'argument le plus concret pour écrire le test au moment où l'on comprend le défaut, plutôt que de se contenter du correctif : le correctif règle un cas, le test surveille une classe.
+
+Et une note sur la dette héritée : ce lot ne monte aucune version d'ESLint, il lève seulement le plafond. `eslint-plugin-import` avait cessé de suivre son écosystème, et le standard qui déléguait une garantie à ce plugin héritait de son immobilité. Le corpus dit désormais quel plugin porte quelle règle, pour que ce risque se suive au lieu de se découvrir un jour d'ERESOLVE.
