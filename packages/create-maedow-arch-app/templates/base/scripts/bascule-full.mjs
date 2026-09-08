@@ -29,6 +29,17 @@ import { join } from "node:path";
  */
 const RESULT = __RESULT_TS__;
 
+/*
+ * Le test du Result Pattern, injecté par le même chemin que le helper.
+ *
+ * Les deux fichiers voyagent ensemble ou pas du tout. La bascule n'écrivait
+ * que le premier : un projet arrivé en Full par ce chemin recevait le helper
+ * sans sa couverture, là où un projet généré directement en Full avait les
+ * deux. La différence était invisible, `npm test` restant vert tant qu'un
+ * autre test existait. Remonté par le projet ABBA, entrée R-010.
+ */
+const RESULT_TEST = __RESULT_TEST_TS__;
+
 /**
  * Crée la couche domaine si elle manque.
  *
@@ -42,5 +53,6 @@ export function assurerLaCoucheDomaine() {
 
   mkdirSync(commun, { recursive: true });
   writeFileSync(result, RESULT);
+  writeFileSync(join(commun, "result.test.ts"), RESULT_TEST);
   return true;
 }

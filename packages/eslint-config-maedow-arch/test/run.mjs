@@ -139,6 +139,41 @@ for (const problem of unexpected) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Les frontières tiennent-elles sous la composition que le corpus prescrit ?
+ * ------------------------------------------------------------------ */
+
+/*
+ * Le banc éprouvait chaque entrée séparément, jamais leur composition. Or
+ * c'est la composition qui est prescrite, et en configuration plate deux
+ * objets qui déclarent la même règle sur un périmètre commun ne fusionnent
+ * pas : le dernier remplace le premier.
+ *
+ * MA-004 en faisait les frais. Chargée seule, l'entrée par défaut refusait le
+ * JSX dans core. Chargée avec l'entrée stricte, elle ne refusait plus rien, et
+ * rien ne le signalait. Remonté par le projet ABBA après usage réel, entrée
+ * R-001 de son relevé : c'est un utilisateur qui a trouvé ce que ce banc
+ * aurait dû trouver.
+ */
+console.log("");
+console.log("▸ Fixture invalid/ : les mêmes violations sous défaut + strict");
+const composeProblems = await lint("invalid", { strict: true });
+
+for (const expected of EXPECTED_VIOLATIONS) {
+  const found = composeProblems.find(
+    (problem) => problem.file === expected.file && problem.message.includes(expected.code)
+  );
+  if (found) {
+    console.log(`  ✓ ${expected.file} : ${expected.code} tient aussi en composé`);
+  } else {
+    fail(
+      `${expected.code} disparaît dans ${expected.file} quand l'entrée stricte est chargée. ` +
+        `C'est la composition que le corpus prescrit : une règle qui s'éteint là ` +
+        `s'éteint chez tout le monde.`
+    );
+  }
+}
+
+/* ------------------------------------------------------------------ *
  * L'entrée stricte, chargée en plus de l'entrée par défaut
  * ------------------------------------------------------------------ */
 
