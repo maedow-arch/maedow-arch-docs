@@ -285,3 +285,23 @@ Le premier défaut est celui que le corpus décrit lui-même à propos du DTO de
 **La leçon.** Un contrôle qui se trompe de périmètre est plus coûteux qu'un contrôle absent, parce qu'il inspire confiance. Les trois défauts ont survécu à la relecture et aux tests : ils ne sont apparus qu'en lançant l'outil sur ce dépôt, c'est-à-dire sur un projet que ses auteurs connaissent assez pour voir que la réponse est fausse.
 
 C'est l'argument le plus concret en faveur du dogfooding : une fixture prouve qu'un outil trouve ce qu'on y a mis, elle ne prouve jamais qu'il ne trouve rien d'autre.
+
+## F-018 : une règle qui s'éteint quand on compose les entrées
+
+**Le contexte.** `eslint-config-maedow-arch` publie deux entrées, et le corpus prescrit de les charger l'une après l'autre. Le banc de test éprouvait chacune séparément : la fixture invalide sous l'entrée par défaut, la fixture stricte sous l'entrée stricte. **Jamais leur composition**, qui est pourtant la seule configuration que les projets emploient.
+
+**Ce qui s'est passé.** En configuration plate, deux objets qui ciblent le même fichier et déclarent la même règle ne fusionnent pas leurs options : la dernière déclaration remplace la précédente en entier. L'entrée par défaut déclarait `no-restricted-syntax` sur `core` pour interdire le JSX, l'entrée stricte la redéclarait sur tous les fichiers TypeScript pour interdire la double assertion. Pour un fichier `.tsx` de `core`, la seconde arrivait après et effaçait la première.
+
+Sous la composition prescrite, MA-004 ne refusait donc plus le JSX dans le domaine. `no-restricted-imports` restait actif, mais l'entrée par défaut explique elle-même pourquoi il ne suffit pas : le runtime JSX automatique n'exige aucun import de React, et cette règle seule « aurait donné l'illusion d'une protection ».
+
+**Ce qui rend ce défaut différent des précédents.** F-001, F-011, F-012 et F-015 décrivent des contrôles qui rendent un verdict favorable sans avoir rien vérifié. F-016 décrit l'absence de contrôle, F-017 les contrôles qui parlent de ce qu'ils n'ont pas regardé. Celui-ci ajoute une quatrième forme : **chaque pièce fonctionne, et c'est leur assemblage qui casse**. Aucune relecture d'un fichier isolé ne pouvait le voir, et le banc validait honnêtement ce qu'il testait.
+
+Le détail qui pique : `strict.js` porte en tête un commentaire qui cite F-001. Le fichier qui nomme le défaut le réintroduisait.
+
+**Ce qu'on en a fait.** Un dernier bloc dans `strict.js` redéclare les trois sélecteurs ensemble pour `core`, seule composition qui préserve les deux intentions. Et surtout, le banc éprouve désormais la fixture invalide **sous la composition** en plus de l'entrée seule : retirer le bloc fait échouer ce test, vérifié en le retirant.
+
+**Comment il a été trouvé.** Pas par nous. Par le projet ABBA, dix-neuf lots d'usage réel, qui l'a diagnostiqué en lisant nos sources plutôt qu'en tâtonnant, et qui note que ce sont nos commentaires expliquant le pourquoi qui l'ont rendu trouvable. Le relevé complet vit dans `feedback/`.
+
+**La leçon.** Un paquet qui publie plusieurs entrées compose une surface qu'aucune de ses entrées ne décrit. Tester les entrées ne suffit pas : il faut tester la configuration que la documentation prescrit, parce que c'est la seule qui existe chez les utilisateurs.
+
+Et une leçon sur le reste du lot : trois autres défauts remontés au même moment, R-003, R-005 et R-010, partagent un trait avec celui-ci. Ils sont **silencieux**. Aucun ne produit d'erreur, tous laissent lint, typecheck, build et audit au vert. Un projet généré recevait Tailwind sans que la feuille soit importée, un socle sans MA-005 à MA-007, un helper sans son test. Ce qu'un standard vérifie mécaniquement ne dit rien de ce qu'il livre.

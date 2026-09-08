@@ -368,6 +368,15 @@ substituteTokens(targetDir, {
   __RESULT_TS__: JSON.stringify(
     readFileSync(join(templatesDir, "mode-full", "src", "core", "common", "result.ts"), "utf-8")
   ),
+  // Le test suit le helper. Sans lui, un projet arrivé en Full par la bascule
+  // recevait le Result Pattern sans la couverture qu'un projet généré
+  // directement en Full obtient, et rien ne signalait la différence.
+  __RESULT_TEST_TS__: JSON.stringify(
+    readFileSync(
+      join(templatesDir, "mode-full", "src", "core", "common", "result.test.ts"),
+      "utf-8"
+    )
+  ),
 });
 pruneGitkeeps(targetDir);
 
