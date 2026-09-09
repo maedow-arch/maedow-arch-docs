@@ -53,6 +53,61 @@ flowchart TD
 
 > **Règle de Lazy Abstraction (Introduction Différée des Contrats)** : un `contract.ts` + un système d'adapters ne doit être introduit **qu'au moment où une deuxième implémentation réelle est nécessaire** (migration de base, multi-tenant avec fournisseurs différents, besoin de mock avancé en test). Tant qu'un seul fournisseur (une seule DB, un seul provider d'auth) est utilisé et qu'aucun changement n'est prévu à court terme, l'accès direct dans `core/<domaine>/repository.ts` est conforme à Maedow Arch. Abstraire par anticipation sans second cas d'usage concret est un anti-pattern Maedow Arch : ça ajoute de l'indirection sans bénéfice mesurable.
 
+### La Lazy Abstraction ne dispense pas de la testabilité
+
+La règle ci-dessus autorise l'accès direct au client de base de données tant qu'il n'y a qu'un fournisseur. Prise à la lettre, elle produit ceci :
+
+```typescript
+// ❌ core/orders/service.ts
+import { db } from "@/core/server/db";
+
+export async function annulerCommande(id: string) {
+  const commande = await db.order.findUnique({ where: { id } });
+  // ...
+}
+```
+
+Ce code est conforme à la Lazy Abstraction, et il **casse la promesse centrale du standard** : `core/` ne se teste plus sans simuler `db`. Deux exigences du corpus se contredisent, et le développeur pressé tranchera en faveur de celle qu'il vient de lire.
+
+**Le service reçoit son dépôt en paramètre, décrit par un type structurel écrit sur place :**
+
+```typescript
+// ✅ core/orders/service.ts
+import type { Result } from "@/core/common/result";
+import type { Commande } from "./types";
+
+type DepotCommandes = {
+  trouverParId(id: string): Promise<Commande | null>;
+  changerStatut(id: string, statut: Commande["statut"]): Promise<Commande>;
+};
+
+export async function annulerCommande(
+  depot: DepotCommandes,
+  id: string
+): Promise<Result<Commande, { kind: "introuvable" } | { kind: "deja-annulee" }>> {
+  const commande = await depot.trouverParId(id);
+  if (commande === null) return { ok: false, error: { kind: "introuvable" } };
+  if (commande.statut === "annulee") return { ok: false, error: { kind: "deja-annulee" } };
+
+  return { ok: true, data: await depot.changerStatut(id, "annulee") };
+}
+```
+
+**Ce n'est pas un `contract.ts` déguisé**, et la distinction est le cœur du sujet. La Lazy Abstraction interdit d'ouvrir un fichier de contrat et un jeu d'adaptateurs pour un fournisseur unique : de l'indirection, des fichiers, une inversion de dépendance à maintenir. Un type écrit à côté de la fonction qui l'emploie n'est rien de tout cela. Il ne décrit pas le dépôt, il décrit **ce dont cette fonction a besoin**, ce qui est en général trois méthodes sur les quarante que le client expose.
+
+Ce que ça change, concrètement :
+
+| | Import direct | Type structurel en paramètre |
+| :--- | :--- | :--- |
+| Test du service | simuler le client entier | un objet littéral de trois méthodes |
+| Fichiers créés | aucun | aucun |
+| Changement de fournisseur | réécrire le service | réécrire le seul appelant |
+| Conforme à Lazy Abstraction | oui | oui |
+
+Le `repository.ts` reste l'implémentation concrète, celle qui parle au client réel et qui convertit ses exceptions avec `fromThrowable`. C'est `app/` qui les assemble, et c'est précisément son rôle : les points d'entrée injectent les dépendances.
+
+**Quand introduire un vrai `contract.ts` malgré tout ?** À la deuxième implémentation réelle, comme la règle le dit. Le type structurel n'anticipe rien : il existe parce que la fonction a besoin d'un paramètre, pas parce qu'un second fournisseur pourrait apparaître un jour.
+
 ### Gestion de l'Authentification (Auth Agnostic)
 
 Le code applicatif interagit avec une abstraction d'identité :
@@ -322,6 +377,22 @@ export function PanierScreen({ clientId }: { clientId: string }) {
 ```
 
 Trois choses valent d'être remarquées. L'état est **une union discriminée** plutôt que trois booléens indépendants, ce qui rend impossible l'état « en chargement et en erreur ». Le hook rend un état, jamais des setters : l'écran ne peut pas contourner la logique. Et l'effet annule proprement sa mise à jour si le composant disparaît avant la réponse, ce qui est exactement le genre de détail qu'on écrit une fois dans un hook plutôt que douze fois dans des écrans.
+
+### Le cas d'un cache client
+
+Une bibliothèque de cache de données, TanStack Query ou SWR, ne change rien à la règle : `useQuery` et `useMutation` vivent dans le `hooks/` de la feature, et leur `queryFn` appelle une fonction de `core/<domaine>/service.ts`.
+
+```ts
+// features/panier/hooks/usePanier.ts
+export function usePanier(clientId: string) {
+  return useQuery({
+    queryKey: ["panier", clientId],
+    queryFn: () => chargerPanier(clientId), // vit dans core/panier/service.ts
+  });
+}
+```
+
+Le hook orchestre le cache, il ne porte aucune règle métier. C'est ce qui permet de changer de bibliothèque de cache, ou de s'en passer, sans toucher au domaine. Un `queryFn` qui contiendrait un calcul de remise remonterait la logique dans `features/`, ce que MA-001 interdit et que le linter ne verra pas puisqu'il n'y a pas d'import fautif.
 
 ### Ce que cela change pour les tests
 

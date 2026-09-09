@@ -60,3 +60,32 @@ export function all<TData, TError>(results: Result<TData, TError>[]): Result<TDa
 
   return { ok: true, data: donnees };
 }
+
+/**
+ * Convertit une fonction qui lève en `Result`.
+ *
+ * C'est la porte d'entrée du Result Pattern, et elle n'a qu'un seul endroit
+ * légitime : `repository.ts`, ou l'adaptateur qui parle au monde extérieur.
+ * Une base de données lève sur une contrainte violée, un `fetch` lève sur un
+ * délai dépassé, et ces exceptions doivent devenir des données typées avant
+ * d'entrer dans le domaine.
+ *
+ * Plus haut, elle n'a pas de sens : `andThen` suppose que tout ce qu'il
+ * enchaîne rend un `Result`, et une exception qui traverse cette chaîne la
+ * court-circuite en silence. Le domaine ne doit jamais avoir à se demander si
+ * un appel peut lever.
+ *
+ * `onError` est obligatoire, et c'est délibéré : elle force à décider ce que
+ * cette erreur signifie pour le métier. Un `catch` qui rendrait l'exception
+ * telle quelle ferait remonter un objet de la bibliothèque jusqu'aux écrans.
+ */
+export async function fromThrowable<TData, TError>(
+  fn: () => Promise<TData>,
+  onError: (cause: unknown) => TError
+): Promise<Result<TData, TError>> {
+  try {
+    return { ok: true, data: await fn() };
+  } catch (cause) {
+    return { ok: false, error: onError(cause) };
+  }
+}
