@@ -382,3 +382,30 @@ node_modules/eslint-config-maedow-arch/strict.js
 **Ce qu'on en a fait.** Le fragment passe en `^0.4.0`, et un test compare les deux sources de vérité du dépôt, la contrainte du fragment et la version de la configuration, sans réseau. Il échoue si l'une avance sans l'autre, vérifié en remettant la valeur fautive.
 
 **La leçon.** Un banc d'essai qui substitue une dépendance cesse d'éprouver la façon dont elle est déclarée. C'est le prix d'un choix par ailleurs justifié, et il se paie à l'endroit exact que la substitution rend aveugle. Ce dépôt en compte trois du même genre en un jour, tous là où la vérification ne pouvait pas atteindre : le lien mort qu'aucun build ne suit, la page dérivée qu'aucune règle n'ignorait, et cette contrainte qu'aucun job ne lit.
+
+## F-023 : trois causes, un seul symptôme, et la troisième était dans le fichier généré
+
+**Le contexte.** Un projet généré en mode Full doit charger les deux entrées de la configuration ESLint : la défaut pour les frontières, la stricte pour la discipline de typage. Le corpus le prescrit, le registre associe MA-005, MA-006 et MA-007 à la seconde, et le champ `exports` du paquet la déclare.
+
+**Ce qui s'est passé.** Le `eslint.config.mjs` généré n'importait que l'entrée par défaut. Pas d'erreur, pas d'avertissement : le fichier est valide, le plugin est installé, l'entrée existe et n'est simplement jamais chargée.
+
+C'est la **troisième cause du même symptôme en une semaine**, après [R-003](#f-018--une-règle-qui-séteint-quand-on-compose-les-entrées) et [F-022](#f-022--la-matrice-éprouve-le-dépôt-pas-ce-que-npm-résout). La première portait sur la version épinglée, la deuxième sur une plage qui ne franchit pas la mineure en 0.x, celle-ci sur le fragment de configuration lui-même. Les deux correctifs précédents étaient bons, et le résultat restait identique : **un projet généré selon la documentation obtenait un socle sans trois des neuf règles, et le lint restait vert.**
+
+**La distinction qui change le diagnostic.** Le projet ABBA a mesuré les deux cas séparément, et ils ne se comportent pas pareil :
+
+| Situation | Ce qui se passe |
+| :--- | :--- |
+| Entrée stricte importée, plugin absent | `ERR_MODULE_NOT_FOUND`, code de sortie 2, le lint entier s'arrête |
+| Entrée stricte jamais importée | rien n'échoue, le lint est vert, trois règles manquent |
+
+Le premier cas est bruyant, donc sans danger. Le second est celui que produisait le fragment, et c'est le mauvais des deux. **Un import qui casse se voit ; un import absent ne se voit pas.**
+
+**Comment il a été trouvé, et pourquoi pas par nous.** Nous avions vérifié les trois règles strictes sur un projet installé depuis npm, avec trois sondes fautives et trois remontées. Mais la configuration que nous avions sondée, nous l'avions **écrite pour l'occasion**. Le générateur n'en produit pas de semblable, et c'est lui qu'il fallait éprouver.
+
+ABBA a fait la même mesure sur le fichier généré tel quel : une remontée sur trois. Puis a ajouté la seule ligne manquante : trois sur trois. La différence tenait entièrement à cette ligne.
+
+**Ce qu'on en a fait.** Le mode Full livre sa propre configuration, qui charge les deux entrées dans l'ordre prescrit. Le profil Light garde la sienne, et **dit désormais pourquoi** l'entrée stricte n'y est pas, avec les deux lignes pour l'ajouter : une absence expliquée est un choix, une absence muette est un oubli, et rien ne les distingue dans un fichier généré.
+
+Deux tests sondent le fragment lui-même plutôt qu'une configuration écrite pour le test.
+
+**La leçon.** Vérifier qu'une configuration se charge ne prouve rien ; il faut faire tirer chaque règle sur une faute écrite exprès, et sur l'artefact que l'utilisateur reçoit, pas sur un équivalent. Cette nuance-là nous a échappé alors même que nous croyions l'appliquer : nous avons sondé notre propre montage en pensant sonder le produit.

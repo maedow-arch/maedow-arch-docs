@@ -277,3 +277,45 @@ test("le fragment épingle une plage qui couvre la config publiée", () => {
       `un projet généré recevrait une version antérieure, avec les dépendances de la nouvelle`
   );
 });
+
+test("la configuration générée en Full charge les deux entrées", () => {
+  /*
+   * Le troisième défaut de la même famille, remonté par un projet réel.
+   *
+   * R-003 portait sur la version épinglée, F-022 sur une plage qui ne franchit
+   * pas la mineure en 0.x, celui-ci sur le fragment de configuration. Trois
+   * causes, un seul symptôme : un projet généré selon la documentation obtient
+   * un socle sans MA-005, MA-006 ni MA-007, et le lint reste vert.
+   *
+   * La distinction que le projet ABBA a mesurée vaut d'être retenue : une
+   * entrée importée dont le plugin manque lève et arrête tout le lint, ce qui
+   * est bruyant donc sans danger. Une entrée jamais importée ne lève rien.
+   * C'est le second cas que produisait le fragment, et c'est le mauvais.
+   */
+  const full = readFileSync(join(templatesDir, "mode-full", "eslint.config.mjs"), "utf-8");
+
+  assert.match(
+    full,
+    /from "eslint-config-maedow-arch\/strict"/,
+    "le mode Full doit charger l'entrée stricte : sans elle, trois des neuf " +
+      "règles disparaissent sans que rien ne le signale"
+  );
+  assert.match(
+    full,
+    /\.\.\.maedowArchConfig,[\s\S]*\.\.\.maedowArchStrict,/,
+    "l'entrée stricte vient après la défaut : c'est la composition que le " +
+      "corpus prescrit et la seule que le banc du paquet éprouve"
+  );
+});
+
+test("le profil Light dit pourquoi il n'a pas l'entrée stricte", () => {
+  // Une absence expliquée est un choix ; une absence muette est un oubli, et
+  // rien ne les distingue dans un fichier généré.
+  const base = readFileSync(join(templatesDir, "base", "eslint.config.mjs"), "utf-8");
+
+  assert.ok(
+    base.includes("strict"),
+    "le fichier de Light doit nommer l'entrée stricte et dire pourquoi elle " +
+      "n'est pas chargée, plutôt que de la passer sous silence"
+  );
+});
