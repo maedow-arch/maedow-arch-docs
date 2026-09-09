@@ -42,3 +42,10 @@ site/content/docs/architecture.mdx
 site/content/docs/models.mdx
 site/content/docs/conventions.mdx
 site/content/docs/rules.mdx
+
+# Les evaluations externes du standard restent locales.
+# Ce sont des avis ecrits par des tiers pour nous, pas pour publication :
+# ils portent des jugements nominatifs et n'ont pas ete relus par leur auteur
+# en vue d'etre publies. Les releves de terrain d'ABBA, eux, sont versionnes :
+# le journal des frictions y renvoie, et ils documentent des corrections reelles.
+/feedback/evaluation-*.md
