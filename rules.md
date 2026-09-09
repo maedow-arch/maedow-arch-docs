@@ -34,6 +34,8 @@ Les codes ne sont jamais réattribués. Une règle retirée laisse son code vaca
 | **MA-008** | Les modules à secrets sont marqués `server-only` | tenue par l'équipe | revue |
 | **MA-009** | Les adaptateurs, dépôts et contrats suivent leur nommage | tenue par l'équipe | revue |
 
+> **Ce tableau n'est pas la liste complète de ce que le standard demande.** Six autres exigences, les [Règles de conception](#les-règles-de-conception-distinctes-des-neuf-codes), n'ont pas de code parce qu'elles s'apprécient au lieu de se constater. Elles ne font échouer aucun lint, et c'est précisément ce qui les rend faciles à ignorer : un projet réel a passé dix-neuf lots sans appliquer la Règle de Logique Extraite, avec des écrans montés à 443 lignes, pendant que ces neuf codes restaient tous au vert.
+
 ---
 
 ## MA-001 · Le flux de dépendance est unidirectionnel

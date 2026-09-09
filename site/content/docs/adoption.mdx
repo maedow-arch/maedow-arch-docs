@@ -30,6 +30,30 @@ C'est une liste blanche, et le choix est délibéré. Une liste d'exclusions lai
 
 Le second chiffre est un **renseignement, pas un reproche**. Sur un projet en migration, savoir combien de fichiers vivent hors des couches vous dit où en est le découpage, et cela n'a rien à voir avec une dette à corriger.
 
+## Ce que la migration coûte, et ce qu'on ne peut pas vous dire
+
+C'est la première question d'une équipe qui évalue, et elle n'a pas de réponse générale : le coût dépend de ce que l'audit trouve chez vous, pas de la taille du projet. Ce qu'on peut dire, c'est **quelle part se corrige mécaniquement et quelle part demande une décision**.
+
+| Ce qui remonte | Qui le corrige | Ce que ça demande |
+| :--- | :--- | :--- |
+| `TS-STRICT` | `--fix` | rien, hors les erreurs de typage que les options révèlent ensuite |
+| MA-005, MA-006 | vous, fichier par fichier | mécanique, mais proportionnel au nombre d'occurrences |
+| MA-004 | vous | déplacer des fichiers, sans décider où va la logique |
+| MA-001, MA-002, MA-003 | vous | **décider où va le code**, et c'est là qu'est le coût réel |
+| MA-007 | vous | défaire un cycle demande souvent d'extraire un troisième module |
+
+Les trois règles de frontière sont les seules qui ne se corrigent pas en série. Une violation vous dit qu'un fichier est au mauvais endroit ; elle ne dit pas où il doit aller, et cette décision-là ne se délègue ni à un outil ni à un stagiaire.
+
+**Le premier geste utile est de lancer l'audit et de lire le total, pas cette page.** Il chiffre votre dette réelle en quelques secondes, sans rien installer :
+
+```bash
+npx maedow-arch check --json > audit.json
+```
+
+Un projet qui rend beaucoup de `TS-STRICT` et peu de frontières s'adapte en quelques jours. Un projet qui range tout dans `app/` n'a pas une dette à corriger : il a un découpage à concevoir, et c'est un autre travail.
+
+**Ce que nous n'avons pas.** Aucun retour public de migration complète chiffrée à ce jour. Le standard a été éprouvé sur dix-neuf lots d'un projet réel construit avec lui depuis le départ, ce qui valide les règles mais ne dit rien du coût d'une reprise d'existant. Si vous conduisez cette migration, [le dépôt](https://github.com/maedow-arch/maedow-arch-docs/issues) est l'endroit où le dire, et ce serait le premier.
+
 ## Lire le rapport
 
 Il est ordonné **par ce qui débloque le reste**, jamais par gravité, et chaque section dit ce que la correction rend possible.
