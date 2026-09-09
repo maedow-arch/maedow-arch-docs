@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [Non publié]
+
+### Corrigé
+
+- **Un projet généré perdait trois règles en silence.** Le fragment épinglait `eslint-config-maedow-arch` en `^0.3.0`, or la configuration est passée en 0.4.0 en remplaçant `eslint-plugin-import` par `import-x`. En 0.x, l'accent circonflexe ne franchit pas la mineure : npm installait donc la 0.3.1, qui importe l'ancien plugin, pendant que le fragment installait le nouveau. L'entrée stricte échouait à se charger, MA-005, MA-006 et MA-007 disparaissaient, et rien ne le signalait puisque la configuration générée ne charge que l'entrée par défaut. Trouvé en jouant le trajet d'un lecteur depuis le registre, seul chemin que la matrice d'intégration ne peut pas emprunter : elle substitue un tarball local, ce qui écrase la contrainte de version et la rend invisible. Un test compare désormais les deux sources de vérité du dépôt. Voir [F-022](./FRICTIONS.md). `create-maedow-arch-app` passe en 0.11.1.
 ## [0.10.0] : 2026-09-09
 
 ### Ajouté
