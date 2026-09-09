@@ -44,6 +44,22 @@ const PAGES = [
     description:
       "Les neuf règles normatives de Maedow Arch, leur code stable, et pour chacune si elle est vérifiée par la machine ou tenue par l'équipe.",
   },
+  /*
+   * Le journal des frictions rejoint le site, et ce n'est pas un document de
+   * plus. C'est le seul qui montre ce que le standard a coûté : ce qui a
+   * échoué, pourquoi, et ce qu'on en a tiré. Il vivait sur GitHub, cité par
+   * la documentation mais jamais publié avec elle, si bien qu'une évaluation
+   * faite depuis le site a conclu à un outillage immature sans avoir pu voir
+   * les vingt et une frictions ni les dix-neuf lots d'usage qui les ont
+   * produites. La preuve existait, elle n'était pas là où on regarde.
+   */
+  {
+    source: "FRICTIONS.md",
+    out: "frictions.mdx",
+    title: "Journal des frictions",
+    description:
+      "Ce qui a résisté en conditions réelles : la règle trop stricte, le cas limite imprévu, le contrôle qui rendait un verdict favorable sans rien vérifier.",
+  },
   {
     source: "conventions.md",
     out: "conventions.mdx",

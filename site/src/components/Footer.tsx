@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { REPO_URL, NPM_CLI_URL, NPM_ESLINT_URL } from "@/lib/links";
+import { versionDuStandard } from "@/lib/version";
 
 const COLUMNS = [
   {
@@ -30,6 +31,8 @@ const COLUMNS = [
 ];
 
 export function Footer() {
+  const version = versionDuStandard();
+
   return (
     <footer className="relative border-t border-fd-border mt-auto">
       <div className="absolute inset-0 maedow-dots opacity-40 pointer-events-none" aria-hidden />
@@ -44,6 +47,7 @@ export function Footer() {
           </p>
           <p className="mt-6 text-xs text-fd-muted-foreground">
             © {new Date().getFullYear()} Maedow Arch. Licence MIT
+            {version !== null ? ` · Standard ${version}` : null}
           </p>
         </div>
 
