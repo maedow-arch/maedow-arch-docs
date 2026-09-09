@@ -69,7 +69,7 @@ function usage() {
     "Options :",
     "  -m, --mode <full|light>       Profil d'architecture. Par défaut : full.",
     "  -t, --template <demo|blank>   Contenu de départ. Par défaut : demo.",
-    "  -c, --css <vanilla|tailwind>  Style. Par défaut : vanilla.",
+    "  -s, --style <css|tailwind>    Style. Par défaut : css.",
     "  -f, --framework <next|vite>   Framework hôte. Par défaut : next.",
     "  -y, --yes                     Accepte les valeurs par défaut, sans question.",
     "  -h, --help                    Affiche cette aide.",
@@ -85,7 +85,7 @@ function usage() {
     "  blank   L'arborescence et la configuration, sans code d'exemple.",
     "",
     "Styles :",
-    "  vanilla   CSS natif, aucune dépendance de style.",
+    "  css       CSS natif, aucune dépendance de style.",
     "  tailwind  Tailwind CSS 4, configuré et prêt à l'emploi.",
     "",
     "Frameworks, voir « Maedow Arch hors Next.js » dans architecture.md :",
@@ -317,7 +317,7 @@ if ((mode === null || template === null || style === null || framework === null)
     style = await ask(
       "Quel style ?",
       [
-        { value: "vanilla", label: "CSS natif", hint: "aucune dépendance de style" },
+        { value: "css", label: "CSS natif", hint: "aucune dépendance de style" },
         { value: "tailwind", label: "Tailwind CSS 4", hint: "configuré et prêt à l'emploi" },
       ],
       DEFAULT_STYLE

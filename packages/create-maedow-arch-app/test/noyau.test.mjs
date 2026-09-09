@@ -73,7 +73,7 @@ test("--yes remplit les axes restants sans écraser les choix explicites", () =>
   assert.equal(args.mode, "light", "le choix explicite l'emporte sur le défaut");
   assert.equal(args.framework, "next");
   assert.equal(args.template, "demo");
-  assert.equal(args.style, "vanilla");
+  assert.equal(args.style, "css");
 });
 
 test("parseArgs refuse une option inconnue et une valeur manquante", () => {
@@ -87,7 +87,7 @@ test("parseArgs refuse une option inconnue et une valeur manquante", () => {
 
 test("layersFor pose la coquille, le profil et le style dans cet ordre", () => {
   const couches = layersFor(
-    { framework: "next", mode: "full", template: "blank", style: "vanilla" },
+    { framework: "next", mode: "full", template: "blank", style: "css" },
     templatesDir
   );
   assert.deepEqual(couches.slice(0, 2), ["base", "framework-next"]);
@@ -106,10 +106,10 @@ test("layersFor ajoute les couches de démonstration en mode demo", () => {
 
 test("layersFor écarte les couches absentes du disque", () => {
   const couches = layersFor(
-    { framework: "next", mode: "full", template: "demo", style: "vanilla" },
+    { framework: "next", mode: "full", template: "demo", style: "css" },
     templatesDir
   );
-  assert.ok(!couches.includes("css-inexistant"));
+  assert.ok(!couches.includes("style-inexistant"));
   assert.equal(new Set(couches).size, couches.length, "aucune couche en double");
 });
 
@@ -318,4 +318,28 @@ test("le profil Light dit pourquoi il n'a pas l'entrée stricte", () => {
     "le fichier de Light doit nommer l'entrée stricte et dire pourquoi elle " +
       "n'est pas chargée, plutôt que de la passer sous silence"
   );
+});
+
+test("l'ancienne forme de l'option reste acceptée", () => {
+  /*
+   * `--css vanilla` était la forme d'avant. L'option dit maintenant ce
+   * qu'elle choisit, un style, et sa valeur nomme la technologie plutôt que
+   * son absence.
+   *
+   * Ce paquet est en 0.x et pourrait casser, mais une commande écrite dans un
+   * script d'intégration continue ne se corrige pas toute seule. Les deux
+   * formes mènent au même style, et ce test le fige.
+   */
+  assert.equal(parseArgs(["p", "--style", "css"]).style, "css");
+  assert.equal(parseArgs(["p", "--style=tailwind"]).style, "tailwind");
+  assert.equal(parseArgs(["p", "-s", "tailwind"]).style, "tailwind");
+
+  assert.equal(
+    parseArgs(["p", "--css", "vanilla"]).style,
+    "css",
+    "ancienne option et ancienne valeur"
+  );
+  assert.equal(parseArgs(["p", "--css=vanilla"]).style, "css");
+  assert.equal(parseArgs(["p", "--css", "tailwind"]).style, "tailwind");
+  assert.equal(parseArgs(["p", "--vanilla"]).style, "css", "le raccourci mène au même style");
 });

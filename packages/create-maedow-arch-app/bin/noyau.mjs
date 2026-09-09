@@ -17,11 +17,11 @@ import { join } from "node:path";
 
 export const MODES = ["full", "light"];
 export const TEMPLATES = ["demo", "blank"];
-export const STYLES = ["vanilla", "tailwind"];
+export const STYLES = ["css", "tailwind"];
 export const FRAMEWORKS = ["next", "vite"];
 export const DEFAULT_MODE = "full";
 export const DEFAULT_TEMPLATE = "demo";
-export const DEFAULT_STYLE = "vanilla";
+export const DEFAULT_STYLE = "css";
 export const DEFAULT_FRAMEWORK = "next";
 
 /** Ce que npm accepte dans un nom de package, et donc ce que la CLI accepte. */
@@ -58,10 +58,23 @@ export function parseArgs(argv) {
       template = take(argv[++i], "--template");
     } else if (arg.startsWith("--template=")) {
       template = arg.slice("--template=".length);
+    } else if (arg === "--style" || arg === "-s") {
+      style = normaliserStyle(take(argv[++i], "--style"));
+    } else if (arg.startsWith("--style=")) {
+      style = normaliserStyle(arg.slice("--style=".length));
+      /*
+       * `--css` était la forme d'avant, et `vanilla` sa valeur par défaut.
+       * L'option dit maintenant ce qu'elle choisit, un style, et sa valeur
+       * nomme la technologie plutôt que son absence.
+       *
+       * L'ancienne forme reste acceptée : ce paquet est en 0.x, mais une
+       * commande qui cesse de fonctionner sans prévenir coûte plus qu'une
+       * branche de compatibilité.
+       */
     } else if (arg === "--css" || arg === "-c") {
-      style = take(argv[++i], "--css");
+      style = normaliserStyle(take(argv[++i], "--css"));
     } else if (arg.startsWith("--css=")) {
-      style = arg.slice("--css=".length);
+      style = normaliserStyle(arg.slice("--css=".length));
     } else if (arg === "--framework" || arg === "-f") {
       framework = take(argv[++i], "--framework");
     } else if (arg.startsWith("--framework=")) {
@@ -73,7 +86,7 @@ export function parseArgs(argv) {
     } else if (arg === "--tailwind") {
       style = "tailwind";
     } else if (arg === "--vanilla") {
-      style = "vanilla";
+      style = "css";
     } else if (arg === "--light") {
       mode = "light";
     } else if (arg === "--full") {
@@ -107,8 +120,21 @@ export function parseArgs(argv) {
  * Les couches absentes du disque sont écartées, ce qui évite d'entretenir des
  * dossiers vides pour des combinaisons dont le nombre croît avec chaque axe.
  */
+/**
+ * La valeur d'un style, ancienne forme comprise.
+ *
+ * `vanilla` désignait le CSS natif par ce qu'il n'est pas. `css` le désigne
+ * par ce qu'il est, et se lit sans connaître l'histoire de l'option.
+ *
+ * L'ancienne valeur reste acceptée pour ne pas casser les commandes écrites
+ * dans les scripts d'intégration continue de ceux qui nous lisent.
+ */
+function normaliserStyle(valeur) {
+  return valeur === "vanilla" ? "css" : valeur;
+}
+
 export function layersFor({ framework, mode, template, style }, templatesDir) {
-  const layers = ["base", `framework-${framework}`, `mode-${mode}`, `css-${style}`];
+  const layers = ["base", `framework-${framework}`, `mode-${mode}`, `style-${style}`];
   if (template === "demo") {
     layers.push("demo-shared", `demo-${style}`, `demo-${mode}`, `demo-app-${framework}`);
   }

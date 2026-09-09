@@ -6,7 +6,16 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
-## [Non publié]
+## [0.10.1] : 2026-09-09
+
+### Modifié
+
+- **L'option de style se nomme `--style`, et sa valeur `css`.** `--css vanilla` désignait le CSS natif par ce qu'il n'est pas, et nommait l'option d'après une seule de ses valeurs. `npx create-maedow-arch-app mon-projet --style css` et `--style tailwind` se lisent sans connaître l'histoire de la commande. **L'ancienne forme reste acceptée**, valeur `vanilla` comprise : ce paquet est en 0.x et pourrait casser, mais une commande écrite dans un script d'intégration continue ne se corrige pas toute seule. Un test fige les deux formes. Les couches de gabarit suivent le même nom, `style-css` et `style-tailwind`, pour que l'option et le dossier cessent de diverger. `create-maedow-arch-app` passe en 0.12.0.
+
+### Ajouté
+
+- **Le README dit que l'entrée stricte existe.** Il ne montrait que l'entrée par défaut, et un lecteur qui s'arrêtait là croyait tenir la configuration complète, sans savoir que trois des neuf règles vivent ailleurs. Il donne désormais les deux, avec la raison de ne pas les charger ensemble sur un projet existant : remonter toute la dette de typage en une fois est le meilleur moyen de tout désactiver la semaine suivante. Un projet généré, lui, reçoit les deux d'emblée, puisqu'il part d'un code conforme.
+- **Le corpus documente le choix du style à la génération**, là où il documentait déjà celui du profil et du contenu. Le défaut est `css` : le standard revendique l'agnosticisme d'infrastructure, et la démonstration doit prouver qu'aucun framework de style n'est nécessaire pour livrer quelque chose de soigné.
 
 ### Corrigé
 

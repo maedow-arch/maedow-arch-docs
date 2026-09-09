@@ -60,8 +60,8 @@ Les frontières sont vraiment appliquées dans les deux cas, sans configuration 
 ## Choisir son style
 
 ```bash
-npx create-maedow-arch-app mon-projet --css vanilla     # par défaut
-npx create-maedow-arch-app mon-projet --css tailwind
+npx create-maedow-arch-app mon-projet --style css       # par défaut
+npx create-maedow-arch-app mon-projet --style tailwind
 ```
 
 **CSS natif** ne pose aucune dépendance de style. La démonstration livrée prouve qu'il n'en faut aucune pour obtenir quelque chose de soigné.
