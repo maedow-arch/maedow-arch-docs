@@ -38,10 +38,15 @@ Thumbs.db
 # Elles sont régénérées en predev et prebuild : les versionner, c'est
 # rouvrir la porte à la divergence silencieuse (voir FRICTIONS.md, F-005).
 # index.mdx est écrit à la main et reste versionné.
-site/content/docs/architecture.mdx
-site/content/docs/models.mdx
-site/content/docs/conventions.mdx
-site/content/docs/rules.mdx
+# Les pages derivees du corpus par sync-docs.mjs.
+#
+# La regle s'exprime a l'envers : tout .mdx de ce dossier est genere, sauf
+# les deux ecrits a la main. Enumerer les fichiers generes obligeait a penser
+# au gitignore a chaque page ajoutee, et la septieme y a echappe : elle est
+# entree dans un commit comme si elle etait une source.
+site/content/docs/*.mdx
+!site/content/docs/index.mdx
+!site/content/docs/adoption.mdx
 
 # Les evaluations externes du standard restent locales.
 # Ce sont des avis ecrits par des tiers pour nous, pas pour publication :
