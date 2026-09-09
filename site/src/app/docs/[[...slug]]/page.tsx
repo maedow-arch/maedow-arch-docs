@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { source } from "@/lib/source";
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from "fumadocs-ui/page";
 import { Cards, Card } from "fumadocs-ui/components/card";
@@ -10,6 +12,41 @@ import { REPO_URL } from "@/lib/links";
 import { ModeFull, ModeLight } from "@/components/ModeOnly";
 import { ModeToc } from "@/components/ModeToc";
 import { Mermaid } from "@/components/Mermaid";
+
+/**
+ * Où vit la source de chaque page, pour le lien « modifier sur GitHub ».
+ *
+ * Le corpus de la racine est la source de quatre pages ; les trois autres ont
+ * la leur ailleurs. Une table le dit, là où une transformation du nom de
+ * fichier se trompait en silence : un lien mort ne casse aucun build.
+ */
+const SOURCES: Record<string, string> = {
+  "index.mdx": "README.md",
+  "adoption.mdx": "site/content/docs/adoption.mdx",
+  "frictions.mdx": "FRICTIONS.md",
+};
+
+/**
+ * Le chemin de la source, vérifié au build.
+ *
+ * Un lien mort ne casse rien : la page se construit, le bouton s'affiche, et le
+ * 404 n'apparaît qu'au visiteur qui clique. Deux y ont vécu sans être vus, dont
+ * un depuis la création de la page d'adoption.
+ *
+ * Cette vérification les fait échouer à la construction, là où on les corrige.
+ */
+function sourceDe(chemin: string): string {
+  const relatif = SOURCES[chemin] ?? chemin.replace(/\.mdx$/, ".md");
+
+  if (!existsSync(join(process.cwd(), "..", relatif))) {
+    throw new Error(
+      `Le lien « modifier sur GitHub » de ${chemin} pointe vers ${relatif}, qui n'existe pas ` +
+        `dans le dépôt. Ajoutez sa source à SOURCES dans docs/[[...slug]]/page.tsx.`
+    );
+  }
+
+  return relatif;
+}
 
 export default async function Page(props: { params: Promise<{ slug?: string[] }> }) {
   const params = await props.params;
@@ -40,11 +77,15 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
         owner: "maedow-arch",
         repo: "maedow-arch-docs",
         sha: "main",
-        // Les pages sont dérivées des documents de la racine du dépôt :
-        // on renvoie vers la source, pas vers le .mdx généré.
-        // `page.path` est relatif au dossier de contenu, par exemple
-        // `architecture.mdx`.
-        path: page.path === "index.mdx" ? "README.md" : page.path.replace(/\.mdx$/, ".md"),
+        // La source réelle de chaque page, et non une déduction.
+        //
+        // Le chemin était calculé en remplaçant `.mdx` par `.md`, ce qui marche
+        // pour les quatre pages dérivées du corpus et casse pour les deux
+        // autres : `FRICTIONS.md` porte des majuscules, et la page d'adoption
+        // n'a pas de source à la racine puisqu'elle est écrite directement dans
+        // le dossier de contenu. Les deux liens rendaient 404, sans que rien ne
+        // le signale.
+        path: sourceDe(page.path),
       }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
