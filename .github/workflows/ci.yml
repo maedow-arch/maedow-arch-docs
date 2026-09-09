@@ -95,7 +95,7 @@ jobs:
   # paquets. Sans cette matrice, une combinaison se met à pourrir en silence :
   # c'est le mode de défaillance que documente FRICTIONS.md, de bout en bout.
   scaffold:
-    name: ${{ matrix.framework }}/${{ matrix.mode }}/${{ matrix.template }}/${{ matrix.css }} sous ${{ matrix.pm }}
+    name: ${{ matrix.framework }}/${{ matrix.mode }}/${{ matrix.template }}/${{ matrix.style }} sous ${{ matrix.pm }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -107,13 +107,13 @@ jobs:
         framework: [next, vite]
         mode: [full, light]
         template: [demo, blank]
-        css: [vanilla, tailwind]
+        style: [css, tailwind]
         pm: [npm]
         include:
-          - { framework: next, mode: full, template: demo, css: tailwind, pm: pnpm }
-          - { framework: next, mode: full, template: demo, css: vanilla, pm: bun }
-          - { framework: vite, mode: full, template: demo, css: tailwind, pm: bun }
-          - { framework: vite, mode: light, template: demo, css: vanilla, pm: pnpm }
+          - { framework: next, mode: full, template: demo, style: tailwind, pm: pnpm }
+          - { framework: next, mode: full, template: demo, style: css, pm: bun }
+          - { framework: vite, mode: full, template: demo, style: tailwind, pm: bun }
+          - { framework: vite, mode: light, template: demo, style: css, pm: pnpm }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -137,7 +137,7 @@ jobs:
           npm run build
 
       - name: Générer le projet
-        run: node packages/create-maedow-arch-app/dist/create-maedow-arch-app.mjs app --framework ${{ matrix.framework }} --mode ${{ matrix.mode }} --template ${{ matrix.template }} --css ${{ matrix.css }}
+        run: node packages/create-maedow-arch-app/dist/create-maedow-arch-app.mjs app --framework ${{ matrix.framework }} --mode ${{ matrix.mode }} --template ${{ matrix.template }} --style ${{ matrix.style }}
 
       # La config ESLint est empaquetée puis installée depuis son tarball, et
       # non liée par `file:`. npm et bun résolvent un lien `file:` par un
@@ -218,7 +218,7 @@ jobs:
           EOF
           fi
           if npm run lint; then
-            echo "::error::Le lint est passé alors qu'un import interdit était présent. Les frontières ne sont pas appliquées en ${{ matrix.framework }}/${{ matrix.mode }}/${{ matrix.css }} sous ${{ matrix.pm }}."
+            echo "::error::Le lint est passé alors qu'un import interdit était présent. Les frontières ne sont pas appliquées en ${{ matrix.framework }}/${{ matrix.mode }}/${{ matrix.style }} sous ${{ matrix.pm }}."
             exit 1
           fi
-          echo "Violation correctement détectée en ${{ matrix.framework }}/${{ matrix.mode }}/${{ matrix.css }} sous ${{ matrix.pm }}."
+          echo "Violation correctement détectée en ${{ matrix.framework }}/${{ matrix.mode }}/${{ matrix.style }} sous ${{ matrix.pm }}."

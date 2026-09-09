@@ -470,7 +470,9 @@ npx create-maedow-arch-app mon-projet --mode light   # sans couche core
 
 Sans drapeau, la CLI pose la question lorsqu'elle est lancée depuis un terminal, et retient `full` sinon.
 
-Chaque profil se décline en deux contenus : `--template demo` livre un compteur borné illustrant le profil choisi, `--template blank` livre l'arborescence seule. Générer la même démonstration dans les deux profils et comparer les arborescences est le moyen le plus court de saisir ce que la séparation apporte, et ce qu'elle coûte.
+Chaque profil se décline en deux contenus : `--template demo` livre un compteur borné illustrant le profil choisi, `--template blank` livre l'arborescence seule.
+
+Le style se choisit de la même façon, `--style css` pour du CSS natif sans aucune dépendance, `--style tailwind` pour Tailwind CSS 4 configuré. Le défaut est `css` : le standard revendique l'agnosticisme d'infrastructure, et la démonstration doit prouver qu'aucun framework de style n'est nécessaire pour livrer quelque chose de soigné. Générer la même démonstration dans les deux profils et comparer les arborescences est le moyen le plus court de saisir ce que la séparation apporte, et ce qu'elle coûte.
 
 **Règle de bascule** : un projet démarré en Mode Light qui gagne en complexité (nouvelle feature qui duplique de la logique, besoin de tester le métier indépendamment de l'UI, montée en charge du produit) doit migrer progressivement vers le Mode Full, domaine par domaine, jamais en un seul refactor global.
 

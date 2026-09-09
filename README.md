@@ -51,6 +51,15 @@ import maedowArchConfig from "eslint-config-maedow-arch";
 export default [...maedowArchConfig];
 ```
 
+Cette entrée porte les **frontières**, `MA-001` à `MA-004`. Une seconde entrée, `eslint-config-maedow-arch/strict`, ajoute la discipline de typage, `MA-005` à `MA-007` :
+
+```js
+import maedowArchStrict from "eslint-config-maedow-arch/strict";
+export default [...maedowArchConfig, ...maedowArchStrict];
+```
+
+> Sur un projet **existant**, adoptez-les dans cet ordre plutôt que d'un coup : charger les deux ensemble sur une base ancienne remonte tout en même temps, et c'est le meilleur moyen de tout désactiver le vendredi suivant. Un projet **généré** reçoit les deux d'emblée, puisqu'il part d'un code conforme.
+
 > `eslint-import-resolver-typescript` n'est pas optionnel : sans résolveur TypeScript, les imports `.ts`/`.tsx` sont classés « unknown » et **aucune règle de frontière ne se déclenche**. Le lint passe alors au vert sans rien vérifier.
 
 ---
