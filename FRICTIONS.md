@@ -361,3 +361,24 @@ Le contrôle a été fait avant d'écrire la version, et non après un échec de
 La conséquence pratique est qu'une montée de majeure ne se décide pas en lisant le registre npm. Elle se décide en lisant les `peerDependencies` de ce qui vérifie les règles, et ce contrôle vaut d'être fait à chaque fois.
 
 **Au passage, le piège que le projet ABBA avait documenté.** Leur entrée N-002 décrivait un premier build Next 16 qui réécrit `tsconfig.json` en cours d'exécution puis échoue, le second passant. Le remède est de livrer d'avance les valeurs que Next impose : `jsx` en `react-jsx`, et l'entrée `.next/dev/types` dans `include`. Vérifié par empreinte sur un projet neuf, le fichier n'est plus touché et aucun message de reconfiguration n'apparaît.
+
+## F-022 : la matrice éprouve le dépôt, pas ce que npm résout
+
+**Le contexte.** Vingt jobs génèrent un projet, l'installent, le lintent et le construisent. Pour éprouver la configuration ESLint locale plutôt que celle du registre, ils l'empaquettent et substituent un chemin `file:` dans le `package.json` du projet généré. C'est délibéré, et c'est écrit dans le workflow : un tarball reproduit ce qu'un utilisateur reçoit, là où un lien `file:` par symlink ferait chercher les dépendances de pair au mauvais endroit.
+
+**Ce qui s'est passé.** La substitution écrase la contrainte de version. La matrice ne lit donc jamais ce que le fragment épingle, et un écart entre cette contrainte et la version publiée lui est invisible.
+
+Quand la configuration est passée en 0.4.0, en remplaçant `eslint-plugin-import` par `import-x`, le fragment est resté en `^0.3.0`. En 0.x, l'accent circonflexe ne franchit pas la mineure : `^0.3.0` couvre 0.3.x et exclut la 0.4.0. Un projet généré depuis npm recevait donc la 0.3.1, qui importe l'ancien plugin, pendant que le fragment installait le nouveau.
+
+```text
+Cannot find package 'eslint-plugin-import' imported from
+node_modules/eslint-config-maedow-arch/strict.js
+```
+
+**L'entrée stricte ne se chargeait plus**, donc MA-005, MA-006 et MA-007 disparaissaient. Et rien ne le signalait : la configuration générée ne charge que l'entrée par défaut, si bien que `lint`, `typecheck` et `build` restaient au vert.
+
+**Comment il a été trouvé.** En jouant le trajet d'un lecteur avant une annonce publique : `npx create-maedow-arch-app` depuis le registre, puis l'installation, le lint et le build. C'est le seul chemin qui ne passe pas par le dépôt, et c'est exactement celui que la matrice ne peut pas emprunter.
+
+**Ce qu'on en a fait.** Le fragment passe en `^0.4.0`, et un test compare les deux sources de vérité du dépôt, la contrainte du fragment et la version de la configuration, sans réseau. Il échoue si l'une avance sans l'autre, vérifié en remettant la valeur fautive.
+
+**La leçon.** Un banc d'essai qui substitue une dépendance cesse d'éprouver la façon dont elle est déclarée. C'est le prix d'un choix par ailleurs justifié, et il se paie à l'endroit exact que la substitution rend aveugle. Ce dépôt en compte trois du même genre en un jour, tous là où la vérification ne pouvait pas atteindre : le lien mort qu'aucun build ne suit, la page dérivée qu'aucune règle n'ignorait, et cette contrainte qu'aucun job ne lit.

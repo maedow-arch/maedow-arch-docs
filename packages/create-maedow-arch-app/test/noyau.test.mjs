@@ -234,3 +234,46 @@ test("les deux chemins vers Full livrent les mêmes fichiers de domaine", () => 
     assert.ok(script.includes(fichier), `la bascule n'écrit pas ${fichier} sur le disque`);
   }
 });
+
+/* ------------------------------------------------------------------ *
+ * Ce que le scaffold épingle, face à ce que le registre publie
+ * ------------------------------------------------------------------ */
+
+test("le fragment épingle une plage qui couvre la config publiée", () => {
+  /*
+   * Le défaut que ce test ferme : la configuration est passée en 0.4.0 en
+   * remplaçant `eslint-plugin-import` par `import-x`, et le fragment est resté
+   * en `^0.3.0`. Or `^0.3.0` exclut la 0.4.0 : un projet généré recevait la
+   * 0.3.1, qui importe l'ancien plugin, pendant que le fragment installait le
+   * nouveau. L'entrée stricte ne se chargeait plus, donc MA-005, MA-006 et
+   * MA-007 disparaissaient, et rien ne le signalait puisque la configuration
+   * générée ne charge que l'entrée par défaut.
+   *
+   * La matrice d'intégration ne pouvait pas l'attraper : elle substitue un
+   * tarball local par un chemin `file:`, donc elle éprouve toujours la version
+   * du dépôt et jamais celle que npm résoudrait.
+   *
+   * Ce test compare les deux sources de vérité du dépôt, sans réseau.
+   */
+  const fragment = JSON.parse(
+    readFileSync(join(templatesDir, "base", "package.fragment.json"), "utf-8")
+  );
+  const plage = fragment.devDependencies["eslint-config-maedow-arch"];
+  const version = JSON.parse(
+    readFileSync(
+      join(templatesDir, "..", "..", "eslint-config-maedow-arch", "package.json"),
+      "utf-8"
+    )
+  ).version;
+
+  // En 0.x, `^` ne franchit pas la mineure : `^0.3.0` couvre 0.3.x, pas 0.4.0.
+  const [majeurePlage, mineurePlage] = plage.replace(/^[^\d]*/, "").split(".");
+  const [majeureVersion, mineureVersion] = version.split(".");
+
+  assert.equal(
+    `${majeurePlage}.${mineurePlage}`,
+    `${majeureVersion}.${mineureVersion}`,
+    `le fragment épingle ${plage}, or la configuration du dépôt est en ${version} : ` +
+      `un projet généré recevrait une version antérieure, avec les dépendances de la nouvelle`
+  );
+});
