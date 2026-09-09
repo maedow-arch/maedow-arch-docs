@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { all, andThen, mapResult, match, unwrapOr, type Result } from "./result";
+import { all, andThen, fromThrowable, mapResult, match, unwrapOr, type Result } from "./result";
 
 /**
  * Ces tests s'exécutent sans DOM, sans mock et sans monter d'arbre React.
@@ -89,5 +89,48 @@ describe("all", () => {
 
   it("rend une liste vide pour une entrée vide", () => {
     expect(all([])).toEqual({ ok: true, data: [] });
+  });
+});
+
+describe("fromThrowable", () => {
+  it("rend un succès quand la fonction aboutit", async () => {
+    await expect(
+      fromThrowable(
+        () => Promise.resolve(42),
+        () => "jamais atteint"
+      )
+    ).resolves.toEqual({ ok: true, data: 42 });
+  });
+
+  it("convertit une exception en erreur typée, sans la laisser remonter", async () => {
+    await expect(
+      fromThrowable(
+        () => Promise.reject(new Error("contrainte unique violée")),
+        (cause) => (cause instanceof Error ? cause.message : "cause inconnue")
+      )
+    ).resolves.toEqual({ ok: false, error: "contrainte unique violée" });
+  });
+
+  it("attrape ce qui n'est pas une Error, ce que rien n'interdit à un client tiers", async () => {
+    await expect(
+      fromThrowable(
+        () => Promise.reject("chaîne jetée telle quelle"),
+        () => "cause inconnue"
+      )
+    ).resolves.toEqual({ ok: false, error: "cause inconnue" });
+  });
+
+  it("s'enchaîne avec andThen, ce qui est sa raison d'être", async () => {
+    // Sans cette conversion à la frontière, l'exception traverserait la chaîne
+    // et court-circuiterait le andThen qui la suit.
+    const lu = await fromThrowable(
+      () => Promise.reject(new Error("hors service")),
+      () => "lecture impossible"
+    );
+
+    await expect(andThen(lu, (n: number) => Promise.resolve(succes(n * 2)))).resolves.toEqual({
+      ok: false,
+      error: "lecture impossible",
+    });
   });
 });

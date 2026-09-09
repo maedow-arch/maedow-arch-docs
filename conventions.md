@@ -334,6 +334,34 @@ match(checkoutResult, {
 });
 ```
 
+### Par où les exceptions entrent, et où elles s'arrêtent
+
+Les cinq helpers ci-dessus supposent tous que ce qu'ils manipulent est un `Result`. Reste une question que le pattern ne résout pas de lui-même : **le monde extérieur, lui, lève.** Un client de base de données jette sur une contrainte violée, un `fetch` jette sur un délai dépassé, et aucune de ces exceptions n'est un `Result`.
+
+Sans convention, chaque dépôt improvise son `try/catch`, et il suffit d'un oubli pour qu'une exception traverse un `andThen` qui croyait n'enchaîner que des résultats. La chaîne est court-circuitée, et le service qui l'appelait n'a jamais vu passer l'erreur qu'il pensait gérer.
+
+`fromThrowable` est la porte d'entrée, et elle a **un seul endroit légitime** :
+
+```typescript
+// core/orders/repository.ts
+import { fromThrowable, type Result } from "@/core/common/result";
+
+type ErreurDepot = { kind: "indisponible" } | { kind: "conflit"; champ: string };
+
+export function enregistrerCommande(
+  commande: Commande
+): Promise<Result<Commande, ErreurDepot>> {
+  return fromThrowable(
+    () => db.order.create({ data: commande }),
+    (cause) => (estConflitUnicite(cause) ? { kind: "conflit", champ: "reference" } : { kind: "indisponible" })
+  );
+}
+```
+
+**Dans `repository.ts`, jamais plus haut.** C'est la frontière entre ce qui parle au monde extérieur et le domaine, et c'est le seul endroit où une exception a encore un sens. Au-dessus, `core/<domaine>/service.ts` n'a plus à se demander si un appel peut lever : il reçoit un `Result` et compose.
+
+La fonction de conversion est obligatoire, et c'est délibéré. Elle force à décider ce que l'erreur signifie **pour le métier** : un `catch` qui rendrait l'exception telle quelle ferait remonter un objet de la bibliothèque jusqu'aux écrans, et le jour où l'on change de client de base de données, c'est la couche de rendu qui casse.
+
 ---
 
 ## Sécurité & Gestion des Données Sensibles
