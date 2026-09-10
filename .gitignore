@@ -16,6 +16,7 @@ next-env.d.ts
 .vercel
 
 # Environnement
+.env
 .env*.local
 *.pem
 
