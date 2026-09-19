@@ -28,11 +28,19 @@ import {
   layersFor,
   buildPackageJson,
 } from "./noyau.mjs";
+import { banniere, capacites, peindre, recapitulatif } from "./banniere.mjs";
 
-const DOCS_URL = "https://github.com/maedow-arch/maedow-arch-docs";
+const SITE_URL = "https://maedow-arch-docs.vercel.app";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const templatesDir = join(__dirname, "..", "templates");
+
+/*
+ * La version, lue et non recopiée. `bin/` en développement et `dist/` une fois
+ * publié sont tous deux au même niveau que le package.json : le même chemin
+ * relatif vaut pour les deux.
+ */
+const VERSION = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf-8")).version;
 
 /* ------------------------------------------------------------------ *
  * Gestionnaire de paquets
@@ -269,8 +277,16 @@ if (framework !== null && !FRAMEWORKS.includes(framework)) {
   );
 }
 
+/*
+ * La bannière, après la validation des arguments et avant toute question : une
+ * erreur d'usage ne s'affiche pas sous un logo, et le logo ne s'affiche pas
+ * deux fois. Elle se réduit d'elle-même là où elle gênerait, voir `capacites`.
+ */
+const cap = capacites();
+for (const ligne of banniere({ version: VERSION, url: SITE_URL }, cap)) console.log(ligne);
+
 if ((mode === null || template === null || style === null || framework === null) && isInteractive) {
-  intro("Maedow Arch");
+  intro("Nouveau projet");
 
   if (framework === null) {
     framework = await ask(
@@ -335,7 +351,7 @@ const cmd = COMMANDS[pm];
 
 // En non interactif, aucune question n'a été posée : la session clack n'est
 // pas ouverte, et la sortie flotterait hors du rail.
-if (!isInteractive) intro("Maedow Arch");
+if (!isInteractive) intro("Nouveau projet");
 
 log.info(`${projectName} : ${framework}, profil ${mode}, contenu ${template}, style ${style}`);
 
@@ -387,6 +403,13 @@ pruneGitkeeps(targetDir);
 const steps = [`cd ${projectName}`, cmd.install, cmd.run("dev")];
 
 log.success(`${countFiles(targetDir)} fichiers écrits dans ./${projectName}`);
+
+// Une coche par fait réellement produit : le récapitulatif suit le profil
+// généré et n'annonce rien qui n'ait eu lieu.
+for (const { titre, detail } of recapitulatif({ mode, framework, style })) {
+  const lignes = detail ? [titre, peindre(detail, "brume", cap.couleur)] : [titre];
+  log.message(lignes, { symbol: peindre("✓", "cyan", cap.couleur) });
+}
 log.step(["Démarrer :", ...steps.map((s) => `  ${s}`)].join("\n"));
 
 if (template === "demo") {
@@ -424,4 +447,4 @@ log.step(
   ].join("\n")
 );
 
-outro(DOCS_URL);
+outro(`${peindre("Prêt.", "magenta", cap.couleur)} La documentation : ${SITE_URL}`);

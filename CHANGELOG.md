@@ -6,6 +6,12 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le v
 
 Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md](./FRICTIONS.md).
 
+## [Non publié]
+
+### Ajouté
+
+- **La CLI s'ouvre sur le logo et se clôt sur ce qu'elle a produit.** Le nom en blocs, la version et l'adresse de la documentation précèdent les questions ; après l'écriture des fichiers, une coche par fait : le profil, les couches créées, les règles que le lint chargera. **Le récapitulatif ne promet que ce qui a eu lieu** : un projet Light lit « 4 règles sur 9 » et ne voit pas de couche `core/`, parce qu'il n'en a pas. Un test croise l'annonce avec le `eslint.config.mjs` livré par chaque profil, pour que l'écran de fin ne puisse pas redevenir le défaut de [F-023](./FRICTIONS.md) sous une autre forme. Le logo s'efface en intégration continue, hors d'un terminal interactif, dans une fenêtre étroite et dans une console qui affiche mal l'Unicode ; `NO_COLOR` retire les couleurs et garde le reste. Aucune dépendance ajoutée. `create-maedow-arch-app` passe en 0.13.0.
+
 ## [0.10.1] : 2026-09-09
 
 ### Modifié
@@ -21,6 +27,7 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 
 - **La configuration générée en mode Full ne chargeait pas l'entrée stricte.** Le `eslint.config.mjs` livré n'importait que l'entrée par défaut : MA-005, MA-006 et MA-007 étaient absentes d'un projet généré, sans qu'aucune erreur ne le signale, le fichier étant valide et le plugin installé. C'est la troisième cause du même symptôme en une semaine, après la version épinglée et la plage qui ne franchit pas la mineure : les deux correctifs précédents étaient bons et le résultat restait identique. Le mode Full livre désormais sa propre configuration, qui charge les deux entrées dans l'ordre prescrit, et le profil Light dit pourquoi il n'a pas la stricte plutôt que de la passer sous silence. Remonté par le projet ABBA, qui a sondé le fichier généré là où nous avions sondé une configuration écrite pour l'occasion. Voir [F-023](./FRICTIONS.md). `create-maedow-arch-app` passe en 0.11.2.
 - **Un projet généré perdait trois règles en silence.** Le fragment épinglait `eslint-config-maedow-arch` en `^0.3.0`, or la configuration est passée en 0.4.0 en remplaçant `eslint-plugin-import` par `import-x`. En 0.x, l'accent circonflexe ne franchit pas la mineure : npm installait donc la 0.3.1, qui importe l'ancien plugin, pendant que le fragment installait le nouveau. L'entrée stricte échouait à se charger, MA-005, MA-006 et MA-007 disparaissaient, et rien ne le signalait puisque la configuration générée ne charge que l'entrée par défaut. Trouvé en jouant le trajet d'un lecteur depuis le registre, seul chemin que la matrice d'intégration ne peut pas emprunter : elle substitue un tarball local, ce qui écrase la contrainte de version et la rend invisible. Un test compare désormais les deux sources de vérité du dépôt. Voir [F-022](./FRICTIONS.md). `create-maedow-arch-app` passe en 0.11.1.
+
 ## [0.10.0] : 2026-09-09
 
 ### Ajouté
@@ -56,6 +63,7 @@ Les frictions à l'origine des corrections sont détaillées dans [FRICTIONS.md]
 - **Le scaffold épinglait une version d'`eslint-config-maedow-arch` sans entrée stricte.** Le fragment portait `^0.1.0`, or l'entrée `strict` n'existe qu'à partir de `0.3.0` : un projet généré obtenait un socle sans MA-005, MA-006 ni MA-007, et le lint restait vert. Le fragment passe en `^0.3.0`, et `vitest` quitte `^2.1.0`, plage dont aucune version ne sort d'une vulnérabilité critique, pour `^3.2.7`. La dernière majeure a été essayée d'abord et rompait l'installation sous npm dans la matrice d'intégration, sur les seize combinaisons concernées : `^3.2.7` sort de la plage vulnérable, qui s'arrête à `3.2.5`, sans changer de génération.
 - **La bascule de Light vers Full livrait le Result Pattern sans son test.** Un projet généré directement en Full avait les deux fichiers, un projet arrivé en Full par `generate:domain` n'avait que le premier, et rien ne signalait la différence. Le test est désormais injecté par le même chemin que le helper, jamais recopié à la main.
 - **Deux tests ferment la classe de ces écarts plutôt que leurs cas.** Le premier vérifie que tout point d'entrée de framework importe la feuille de style, le second que les deux chemins vers Full livrent les mêmes fichiers. Les défauts précédents divergeaient sur une case d'une matrice dont les autres étaient correctes : les vérifier isolément ne pouvait pas les voir, les comparer entre eux, si. `create-maedow-arch-app` passe en 0.9.0.
+
 ## [0.9.1] : 2026-09-01
 
 ### Corrigé
