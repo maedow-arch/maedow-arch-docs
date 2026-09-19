@@ -19,6 +19,8 @@ bunx create-maedow-arch-app mon-projet
 yarn dlx create-maedow-arch-app mon-projet
 ```
 
+La commande s'ouvre sur le logo et se clôt sur un récapitulatif de ce qu'elle a réellement produit. Le logo s'efface de lui-même là où il gênerait : en intégration continue, quand la sortie est redirigée vers un fichier, dans une fenêtre trop étroite ou une console qui affiche mal l'Unicode. `NO_COLOR` retire les couleurs et garde le reste.
+
 ## Choisir son profil
 
 Le corpus définit deux profils d'architecture, et la CLI produit l'un ou l'autre.
